@@ -406,3 +406,20 @@ img { max-width: 100%; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
 }
+
+/* Fontes oficiais */
+.badge-oficial { background: var(--accent-soft); color: var(--accent-ink); }
+.badge-revogado { background: var(--danger-soft); color: var(--danger); }
+.badge-vetado { background: var(--surface-2); color: var(--fg-2); }
+.src-card > * { grid-column: 2; min-width: 0; }
+.src-excerpt { border-top: 1px dashed var(--border); padding-top: 6px; margin-top: 2px; }
+.src-excerpt summary { cursor: pointer; font-size: var(--fs-xs); font-weight: 600; color: var(--accent-ink); }
+.src-excerpt p { margin-top: 6px; font-size: var(--fs-sm); color: var(--fg-2); line-height: 1.55; white-space: normal; }
+.demo-notice.is-oficial { background: var(--accent-soft); }
+.demo-notice.is-oficial svg { color: var(--accent); }
+.demo-registry { border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); padding: 12px 16px; }
+.demo-registry summary { cursor: pointer; font-weight: 600; font-size: var(--fs-base); }
+.demo-registry .registry { margin-top: 12px; }
+.seg button:disabled { opacity: .45; cursor: not-allowed; }
+.muted { color: var(--muted); }
+.reg-card .muted { font-size: var(--fs-sm); }
