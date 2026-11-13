@@ -16,7 +16,10 @@ window.ROSS_I18N = {
       ],
       examplesLabel: 'Exemplos para começar',
       footnote: 'O ROSS AI é uma ferramenta de informação e compreensão jurídica. Não substitui a análise de um profissional.',
-      demoNotice: 'Versão de demonstração: as respostas usam fontes fictícias e ainda não estão conectadas a bases jurídicas reais.'
+      demoNotice: 'Versão de demonstração: as respostas usam fontes fictícias e ainda não estão conectadas a bases jurídicas reais.',
+      oficialNotice: 'Fontes oficiais: {n} normas federais com texto do Planalto, capturado em {date}. A explicação em linguagem simples é gerada por IA; confira sempre os artigos citados.',
+      oficialNoAI: 'Neste ambiente a explicação por IA não está disponível: as respostas mostram os trechos oficiais encontrados.',
+      aiNotice: 'Modo IA sem fontes verificadas: as respostas são gerais e marcadas como não confirmadas.'
     },
     composer: {
       attach: 'Anexar documento',
@@ -70,7 +73,9 @@ window.ROSS_I18N = {
       apply: 'Aplicar',
       typing: 'Preparando resposta',
       aiBanner: 'Modo IA experimental: resposta gerada sem consulta a fontes oficiais. Nomes de normas e artigos não foram verificados.',
-      demoBanner: 'Demonstração com fontes fictícias. Nenhuma norma citada aqui é real.'
+      demoBanner: 'Demonstração com fontes fictícias. Nenhuma norma citada aqui é real.',
+      modeOficial: 'Fontes oficiais',
+      oficialBanner: 'Baseado em trechos do texto oficial (Planalto), capturados em {date}. A explicação é gerada por IA e deve ser conferida nos artigos citados.'
     },
     sections: {
       summary: 'Em resumo',
@@ -97,7 +102,9 @@ window.ROSS_I18N = {
       projeto: 'Projeto de lei',
       nao_confirmada: 'Não confirmada',
       pagina: 'Página oficial',
-      unverified: 'Não verificada'
+      unverified: 'Não verificada',
+      revogado: 'Revogado',
+      vetado: 'Vetado'
     },
     source: {
       article: 'Artigo ou seção',
@@ -108,11 +115,17 @@ window.ROSS_I18N = {
       jurisdiction: 'Jurisdição',
       published: 'Publicação',
       index: 'Índice usado na busca',
-      noLink: 'Sem link verificado'
+      noLink: 'Sem link verificado',
+      official: 'Texto oficial · Planalto',
+      captured: 'Capturado em',
+      open: 'Abrir no Planalto',
+      excerpt: 'Ver trecho consultado',
+      note: 'Nota'
     },
     loading: {
       demo: ['Buscando fontes no índice', 'Confirmando texto na fonte oficial', 'Escrevendo em linguagem simples'],
-      ai: ['Preparando sua pergunta', 'Consultando o modelo', 'Organizando a resposta']
+      ai: ['Preparando sua pergunta', 'Consultando o modelo', 'Organizando a resposta'],
+      oficial: ['Selecionando normas no catálogo', 'Buscando artigos no texto oficial', 'Escrevendo em linguagem simples']
     },
     errors: {
       title: 'Não foi possível concluir a resposta',
@@ -123,13 +136,15 @@ window.ROSS_I18N = {
       invalid_json: 'O modelo respondeu em um formato inesperado. Tente novamente.',
       images_unavailable: 'Este ambiente não permite enviar imagens ao modelo. Cole o texto do trecho na mensagem.',
       image_rejected: 'Uma das imagens não foi aceita pelo modelo. Tente outro formato ou tamanho.',
-      unavailable: 'O Modo IA não está disponível neste ambiente. A resposta foi gerada no modo de demonstração.'
+      unavailable: 'O Modo IA não está disponível neste ambiente. A resposta foi gerada no modo de demonstração.',
+      law_fetch: 'Não foi possível carregar o texto da norma. Verifique a conexão e tente novamente.',
+      catalog_unavailable: 'A base de leis não está carregada neste ambiente.'
     },
     attachModal: {
       title: 'Antes de anexar',
       body: 'Documentos costumam conter dados pessoais, como nome, CPF, endereço e valores. Anexe apenas o que for necessário para a sua pergunta.',
       demoLine: 'Nesta versão de demonstração, o arquivo não é enviado a nenhum servidor nem lido pelo sistema. Apenas o nome, o tamanho e o tipo ficam no histórico local deste navegador.',
-      aiLine: 'Com o Modo IA ativado, imagens anexadas são enviadas ao modelo de IA pela sua conta, apenas para gerar a resposta. Arquivos PDF não são lidos nesta versão.',
+      aiLine: 'Quando a explicação por IA está ativa (dentro do claude.ai), imagens anexadas são enviadas ao modelo pela sua conta, apenas para gerar a resposta. Arquivos PDF não são lidos nesta versão.',
       cancel: 'Cancelar',
       confirm: 'Anexar',
       tooLarge: 'acima de 20 MB. Escolha um arquivo menor.',
@@ -157,7 +172,16 @@ window.ROSS_I18N = {
       deleted: 'Todas as conversas foram apagadas.',
       about: 'Sobre',
       aboutText: 'ROSS AI, versão de demonstração 0.1. Fontes fictícias, sem conexão com bases jurídicas reais.',
-      count: '{n} conversa(s) armazenada(s).'
+      count: '{n} conversa(s) armazenada(s).',
+      mode: 'Modo de resposta',
+      modeHelp: 'Fontes oficiais usa o texto das normas capturado do Planalto e explica com IA. Demonstração usa fontes fictícias. IA sem fontes gera respostas gerais, marcadas como não verificadas.',
+      modeOficial: 'Fontes oficiais',
+      modeDemo: 'Demonstração',
+      modeAI: 'IA sem fontes',
+      oficialNote: 'Base com {n} normas federais, capturadas em {date}.',
+      oficialNoAI: 'Neste ambiente a explicação por IA não está disponível; as respostas mostram os trechos oficiais encontrados.',
+      oficialUnavailable: 'A base de leis não foi carregada neste ambiente. Enquanto isso, as respostas usam o modo de demonstração.',
+      demoNote: 'Respostas roteirizadas com fontes fictícias, para demonstrar a experiência.'
     },
     sourcesPage: {
       title: 'Base de fontes',
@@ -186,7 +210,28 @@ window.ROSS_I18N = {
         type: 'Tipo', jurisdiction: 'Jurisdição', published: 'Publicação', status: 'Situação',
         index: 'Índice', link: 'Link oficial', verified: 'Última verificação', version: 'Versão em uso'
       },
-      types: { lei: 'Lei', portaria: 'Portaria', pagina: 'Página oficial', projeto: 'Projeto de lei' }
+      types: { lei: 'Lei', portaria: 'Portaria', pagina: 'Página oficial', projeto: 'Projeto de lei', constituicao: 'Constituição', decreto: 'Decreto', 'decreto-lei': 'Decreto-Lei' },
+      official: 'Fontes oficiais',
+      officialIntro: 'Fonte do texto: {source}. Índice: {index}. {n} normas federais, capturadas em {date}. Cada norma guarda o hash do texto bruto, a data da captura e o histórico de versões.',
+      officialUnavailable: 'A base de leis não foi carregada neste ambiente.',
+      demoSection: 'Fontes de demonstração (fictícias)',
+      articles: 'Artigos',
+      inForce: 'vigentes',
+      repealed: 'revogados ou vetados',
+      hash: 'Hash do texto bruto',
+      lexml: 'URN LexML',
+      checkCmd: 'Para verificar atualizações: node scripts/ingest-laws.mjs --check',
+      approveCmd: 'Depois de conferir, aplique com: node scripts/ingest-laws.mjs --approve'
+    },
+    oficial: {
+      jurisdiction: 'A base de fontes oficiais cobre, por enquanto, apenas a legislação federal do Brasil. Ainda não tenho fontes para {country}, por isso não vou arriscar uma resposta.',
+      jurisdictionStep: 'Mude a jurisdição para Brasil ou aguarde a inclusão de outras jurisdições na base.',
+      docDefaultQuery: 'contrato cláusula multa rescisão cancelamento prazo',
+      empty: 'Não encontrei, nas normas da base, trechos que tratem diretamente disso. Prefiro dizer isso a arriscar uma resposta.',
+      emptyQuestions: ['Sobre qual tema é a dúvida: consumo, trabalho, moradia, família, dados pessoais ou outro?', 'Há alguma lei, contrato ou documento específico envolvido?'],
+      emptyStep: 'Reformule com mais detalhes ou cite a norma, se souber qual é.',
+      noAI: 'Encontrei estes trechos nas fontes oficiais. A explicação em linguagem simples usa IA e só funciona com o ROSS AI aberto dentro do claude.ai; aqui mostro o texto oficial para você conferir.',
+      noAIWarn: 'Trechos selecionados por busca de palavras no texto oficial. Leia o artigo completo no link antes de concluir.'
     },
     pages: {
       privacy: {
@@ -204,7 +249,7 @@ window.ROSS_I18N = {
 </ul>
 <p>Esses dados ficam no armazenamento local do navegador (localStorage). Eles não saem do seu dispositivo e não são lidos por outras pessoas que abrirem este aplicativo.</p>
 <h2>Documentos anexados</h2>
-<p>Antes de anexar, avisamos que documentos podem conter dados pessoais e você pode cancelar. No modo de demonstração, o arquivo não é lido nem enviado a lugar nenhum. Com o Modo IA ativado, imagens anexadas são enviadas ao modelo de IA pela sua própria conta, apenas para gerar a resposta, e não são publicadas nem exibidas em páginas públicas.</p>
+<p>Antes de anexar, avisamos que documentos podem conter dados pessoais e você pode cancelar. No modo de demonstração, o arquivo não é lido nem enviado a lugar nenhum. Quando a explicação por IA está ativa (modos Fontes oficiais e IA, dentro do claude.ai), a pergunta, os trechos de lei selecionados e as imagens anexadas são enviados ao modelo pela sua própria conta, apenas para gerar a resposta, e não são publicados nem exibidos em páginas públicas.</p>
 <h2>Como apagar</h2>
 <ul>
 <li>Cada conversa pode ser apagada no menu, na lista de conversas anteriores.</li>
@@ -278,6 +323,7 @@ window.ROSS_I18N = {
 <li><strong>Texto histórico</strong>: redação anterior, que pode valer para fatos antigos.</li>
 <li><strong>Projeto de lei</strong>: proposta sem efeito até ser aprovada.</li>
 <li><strong>Não confirmada</strong>: informação sem fonte oficial conferida.</li>
+<li><strong>Fontes oficiais</strong>: trechos do texto oficial do Planalto, com link para conferir.</li>
 <li><strong>Demonstração</strong>: resposta com fontes fictícias.</li>
 <li><strong>Modo IA</strong>: resposta gerada por IA sem fontes verificadas.</li>
 </ul>
@@ -317,7 +363,10 @@ window.ROSS_I18N = {
       ],
       examplesLabel: 'Examples to start with',
       footnote: 'ROSS AI is a tool for legal information and understanding. It does not replace a professional review.',
-      demoNotice: 'Demonstration version: answers use fictional sources and are not yet connected to real legal databases.'
+      demoNotice: 'Demonstration version: answers use fictional sources and are not yet connected to real legal databases.',
+      oficialNotice: 'Official sources: {n} Brazilian federal laws with text from Planalto, captured on {date}. The plain-language explanation is generated by AI; always check the cited articles.',
+      oficialNoAI: 'In this environment the AI explanation is unavailable: answers show the official excerpts found.',
+      aiNotice: 'AI mode without verified sources: answers are general and marked as unconfirmed.'
     },
     composer: {
       attach: 'Attach document',
@@ -371,7 +420,9 @@ window.ROSS_I18N = {
       apply: 'Apply',
       typing: 'Preparing answer',
       aiBanner: 'Experimental AI mode: answer generated without consulting official sources. Law names and articles were not verified.',
-      demoBanner: 'Demonstration with fictional sources. No law cited here is real.'
+      demoBanner: 'Demonstration with fictional sources. No law cited here is real.',
+      modeOficial: 'Official sources',
+      oficialBanner: 'Based on excerpts of the official text (Planalto), captured on {date}. The explanation is generated by AI and should be checked against the cited articles.'
     },
     sections: {
       summary: 'In short',
@@ -398,7 +449,9 @@ window.ROSS_I18N = {
       projeto: 'Bill',
       nao_confirmada: 'Unconfirmed',
       pagina: 'Official page',
-      unverified: 'Unverified'
+      unverified: 'Unverified',
+      revogado: 'Repealed',
+      vetado: 'Vetoed'
     },
     source: {
       article: 'Article or section',
@@ -409,11 +462,17 @@ window.ROSS_I18N = {
       jurisdiction: 'Jurisdiction',
       published: 'Published',
       index: 'Index used in search',
-      noLink: 'No verified link'
+      noLink: 'No verified link',
+      official: 'Official text · Planalto',
+      captured: 'Captured on',
+      open: 'Open at Planalto',
+      excerpt: 'See the excerpt consulted',
+      note: 'Note'
     },
     loading: {
       demo: ['Searching the source index', 'Confirming text at the official source', 'Writing in plain words'],
-      ai: ['Preparing your question', 'Consulting the model', 'Organizing the answer']
+      ai: ['Preparing your question', 'Consulting the model', 'Organizing the answer'],
+      oficial: ['Selecting laws in the catalog', 'Searching articles in the official text', 'Writing in plain words']
     },
     errors: {
       title: 'The answer could not be completed',
@@ -424,13 +483,15 @@ window.ROSS_I18N = {
       invalid_json: 'The model replied in an unexpected format. Try again.',
       images_unavailable: 'This environment cannot send images to the model. Paste the text of the excerpt instead.',
       image_rejected: 'One of the images was not accepted by the model. Try another format or size.',
-      unavailable: 'AI mode is not available in this environment. The answer was generated in demonstration mode.'
+      unavailable: 'AI mode is not available in this environment. The answer was generated in demonstration mode.',
+      law_fetch: 'The law text could not be loaded. Check the connection and try again.',
+      catalog_unavailable: 'The law base is not loaded in this environment.'
     },
     attachModal: {
       title: 'Before attaching',
       body: 'Documents often contain personal data such as names, ID numbers, addresses and amounts. Attach only what your question needs.',
       demoLine: 'In this demonstration version the file is not sent to any server and is not read by the system. Only its name, size and type stay in this browser’s local history.',
-      aiLine: 'With AI mode on, attached images are sent to the AI model through your account, only to generate the answer. PDF files are not read in this version.',
+      aiLine: 'When the AI explanation is active (inside claude.ai), attached images are sent to the model through your account, only to generate the answer. PDF files are not read in this version.',
       cancel: 'Cancel',
       confirm: 'Attach',
       tooLarge: 'over 20 MB. Choose a smaller file.',
@@ -458,7 +519,16 @@ window.ROSS_I18N = {
       deleted: 'All conversations were deleted.',
       about: 'About',
       aboutText: 'ROSS AI, demonstration version 0.1. Fictional sources, no connection to real legal databases.',
-      count: '{n} conversation(s) stored.'
+      count: '{n} conversation(s) stored.',
+      mode: 'Answer mode',
+      modeHelp: 'Official sources uses the law text captured from Planalto and explains it with AI. Demonstration uses fictional sources. AI without sources gives general answers, marked as unverified.',
+      modeOficial: 'Official sources',
+      modeDemo: 'Demonstration',
+      modeAI: 'AI without sources',
+      oficialNote: 'Base with {n} federal laws, captured on {date}.',
+      oficialNoAI: 'In this environment the AI explanation is unavailable; answers show the official excerpts found.',
+      oficialUnavailable: 'The law base was not loaded in this environment. Meanwhile, answers use the demonstration mode.',
+      demoNote: 'Scripted answers with fictional sources, to show the experience.'
     },
     sourcesPage: {
       title: 'Source registry',
@@ -487,7 +557,28 @@ window.ROSS_I18N = {
         type: 'Type', jurisdiction: 'Jurisdiction', published: 'Published', status: 'Status',
         index: 'Index', link: 'Official link', verified: 'Last verified', version: 'Version in use'
       },
-      types: { lei: 'Law', portaria: 'Regulation', pagina: 'Official page', projeto: 'Bill' }
+      types: { lei: 'Law', portaria: 'Regulation', pagina: 'Official page', projeto: 'Bill', constituicao: 'Constitution', decreto: 'Decree', 'decreto-lei': 'Decree-Law' },
+      official: 'Official sources',
+      officialIntro: 'Text source: {source}. Index: {index}. {n} federal laws, captured on {date}. Each law keeps the raw text hash, the capture date and the version history.',
+      officialUnavailable: 'The law base was not loaded in this environment.',
+      demoSection: 'Demonstration sources (fictional)',
+      articles: 'Articles',
+      inForce: 'in force',
+      repealed: 'repealed or vetoed',
+      hash: 'Raw text hash',
+      lexml: 'LexML URN',
+      checkCmd: 'To check for updates: node scripts/ingest-laws.mjs --check',
+      approveCmd: 'After review, apply with: node scripts/ingest-laws.mjs --approve'
+    },
+    oficial: {
+      jurisdiction: 'The official source base covers, for now, only Brazilian federal legislation. I do not have sources for {country} yet, so I will not risk an answer.',
+      jurisdictionStep: 'Switch the jurisdiction to Brazil or wait for other jurisdictions to be added to the base.',
+      docDefaultQuery: 'contrato cláusula multa rescisão cancelamento prazo',
+      empty: 'I did not find, in the laws of this base, excerpts that deal directly with this. I would rather say so than risk an answer.',
+      emptyQuestions: ['What is the question about: consumer, work, housing, family, personal data or other?', 'Is there a specific law, contract or document involved?'],
+      emptyStep: 'Rephrase with more detail or name the law, if you know which one.',
+      noAI: 'I found these excerpts in the official sources. The plain-language explanation uses AI and only works with ROSS AI opened inside claude.ai; here I show the official text for you to check.',
+      noAIWarn: 'Excerpts selected by word search in the official text. Read the full article at the link before concluding.'
     },
     pages: {
       privacy: {
@@ -505,7 +596,7 @@ window.ROSS_I18N = {
 </ul>
 <p>This data lives in the browser’s local storage (localStorage). It does not leave your device and is not read by other people who open this app.</p>
 <h2>Attached documents</h2>
-<p>Before attaching, we warn that documents may contain personal data and you can cancel. In demonstration mode the file is neither read nor sent anywhere. With AI mode on, attached images are sent to the AI model through your own account, only to generate the answer, and are never published or shown on public pages.</p>
+<p>Before attaching, we warn that documents may contain personal data and you can cancel. In demonstration mode the file is neither read nor sent anywhere. When the AI explanation is active (Official sources and AI modes, inside claude.ai), the question, the selected law excerpts and attached images are sent to the model through your own account, only to generate the answer, and are never published or shown on public pages.</p>
 <h2>How to delete</h2>
 <ul>
 <li>Each conversation can be deleted from the menu, in the list of previous conversations.</li>
@@ -579,6 +670,7 @@ window.ROSS_I18N = {
 <li><strong>Historical text</strong>: earlier wording, which may apply to older facts.</li>
 <li><strong>Bill</strong>: a proposal with no effect until approved.</li>
 <li><strong>Unconfirmed</strong>: information without a checked official source.</li>
+<li><strong>Official sources</strong>: excerpts of the official Planalto text, with a link to check.</li>
 <li><strong>Demonstration</strong>: answer with fictional sources.</li>
 <li><strong>AI mode</strong>: answer generated by AI without verified sources.</li>
 </ul>
