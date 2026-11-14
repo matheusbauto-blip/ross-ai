@@ -141,6 +141,10 @@ window.ROSS_I18N = {
       image_rejected: 'Uma das imagens não foi aceita pelo modelo. Tente outro formato ou tamanho.',
       unavailable: 'O Modo IA não está disponível neste ambiente. A resposta foi gerada no modo de demonstração.',
       law_fetch: 'Não foi possível carregar o texto da norma. Verifique a conexão e tente novamente.',
+      api_not_configured: 'O servidor de IA ainda não tem a chave da API configurada. A resposta não foi gerada.',
+      api_error: 'O servidor de IA não respondeu. Tente novamente em instantes.',
+      refusal: 'O modelo não pôde responder a este pedido. Reformule a pergunta ou procure um profissional.',
+      truncated: 'A resposta ficou longa demais e foi interrompida. Tente uma pergunta mais específica.',
       catalog_unavailable: 'A base de leis não está carregada neste ambiente.'
     },
     attachModal: {
@@ -148,6 +152,7 @@ window.ROSS_I18N = {
       body: 'Documentos costumam conter dados pessoais, como nome, CPF, endereço e valores. Anexe apenas o que for necessário para a sua pergunta.',
       demoLine: 'Nesta versão de demonstração, o arquivo não é enviado a nenhum servidor nem lido pelo sistema. Apenas o nome, o tamanho e o tipo ficam no histórico local deste navegador.',
       aiLine: 'Quando a explicação por IA está ativa (dentro do claude.ai), imagens anexadas são enviadas ao modelo pela sua conta, apenas para gerar a resposta. Arquivos PDF não são lidos nesta versão.',
+      apiLine: 'Imagens e PDFs anexados são enviados ao servidor do ROSS AI e ao modelo de IA apenas para gerar a resposta. Não são armazenados.',
       cancel: 'Cancelar',
       confirm: 'Anexar',
       tooLarge: 'acima de 20 MB. Escolha um arquivo menor.',
@@ -165,7 +170,7 @@ window.ROSS_I18N = {
       jurisdictionHelp: 'Usada em novas conversas. Você pode mudar a qualquer momento.',
       ai: 'Modo IA (experimental)',
       aiHelp: 'Gera respostas gerais com um modelo de IA, pela sua conta, sem consultar fontes oficiais. As respostas vêm marcadas como não verificadas. Desativado, o ROSS AI usa o modo de demonstração com fontes fictícias.',
-      aiUnavailable: 'Indisponível neste ambiente. O Modo IA funciona quando o aplicativo é aberto dentro do claude.ai.',
+      aiUnavailable: 'Indisponível neste ambiente: nem o claude.ai nem o servidor do ROSS AI estão acessíveis.',
       aiOn: 'Ativado',
       aiOff: 'Desativado',
       data: 'Seus dados',
@@ -183,6 +188,8 @@ window.ROSS_I18N = {
       modeAI: 'IA sem fontes',
       oficialNote: 'Base com {n} normas federais, capturadas em {date}.',
       oficialNoAI: 'Neste ambiente a explicação por IA não está disponível; as respostas mostram os trechos oficiais encontrados.',
+      viaClaude: 'Explicação por IA pela sua conta do claude.ai.',
+      viaApi: 'Explicação por IA pelo servidor do ROSS AI (API própria).',
       oficialUnavailable: 'A base de leis não foi carregada neste ambiente. Enquanto isso, as respostas usam o modo de demonstração.',
       demoNote: 'Respostas roteirizadas com fontes fictícias, para demonstrar a experiência.'
     },
@@ -494,6 +501,10 @@ window.ROSS_I18N = {
       image_rejected: 'One of the images was not accepted by the model. Try another format or size.',
       unavailable: 'AI mode is not available in this environment. The answer was generated in demonstration mode.',
       law_fetch: 'The law text could not be loaded. Check the connection and try again.',
+      api_not_configured: 'The AI server does not have its API key configured yet. No answer was generated.',
+      api_error: 'The AI server did not respond. Try again in a moment.',
+      refusal: 'The model could not answer this request. Rephrase the question or seek a professional.',
+      truncated: 'The answer became too long and was cut off. Try a more specific question.',
       catalog_unavailable: 'The law base is not loaded in this environment.'
     },
     attachModal: {
@@ -501,6 +512,7 @@ window.ROSS_I18N = {
       body: 'Documents often contain personal data such as names, ID numbers, addresses and amounts. Attach only what your question needs.',
       demoLine: 'In this demonstration version the file is not sent to any server and is not read by the system. Only its name, size and type stay in this browser’s local history.',
       aiLine: 'When the AI explanation is active (inside claude.ai), attached images are sent to the model through your account, only to generate the answer. PDF files are not read in this version.',
+      apiLine: 'Attached images and PDFs are sent to the ROSS AI server and to the AI model only to generate the answer. They are not stored.',
       cancel: 'Cancel',
       confirm: 'Attach',
       tooLarge: 'over 20 MB. Choose a smaller file.',
@@ -518,7 +530,7 @@ window.ROSS_I18N = {
       jurisdictionHelp: 'Used in new conversations. You can change it at any time.',
       ai: 'AI mode (experimental)',
       aiHelp: 'Generates general answers with an AI model, through your account, without consulting official sources. Answers are marked as unverified. When off, ROSS AI uses the demonstration mode with fictional sources.',
-      aiUnavailable: 'Unavailable in this environment. AI mode works when the app is opened inside claude.ai.',
+      aiUnavailable: 'Unavailable in this environment: neither claude.ai nor the ROSS AI server is reachable.',
       aiOn: 'On',
       aiOff: 'Off',
       data: 'Your data',
@@ -536,6 +548,8 @@ window.ROSS_I18N = {
       modeAI: 'AI without sources',
       oficialNote: 'Base with {n} federal laws, captured on {date}.',
       oficialNoAI: 'In this environment the AI explanation is unavailable; answers show the official excerpts found.',
+      viaClaude: 'AI explanation through your claude.ai account.',
+      viaApi: 'AI explanation through the ROSS AI server (own API).',
       oficialUnavailable: 'The law base was not loaded in this environment. Meanwhile, answers use the demonstration mode.',
       demoNote: 'Scripted answers with fictional sources, to show the experience.'
     },

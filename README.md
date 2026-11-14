@@ -6,18 +6,23 @@ Aplicativo web estático: interface de conversa, base de legislação federal br
 
 ## Como rodar
 
-`index.html` é o conteúdo da página sem o esqueleto HTML (ele é adicionado ao publicar como artifact no claude.ai).
-Para abrir localmente, use `preview.html`, que embrulha o mesmo conteúdo, servido por um servidor estático:
+Site publicado: https://matheusbauto-blip.github.io/ross-ai/ (GitHub Pages, a partir da branch `main`).
+
+Localmente, sirva a pasta com um servidor estático e abra `index.html`:
 
 ```bash
 python3 -m http.server 8765
 ```
 
-Depois acesse http://localhost:8765/preview.html. Se alterar `index.html`, regenere o wrapper:
+`index.html` é o documento completo (site); `artifact.html` é o mesmo conteúdo sem o esqueleto HTML, usado para publicar como artifact no claude.ai. Os dois carregam os mesmos arquivos.
 
-```bash
-{ printf '%s\n' '<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light}body{margin:0;font:14px system-ui}img{max-width:100%}[hidden]{display:none!important}</style></head><body>'; cat index.html; printf '%s\n' '</body></html>'; } > preview.html
-```
+## Backend (API própria)
+
+A explicação em linguagem simples usa o Claude. Dentro do claude.ai, pela capacidade `sample` (conta de quem abre o artifact). No site, pela função `supabase/functions/ross-ai/index.ts` (Supabase Edge Function), cujo endereço está em `config.js`. A função recebe a pergunta e os trechos de lei já selecionados pelo app, chama a API do Claude (`claude-opus-5-5` para a resposta, `claude-haiku-5-5` para preparar a busca) com saída estruturada e devolve o JSON que a interface renderiza. Ela também aceita imagens e PDFs anexados.
+
+Proteções: só aceita chamadas das origens listadas, limita pedidos por IP e por dia (tabela `ross_ai_usage`, migração em `supabase/migrations/`) e não guarda perguntas nem documentos.
+
+Para publicar ou atualizar a função é preciso o segredo `ANTHROPIC_API_KEY` no projeto Supabase (Edge Functions → Secrets). Variáveis opcionais: `ROSS_ALLOWED_ORIGINS`, `ROSS_ANSWER_MODEL`, `ROSS_HELPER_MODEL`, `ROSS_IP_DAILY_LIMIT`, `ROSS_GLOBAL_DAILY_LIMIT`, `ROSS_SALT`.
 
 ## Modos de resposta
 
@@ -49,13 +54,14 @@ A fila de conferência aparece na página **Base de fontes** do app. A busca é 
 
 ## Arquivos
 
-- `index.html` — casca da página (barra, drawer, área principal, modais, toasts).
+- `index.html` — documento completo do site; `artifact.html` — mesmo conteúdo para o artifact; `config.js` — endereço da API.
 - `styles.css` — tokens de cor (claro e escuro), tipografia e componentes.
 - `i18n.js` — textos da interface em pt-BR e en, páginas de Privacidade, Termos e Ajuda, países e regiões.
 - `demo-data.js` — base de demonstração: registro de fontes FICTÍCIAS (com versões e fila de conferência) e respostas roteirizadas.
 - `app.js` — estado, armazenamento local, telas, renderização das respostas e provedores (`demo`, `oficial`, `ai`).
 - `scripts/ingest-laws.mjs` e `scripts/laws.config.json` — ingestão e verificação da legislação.
 - `data/` — catálogo, normas por artigo e fila de conferência.
+- `supabase/` — função de backend e migração da tabela de uso.
 
 ## Provedores de resposta
 

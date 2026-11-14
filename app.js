@@ -314,7 +314,7 @@
       '<h2 id="modal-title">' + esc(t('attachModal.title')) + '</h2>' +
       '<p>' + esc(t('attachModal.body')) + '</p>' +
       (ok.length ? '<div class="files">' + chips + '</div>' : '') +
-      '<p>' + esc(effectiveMode() !== 'demo' && state.aiAvailable ? t('attachModal.aiLine') : t('attachModal.demoLine')) + '</p>' +
+      '<p>' + esc(effectiveMode() !== 'demo' && state.aiAvailable ? (aiBackend() === 'api' ? t('attachModal.apiLine') : t('attachModal.aiLine')) : t('attachModal.demoLine')) + '</p>' +
       (skipped.length ? '<div class="callout callout-warn">' + ICONS.warn + '<div><b>' + esc(t('attachModal.skipped')) + '</b><ul>' + skipped.map((s) => '<li>' + esc(s) + '</li>').join('') + '</ul></div></div>' : '') +
       '<div class="row"><button type="button" class="btn btn-secondary" id="modal-cancel">' + esc(t('attachModal.cancel')) + '</button>' + (ok.length ? '<button type="button" class="btn" id="modal-ok">' + esc(t('attachModal.confirm')) + '</button>' : '') + '</div>' +
       '</div></div>';
@@ -607,17 +607,44 @@
     }
   };
 
-  /* Modo IA: usa a capacidade `sample` do visualizador. Sem acesso a fontes oficiais; tudo marcado como não verificado. */
+  /* Explicação por IA: dentro do claude.ai usa a capacidade `sample` (conta de quem abre o artifact);
+     fora dele, usa a API própria (função de backend configurada em config.js). */
   let sampleFn = null;
+  const API_URL = (window.ROSS_CONFIG && window.ROSS_CONFIG.apiUrl) || '';
+  const API_MEDIA = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'application/pdf'];
+  function aiBackend() { return sampleFn ? 'sample' : (API_URL ? 'api' : null); }
   async function probeAI() {
     try {
-      if (!window.claude || typeof window.claude.use !== 'function') return;
-      const s = await window.claude.use('sample');
-      if (!s) return;
-      sampleFn = s; state.aiAvailable = true;
-      try { state.aiLimits = await s.limits(); } catch (e) { state.aiLimits = null; }
-      if (state.view === 'settings') render({ keep: true });
+      if (window.claude && typeof window.claude.use === 'function') {
+        const s = await window.claude.use('sample');
+        if (s) { sampleFn = s; try { state.aiLimits = await s.limits(); } catch (e) { state.aiLimits = null; } }
+      }
     } catch (e) { /* indisponível */ }
+    state.aiAvailable = !!aiBackend();
+    if (['settings', 'home'].includes(state.view)) render({ keep: true });
+  }
+  function fileToBase64(file) {
+    return new Promise((resolve, reject) => { const r = new FileReader(); r.onload = () => resolve(String(r.result).split(',')[1] || ''); r.onerror = () => reject(r.error); r.readAsDataURL(file); });
+  }
+  async function apiCall(op, payload, signal) {
+    let res;
+    try {
+      res = await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(Object.assign({ op: op }, payload)), signal: signal });
+    } catch (e) { if (signal && signal.aborted) throw { code: 'cancelled' }; throw { code: 'api_error', message: String(e && e.message || e) }; }
+    let data = null; try { data = await res.json(); } catch (e) { data = null; }
+    if (res.status === 429) throw { code: 'rate_limited' };
+    if (res.status === 503 && data && data.error === 'api_not_configured') throw { code: 'api_not_configured' };
+    if (!res.ok) throw { code: 'api_error', message: data && data.error ? data.error : 'HTTP ' + res.status };
+    if (data && data.error) throw { code: data.error === 'refusal' ? 'refusal' : data.error === 'invalid_json' ? 'invalid_json' : 'api_error', message: data.error };
+    return data;
+  }
+  async function apiAttachments(attachments) {
+    const out = [];
+    for (const f of (attachments || [])) {
+      if (!f.file || !API_MEDIA.includes(f.type) || f.size > 20 * 1024 * 1024) { out.push({ name: f.name, mediaType: f.type, data: '' }); continue; }
+      out.push({ name: f.name, mediaType: f.type, data: await fileToBase64(f.file) });
+    }
+    return out;
   }
   function aiInstructions(conv) {
     const langName = t('langName');
@@ -636,6 +663,17 @@
   providers.ai = {
     id: 'ai',
     async respond({ text, attachments, conv, onStep, signal }) {
+      if (!sampleFn && API_URL) {
+        onStep(0);
+        const history = conv.messages.filter((m) => m.role !== 'system' && m.status === 'done').slice(-6).map((m) => ({ role: m.role, text: m.role === 'user' ? (m.text || '') : (m.answer && m.answer.summary ? m.answer.summary : '') }));
+        const files = await apiAttachments(attachments);
+        onStep(1);
+        const res = await apiCall('answer', { lang: t('langName'), jurisdiction: jurisdictionLabel(conv.country, conv.region), question: text || '', history: history, excerpts: [], attachments: files }, signal);
+        onStep(2);
+        const d = res.answer || {};
+        if (Array.isArray(d.mentions) && d.mentions.length && !(Array.isArray(d.sources) && d.sources.length)) d.sources = d.mentions.map((m) => ({ name: m.name, article: m.article, status: 'unverified' }));
+        return normalizeAI(d, attachments);
+      }
       if (!sampleFn) throw { code: 'unavailable' };
       onStep(0);
       const history = conv.messages.filter((m) => m.role !== 'system' && m.status !== 'error' && m.status !== 'loading').slice(-8);
@@ -799,9 +837,15 @@
       if (conv.country !== 'BR') return { mode: 'oficial', kind: 'nosources', summary: t('oficial.jurisdiction', { country: countryName(conv.country) }), nextSteps: [t('oficial.jurisdictionStep')], capturedAt: cap };
       onStep(0);
       const question = (text || '').trim() || (attachments && attachments.length ? t('oficial.docDefaultQuery') : '');
-      const aiTerms = await expandQueryAI(question);
+      let aiTerms = '', apiLaws = null;
+      if (sampleFn) aiTerms = await expandQueryAI(question);
+      else if (API_URL) {
+        try { const p = await apiCall('prepare', { question: question, catalog: state.catalog.laws.map((l) => ({ id: l.id, name: l.name })) }, signal); aiTerms = (Array.isArray(p.terms) ? p.terms : []).join(' '); apiLaws = (Array.isArray(p.laws) ? p.laws : []).map((id) => state.catalog.laws.find((l) => l.id === id)).filter(Boolean); }
+        catch (e) { if (e && (e.code === 'cancelled' || e.code === 'rate_limited' || e.code === 'api_not_configured')) throw e; }
+      }
       const searchText = expandQuery(question) + ' ' + aiTerms;
       let laws = selectLaws(searchText);
+      if (!laws.length && apiLaws && apiLaws.length) laws = apiLaws;
       if (!laws.length) { const picked = await selectLawsAI(question); if (picked && picked.length) laws = picked; }
       if (signal.aborted) throw { code: 'cancelled' };
       if (!laws.length) return emptyOfficial();
@@ -811,9 +855,9 @@
       if (signal.aborted) throw { code: 'cancelled' };
       if (!hits.length) return emptyOfficial();
       const sources = hits.map((h, i) => lawSource(h, i + 1));
-      if (!sampleFn) return retrievalOnly(sources);
+      if (!sampleFn && !API_URL) return retrievalOnly(sources);
       onStep(2);
-      const data = await askOfficial(question, sources, conv, attachments, signal);
+      const data = sampleFn ? await askOfficial(question, sources, conv, attachments, signal) : await askOfficialAPI(question, sources, conv, attachments, signal);
       return normalizeOfficial(data, sources, attachments);
     }
   };
@@ -845,6 +889,16 @@
     const opts = { cache: false, signal: signal, modelTier: 'default' };
     if (images.length) opts.images = images;
     return sampleFn.json(prompt, opts);
+  }
+  async function askOfficialAPI(question, sources, conv, attachments, signal) {
+    const history = conv.messages.filter((m) => m.role !== 'system' && m.status === 'done').slice(-6).map((m) => ({ role: m.role, text: m.role === 'user' ? (m.text || '') : (m.answer && m.answer.summary ? m.answer.summary : '') }));
+    const files = await apiAttachments(attachments);
+    const res = await apiCall('answer', {
+      lang: t('langName'), jurisdiction: jurisdictionLabel(conv.country, conv.region), question: question, history: history,
+      excerpts: sources.map((s) => ({ n: s.n, name: s.name, article: s.article, heading: s.heading, nota: s.nota, excerpt: s.excerpt })),
+      attachments: files, capturedAt: fmtDate(state.catalog.generatedAt)
+    }, signal);
+    return res.answer || {};
   }
   function normalizeOfficial(d, sources, attachments) {
     const a = normalizeAI(d, attachments);
@@ -883,7 +937,7 @@
     const s = t('settings');
     if (state.mode === 'oficial' && !state.catalog) return s.oficialUnavailable;
     if (state.mode === 'ai' && !state.aiAvailable) return s.aiUnavailable;
-    if (state.mode === 'oficial') return fmt(s.oficialNote, { n: state.catalog.laws.length, date: fmtDate(state.catalog.generatedAt) }) + (state.aiAvailable ? '' : ' ' + s.oficialNoAI);
+    if (state.mode === 'oficial') return fmt(s.oficialNote, { n: state.catalog.laws.length, date: fmtDate(state.catalog.generatedAt) }) + (state.aiAvailable ? ' ' + (aiBackend() === 'api' ? s.viaApi : s.viaClaude) : ' ' + s.oficialNoAI);
     if (state.mode === 'ai') return s.aiHelp;
     return s.demoNote;
   }
