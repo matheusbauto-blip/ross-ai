@@ -2,6 +2,25 @@
    Para adicionar um idioma, copie um bloco e traduza. A chave do idioma segue BCP 47. */
 window.ROSS_I18N = {
   'pt-BR': {
+    corpus: {
+      title: 'Pesquisar legislação', homeHint: 'Encontre normas por assunto, número, estado ou município.',
+      readRepository: 'Ler texto do repositório', hideText: 'Ocultar texto',
+      intro: 'Pesquise nos textos importados do acervo ctresb/leis e abra a fonte de cada resultado.',
+      count: '{n} documentos importados', loadingCount: 'Consultando o acervo…',
+      coverage: 'Importação em andamento. O acervo ainda não contém toda a legislação brasileira. A data de captura não confirma a vigência atual.',
+      query: 'Assunto, nome ou número da norma', placeholder: 'Ex.: licitações, Código Civil ou 14.133',
+      search: 'Buscar leis', searching: 'Buscando…', scope: 'Esfera', all: 'Todas as esferas',
+      federal: 'Federal', estadual: 'Estadual / DF', municipal: 'Municipal', state: 'Estado', allStates: 'Todos os estados',
+      city: 'Município', cityPlaceholder: 'Ex.: Uberlândia',
+      filterHint: 'O estado e o município também incluem normas federais aplicáveis. Use termos específicos; a pesquisa procura palavras nos textos.',
+      openSource: 'Abrir fonte', openSnapshot: 'Ver edição importada', readExcerpt: 'Ler trecho encontrado',
+      currency: 'Vigência não verificada', imported: 'Texto importado', partial: 'Publicação parcial / pendente',
+      repealed: 'Revogação ou veto indicado no texto', previous: 'Anteriores', next: 'Próximos resultados',
+      empty: 'Nenhum trecho encontrado no acervo já importado. Tente menos palavras, o número da norma ou outros filtros.',
+      unavailable: 'A busca não está disponível agora. Tente novamente em instantes.', rateLimit: 'Você atingiu o limite de consultas por agora. Tente mais tarde.',
+      answerNotice: 'Esta resposta inclui trechos importados do ctresb/leis. Confira a edição, a data de captura e a fonte indicadas em cada referência. A vigência atual desses textos não foi verificada.',
+      noAI: 'Encontrei estes trechos. A explicação por IA ainda não está disponível; você pode consultar o texto e abrir a fonte de cada resultado.'
+    },
     langName: 'Português (Brasil)',
     tagline: 'Informação jurídica, em linguagem simples.',
     taglineAlt: 'Legal information, made clear.',
@@ -362,6 +381,25 @@ window.ROSS_I18N = {
   },
 
   'en': {
+    corpus: {
+      title: 'Search legislation', homeHint: 'Find legal texts by topic, number, state or municipality.',
+      readRepository: 'Read text from repository', hideText: 'Hide text',
+      intro: 'Search the texts imported from ctresb/leis and open the source for each result.',
+      count: '{n} imported documents', loadingCount: 'Checking the corpus…',
+      coverage: 'Import in progress. The corpus does not contain all Brazilian legislation. Capture dates do not establish current legal validity.',
+      query: 'Topic, name or number', placeholder: 'E.g. licitações, Código Civil or 14.133',
+      search: 'Search laws', searching: 'Searching…', scope: 'Jurisdiction', all: 'All jurisdictions',
+      federal: 'Federal', estadual: 'State / Federal District', municipal: 'Municipal', state: 'State', allStates: 'All states',
+      city: 'Municipality', cityPlaceholder: 'E.g. Uberlândia',
+      filterHint: 'State and city filters also include applicable federal texts. Use specific terms; search matches words in the texts.',
+      openSource: 'Open source', openSnapshot: 'View imported edition', readExcerpt: 'Read matching excerpt',
+      currency: 'Current legal validity not verified', imported: 'Imported text', partial: 'Partial / pending publication',
+      repealed: 'Repeal or veto indicated in the text', previous: 'Previous', next: 'Next results',
+      empty: 'No matching passage in the imported corpus. Try fewer words, a law number or other filters.',
+      unavailable: 'Search is unavailable right now. Please try again shortly.', rateLimit: 'The search limit has been reached. Please try again later.',
+      answerNotice: 'This answer includes excerpts imported from ctresb/leis. Check the edition, capture date and source of each reference. Their current legal validity has not been verified.',
+      noAI: 'I found these excerpts. The AI explanation is not yet available; you can read the text and open each source.'
+    },
     langName: 'English',
     tagline: 'Legal information, made clear.',
     taglineAlt: 'Informação jurídica, em linguagem simples.',

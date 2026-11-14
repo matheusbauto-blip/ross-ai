@@ -74,15 +74,62 @@ async function sha256(s: string) {
 const str = (v: unknown, max = 4000) => (typeof v === "string" ? v.slice(0, max) : "");
 const arr = (v: unknown) => (Array.isArray(v) ? v : []);
 
-async function checkQuota(req: Request) {
+async function checkQuota(req: Request, search = false) {
   const url = Deno.env.get("SUPABASE_URL"); const key = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
   if (!url || !key) return { allowed: true };
   const ip = (req.headers.get("x-forwarded-for") ?? "").split(",")[0].trim() || "unknown";
-  const ipHash = await sha256((Deno.env.get("ROSS_SALT") ?? "ross-ai") + "|" + ip);
+  const ipHash = await sha256((Deno.env.get("ROSS_SALT") ?? "ross-ai") + "|" + (search ? "search|" : "ai|") + ip);
   const sb = createClient(url, key, { auth: { persistSession: false } });
-  const { data, error } = await sb.rpc("ross_ai_bump", { p_ip_hash: ipHash, p_ip_limit: IP_LIMIT, p_global_limit: GLOBAL_LIMIT });
+  const { data, error } = await sb.rpc("ross_ai_bump", { p_ip_hash: ipHash, p_ip_limit: search ? IP_LIMIT * 5 : IP_LIMIT, p_global_limit: search ? GLOBAL_LIMIT * 5 : GLOBAL_LIMIT });
   if (error) { console.error("quota error", error.message); return { allowed: true }; }
   return { allowed: !!(data as { allowed?: boolean })?.allowed };
+}
+
+/* Corpus search does not call the model or require an Anthropic key. Imported
+   texts are not labelled as verified current law. Partial/repealed publications
+   can be found in search, but are excluded from passages sent to the model. */
+let statsCache: { at: number; data: unknown } | null = null;
+async function corpusOperation(op: string, body: Record<string, unknown>) {
+  const url = Deno.env.get("SUPABASE_URL");
+  const key = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+  if (!url || !key) throw new Error("corpus_not_configured");
+  const sb = createClient(url, key, { auth: { persistSession: false } });
+  if (op === "repository_read") {
+    const id = str(body.id, 64);
+    if (!/^[a-f0-9]{64}$/.test(id)) throw new Error("invalid_id");
+    const { data: doc, error } = await sb.from("ross_law_documents")
+      .select("title,repository_path,repository_ref,content_sha256,text_version,is_partial,source_url,captured_at")
+      .eq("id", id).single();
+    if (error || !doc || !/^[a-f0-9]{40}$/.test(doc.repository_ref) || doc.repository_path.includes("..")) throw new Error("document_unavailable");
+    // The caller supplies an indexed ID, never an arbitrary URL. No questions,
+    // conversation content or private documents are sent to GitHub.
+    const path = doc.repository_path.split("/").map(encodeURIComponent).join("/");
+    const response = await fetch("https://raw.githubusercontent.com/ctresb/leis/" + doc.repository_ref + "/" + path, { signal: AbortSignal.timeout(15_000), redirect: "error" });
+    if (!response.ok || Number(response.headers.get("content-length") || 0) > 3_000_000) throw new Error("document_unavailable");
+    const raw = await response.text();
+    if (new TextEncoder().encode(raw).length > 3_000_000 || await sha256(raw) !== doc.content_sha256) throw new Error("document_integrity");
+    const markdown = raw.replace(/^---\r?\n[\s\S]*?\r?\n---(?:\r?\n|$)/, "");
+    return { document: doc, markdown, fetchedAt: new Date().toISOString() };
+  }
+  if (op === "corpus_stats") {
+    if (statsCache && Date.now() - statsCache.at < 60_000) return statsCache.data;
+    const { data, error } = await sb.rpc("ross_law_stats");
+    if (error) throw new Error("corpus_unavailable");
+    statsCache = { at: Date.now(), data };
+    return data;
+  }
+  const query = str(body.query, 500).trim();
+  if (query.length < 2) return { results: [], hasMore: false };
+  const scope = ["federal", "estadual", "municipal"].includes(String(body.scope)) ? String(body.scope) : null;
+  const uf = /^[A-Z]{2}$/.test(String(body.uf || "")) ? String(body.uf) : null;
+  const municipality = str(body.municipality, 100).trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, "-") || null;
+  const offset = Math.max(0, Math.min(300, Number(body.offset) || 0));
+  const { data, error } = await sb.rpc("ross_law_search", {
+    p_query: query, p_scope: scope, p_uf: uf, p_municipality: municipality,
+    p_limit: body.forAnswer === true ? 8 : 15, p_offset: offset, p_for_answer: body.forAnswer === true,
+  });
+  if (error) { console.error("corpus search", error.code); throw new Error("corpus_unavailable"); }
+  return { ...data, hasMore: offset < 300 && data.hasMore === true, repository: "ctresb/leis", complete: false };
 }
 
 /* ---------- instruções ---------- */
@@ -173,8 +220,14 @@ Deno.serve(async (req: Request) => {
   if (length > MAX_BODY_BYTES) return json(413, { error: "too_large" }, origin);
 
   let body: Record<string, unknown>;
-  try { body = await req.json(); } catch { return json(400, { error: "invalid_json" }, origin); }
+  try { body = await req.json(); if (!body || Array.isArray(body) || typeof body !== "object") throw new Error(); } catch { return json(400, { error: "invalid_json" }, origin); }
   const op = str(body.op, 20);
+  if (op === "search" || op === "corpus_stats" || op === "repository_read") {
+    try {
+      if (op !== "corpus_stats" && !(await checkQuota(req, true)).allowed) return json(429, { error: "rate_limited" }, origin);
+      return json(200, await corpusOperation(op, body), origin);
+    } catch { return json(503, { error: "corpus_unavailable" }, origin); }
+  }
   if (op !== "prepare" && op !== "answer") return json(400, { error: "unknown_op" }, origin);
 
   const apiKey = Deno.env.get("ANTHROPIC_API_KEY");
