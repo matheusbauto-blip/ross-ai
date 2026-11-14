@@ -9,6 +9,8 @@
      node scripts/ingest-laws.mjs --approve        aplica as mudanças pendentes e registra nova versão no catálogo
      node scripts/ingest-laws.mjs --from-dir DIR   usa arquivos já baixados em DIR/<id>.html em vez de baixar
      node scripts/ingest-laws.mjs --only l8078,d7962
+     node scripts/ingest-laws.mjs --source camara  captura o texto atualizado na Legislação Informatizada da Câmara
+                                                   (resolvido pelo LexML) quando o Planalto não responde a clientes automatizados
 */
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -26,6 +28,10 @@ const flag = (n) => args.includes(n);
 const opt = (n) => { const i = args.indexOf(n); return i >= 0 ? args[i + 1] : null; };
 const only = opt('--only') ? opt('--only').split(',') : null;
 const fromDir = opt('--from-dir');
+const sourcePref = opt('--source') || 'planalto';
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+const CAMARA_NAME = 'Câmara dos Deputados — Legislação Informatizada (texto atualizado)';
+const PLANALTO_NAME = 'Planalto — Portal da Legislação (texto compilado)';
 
 /* ---------- HTML → parágrafos ---------- */
 const ENT = { nbsp: ' ', amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", ordm: 'º', ordf: 'ª', sect: '§', deg: '°', ndash: '–', mdash: '—', laquo: '«', raquo: '»', hellip: '…', middot: '·' };
@@ -120,25 +126,31 @@ function parseArticles(paras) {
 }
 function finish(a) {
   a.text = a.paras.join('\n');
-  const head = a.text.slice(0, 260);
-  if (a.struckHeader || /\((Revogad[oa]|REVOGAD[OA])\b/.test(head)) a.status = 'revogado';
-  else if (/\(VETADO\)/.test(head)) a.status = 'vetado';
+  const caput = a.paras[0] || '';
+  if (a.struckHeader || /\(\s*(?:[Aa]rtigo\s+|[Aa]rt\.\s+)?(?:Revogad[oa]|REVOGAD[OA]|revogad[oa])\b/.test(caput.slice(0, 260)) || /^Art\.[^(]{0,20}\(\s*(?:Revogad|revogad|REVOGAD)/.test(caput)) a.status = 'revogado';
+  else if (/\(VETADO\)/.test(caput.slice(0, 260))) a.status = 'vetado';
   else a.status = 'vigente';
-  const nota = a.text.match(/\((Reda[çc][ãa]o dada|Inclu[íi]d[oa]|Renumerad[oa]|Acrescentad[oa])[^)]*\)/);
-  if (nota) a.nota = nota[0].slice(1, -1);
+  const nota = a.text.match(/\(([^()]{0,60}?(?:[Rr]eda[çc][ãa]o dada|[Ii]nclu[íi]d[oa]|[Aa]crescid[oa]|[Rr]enumerad[oa]|[Aa]crescentad[oa])[^()]*)\)/);
+  if (nota) a.nota = nota[1].replace(/\s+/g, ' ').trim();
   a.hasHistory = a.hist.length > 0;
   delete a.paras; delete a.hist; delete a.struckHeader;
 }
 
 /* ---------- download ---------- */
-async function fetchLaw(law) {
-  let bytes;
-  if (fromDir) bytes = await fs.readFile(path.join(fromDir, law.id + '.html'));
-  else {
-    const res = await fetch(law.url, { headers: { 'User-Agent': UA, Accept: 'text/html' } });
-    if (!res.ok) throw new Error(law.id + ': HTTP ' + res.status);
-    bytes = Buffer.from(await res.arrayBuffer());
-  }
+async function getBytes(url) {
+  const res = await fetch(url, { headers: { 'User-Agent': UA, Accept: 'text/html' } });
+  if (!res.ok) throw new Error('HTTP ' + res.status + ' em ' + url);
+  return Buffer.from(await res.arrayBuffer());
+}
+/* Resolve, pelo LexML, o endereço do texto atualizado na Legislação Informatizada da Câmara. */
+async function resolveCamara(law) {
+  if (!law.lexml) throw new Error(law.id + ': sem URN LexML');
+  const page = decodeBytes(await getBytes('https://www.lexml.gov.br/urn/' + law.lexml));
+  const m = page.match(/https?:\/\/www2\.camara\.(?:gov|leg)\.br\/legin\/[^"'\s<>]+-norma-(p[a-z])\.html/);
+  if (!m) throw new Error(law.id + ': LexML não aponta para a Câmara');
+  return m[0].replace(/^http:\/\/www2\.camara\.gov\.br/, 'https://www2.camara.leg.br').replace('-norma-', '-normaatualizada-');
+}
+function decodeBytes(bytes) {
   let enc;
   if (bytes[0] === 0xff && bytes[1] === 0xfe) enc = 'utf-16le';
   else if (bytes[0] === 0xfe && bytes[1] === 0xff) enc = 'utf-16be';
@@ -148,15 +160,27 @@ async function fetchLaw(law) {
     enc = (m ? m[1] : 'windows-1252').toLowerCase();
     if (/^(iso-8859-1|latin1|cp1252|windows-1252|ansi)$/.test(enc)) enc = 'windows-1252';
   }
-  const html = new TextDecoder(enc).decode(bytes).replace(/^\ufeff/, '');
-  return { html, sha256: crypto.createHash('sha256').update(bytes).digest('hex'), bytes: bytes.length };
+  return new TextDecoder(enc).decode(bytes).replace(/^\ufeff/, '');
+}
+async function fetchLaw(law) {
+  let bytes, textSource = { name: PLANALTO_NAME, url: law.url };
+  if (fromDir) bytes = await fs.readFile(path.join(fromDir, law.id + '.html'));
+  else if (sourcePref === 'camara' || law.textSource === 'camara') {
+    const curl = await resolveCamara(law); await sleep(300);
+    bytes = await getBytes(curl); textSource = { name: CAMARA_NAME, url: curl };
+  } else {
+    bytes = await getBytes(law.url);
+  }
+  const html = decodeBytes(bytes);
+  return { html, sha256: crypto.createHash('sha256').update(bytes).digest('hex'), bytes: bytes.length, textSource };
 }
 
 function buildLaw(law, parsed, retrievedAt) {
   const articles = parseArticles(htmlToParagraphs(parsed.html));
+  if (!articles.length) throw new Error(law.id + ': nenhum artigo encontrado (página vazia ou de erro)');
   return {
     id: law.id, name: law.name, shortName: law.shortName, number: law.number, type: law.type, date: law.date,
-    url: law.url, lexml: law.lexml, jurisdiction: CONFIG.jurisdiction, source: CONFIG.source, index: CONFIG.index,
+    url: law.url, lexml: law.lexml, jurisdiction: CONFIG.jurisdiction, source: parsed.textSource ? parsed.textSource.name : CONFIG.source, textUrl: parsed.textSource ? parsed.textSource.url : law.url, index: CONFIG.index,
     retrievedAt, sha256: parsed.sha256, bytes: parsed.bytes, articleCount: articles.length,
     vigentes: articles.filter((a) => a.status === 'vigente').length, revogados: articles.filter((a) => a.status !== 'vigente').length,
     articles
@@ -190,6 +214,7 @@ const results = [];
 for (const law of laws) {
   process.stdout.write(law.id + ' … ');
   try {
+    if (!fromDir) await sleep(400);
     const parsed = await fetchLaw(law);
     const built = buildLaw(law, parsed, new Date().toISOString());
     results.push({ law, built });
@@ -229,9 +254,9 @@ console.log('catálogo gravado em data/catalog.json');
 
 function summary(law, built) {
   return { id: law.id, name: law.name, shortName: law.shortName, number: law.number, type: law.type, date: law.date, url: law.url, lexml: law.lexml, tags: law.tags,
-    retrievedAt: built.retrievedAt, sha256: built.sha256, articleCount: built.articleCount, vigentes: built.vigentes, revogados: built.revogados, file: 'laws/' + law.id + '.json', status: 'vigente' };
+    retrievedAt: built.retrievedAt, sha256: built.sha256, articleCount: built.articleCount, vigentes: built.vigentes, revogados: built.revogados, file: 'laws/' + law.id + '.json', status: 'vigente', source: built.source, textUrl: built.textUrl };
 }
 async function writeCatalog() {
-  const out = { generatedAt: new Date().toISOString(), source: CONFIG.source, index: CONFIG.index, jurisdiction: CONFIG.jurisdiction, laws: CONFIG.laws.map((l) => byId[l.id]).filter(Boolean) };
+  const out = { generatedAt: new Date().toISOString(), source: CONFIG.source, index: CONFIG.index, jurisdiction: CONFIG.jurisdiction, laws: CONFIG.laws.map((l) => byId[l.id]).filter((l) => l && l.articleCount > 0) };
   await fs.writeFile(path.join(DATA, 'catalog.json'), JSON.stringify(out, null, 1));
 }

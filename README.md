@@ -29,10 +29,18 @@ Depois acesse http://localhost:8765/preview.html. Se alterar `index.html`, regen
 
 `data/catalog.json` lista as normas; `data/laws/<id>.json` traz cada norma por artigo (`id`, `label`, `heading`, `text`, `status` vigente/revogado/vetado, `nota` de alteração), com `sha256` do HTML bruto, `retrievedAt`, URN LexML e histórico de versões.
 
-Normas incluídas: Constituição Federal (com ADCT), Código Civil, Código de Defesa do Consumidor, CLT, Lei do Inquilinato, LGPD, Lei dos Juizados Especiais, Marco Civil da Internet, Decreto do Comércio Eletrônico e Lei Maria da Penha. Para acrescentar uma norma, adicione a entrada (URL do texto compilado no Planalto e palavras-chave) em `scripts/laws.config.json` e rode a ingestão.
+Fontes dos textos, ambas oficiais e indexadas pelo LexML:
+
+- **Planalto, Portal da Legislação** (texto compilado): usado para as dez primeiras normas (Constituição, Código Civil, CDC, CLT, Lei do Inquilinato, LGPD, Juizados Especiais, Marco Civil, Decreto 7.962 e Lei Maria da Penha).
+- **Câmara dos Deputados, Legislação Informatizada** (texto atualizado): usado para as demais normas, porque o Planalto recusa conexões de clientes automatizados. O endereço de cada texto é resolvido pela página LexML da norma (`--source camara`).
+
+Cada registro guarda de qual fonte o texto foi capturado (`source`, `textUrl`); o link oficial exibido nas respostas continua apontando para o Planalto, com âncora no artigo.
+
+A base cobre penal e processo penal, processo civil, trânsito, tributário e empresas, família e pessoas, trabalho e previdência, saúde, educação, ambiente, imóveis e eleitoral. Para acrescentar uma norma, adicione a entrada (número, data, URL do Planalto, URN LexML e palavras-chave) em `scripts/laws.config.json` e rode a ingestão. Normas cuja "norma atualizada" não existe na Câmara ficam fora da base até o Planalto responder (o script relata cada caso).
 
 ```bash
-node scripts/ingest-laws.mjs            # baixa, converte e grava a base
+node scripts/ingest-laws.mjs                 # baixa do Planalto, converte e grava a base
+node scripts/ingest-laws.mjs --source camara # usa o texto atualizado da Câmara (via LexML)
 node scripts/ingest-laws.mjs --check    # detecta mudanças na fonte oficial → data/pending.json (fila de conferência)
 node scripts/ingest-laws.mjs --approve  # aplica as mudanças conferidas e registra nova versão
 ```

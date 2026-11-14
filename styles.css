@@ -423,3 +423,9 @@ img { max-width: 100%; }
 .seg button:disabled { opacity: .45; cursor: not-allowed; }
 .muted { color: var(--muted); }
 .reg-card .muted { font-size: var(--fs-sm); }
+
+/* Filtro da base de fontes */
+.reg-filter { display: block; margin-top: 10px; }
+.reg-filter input { width: 100%; min-height: 40px; padding: 8px 14px; border-radius: 999px; border: 1px solid var(--border); background: var(--bg); color: var(--fg); font: inherit; font-size: var(--fs-sm); }
+.reg-filter input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+#reg-count { margin-top: 6px; }

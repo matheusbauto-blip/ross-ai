@@ -697,8 +697,41 @@
   }
   const norm = (s) => String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
   const STOP = new Set('a o os as um uma uns umas de do da dos das em no na nos nas por para com sem sob sobre e ou que se nao ao aos sao ser foi esta estao estou meu minha meus minhas seu sua seus suas este isto esse essa isso aquele aquela aquilo ele ela eles elas eu voce nos lhe me te como quando onde qual quais quem mais menos muito pouco ja tambem so pode posso poderia devo deve dever tenho tem ter ha fazer faco faz fiz era sendo sido pelo pela pelos pelas num numa dele dela deles delas ate entre apos antes depois ainda mesmo mesma outro outra outros outras todo toda todos todas qualquer caso casos sobre sim nao the of and to in is it my can what how does this that for with about are was were have has been'.split(' '));
-  function stem(w) { if (w.length > 5 && /oes$/.test(w)) return w.slice(0, -3) + 'ao'; if (w.length > 4 && /ns$/.test(w)) return w.slice(0, -2) + 'm'; if (w.length > 3 && /s$/.test(w)) return w.slice(0, -1); return w; }
-  function tokensOf(s) { return Array.from(new Set(norm(s).replace(/[^a-z0-9\s-]/g, ' ').split(/\s+/).filter((w) => w.length > 2 && !STOP.has(w)).map(stem))); }
+  /* Radicalização leve para português: a busca compara por prefixo, então "dirig" alcança dirigir, dirigindo, dirigente. */
+  function stem(w) {
+    if (w.length > 5 && /oes$/.test(w)) w = w.slice(0, -3) + 'ao';
+    if (w.length > 4 && /ns$/.test(w)) w = w.slice(0, -2) + 'm';
+    if (w.length > 3 && /s$/.test(w)) w = w.slice(0, -1);
+    if (w.length > 6 && /(ando|endo|indo|ados|idos|ada|ado|ida|ido|aram|eram|iram|arei|erei|irei)$/.test(w)) w = w.replace(/(ando|endo|indo|ados|idos|ada|ado|ida|ido|aram|eram|iram|arei|erei|irei)$/, '');
+    else if (w.length > 5 && /(ar|er|ir|ou|ei|eu|iu)$/.test(w)) w = w.slice(0, -2);
+    if (w.length > 6 && /(cao|sao|mente|dade|ncia)$/.test(w)) w = w.replace(/(cao|sao|mente|dade|ncia)$/, '');
+    return w;
+  }
+  /* Expressões do dia a dia → termos usados nas normas. Aplicadas antes da busca. */
+  const SYN = [
+    ['bafometro', 'alcool alcoolemia etilometro influencia'], ['carteira de motorista', 'habilitacao cnh'], ['carteira', 'habilitacao'], ['motorista', 'condutor'], ['multa de transito', 'infracao penalidade'],
+    ['demitid', 'rescisao dispensa aviso previo'], ['demissao', 'rescisao dispensa aviso previo'], ['mandado embora', 'rescisao dispensa'], ['patrao', 'empregador'], ['chefe', 'empregador'], ['empresa', 'empregador fornecedor'],
+    ['hora extra', 'jornada suplementar horas extras'], ['salario', 'remuneracao'], ['carteira assinada', 'registro contrato de trabalho ctps'], ['nome sujo', 'cadastro inadimplentes'], ['negativad', 'cadastro inadimplentes'], ['serasa', 'cadastro inadimplentes'], ['spc', 'cadastro inadimplentes'],
+    ['aluguel', 'locacao'], ['alugar', 'locacao'], ['inquilino', 'locatario'], ['dono do imovel', 'locador'], ['proprietario', 'locador'], ['despejo', 'desocupacao'],
+    ['loja', 'fornecedor'], ['golpe', 'estelionato fraude'], ['roubo', 'furto roubo'], ['roubaram', 'furto roubo'], ['pensao', 'alimentos'], ['heranca', 'sucessao'], ['aposentar', 'aposentadoria'], ['inss', 'previdencia beneficio segurado'],
+    ['plano de saude', 'operadora cobertura'], ['cancelar', 'rescisao cancelamento'], ['devolver', 'devolucao restituicao arrependimento'], ['comprei', 'compra consumidor fornecedor'], ['internet', 'distancia eletronico'],
+    ['escola', 'ensino educacao'], ['preso', 'prisao flagrante'], ['barulho', 'sossego perturbacao'], ['vizinho', 'vizinhanca'], ['cachorro', 'animal'], ['gato', 'animal'], ['defeito', 'vicio'], ['troca', 'substituicao'], ['juros', 'mora'],
+    ['filho', 'filhos menor crianca'], ['marido', 'conjuge'], ['esposa', 'conjuge'], ['divorcio', 'divorcio dissolucao'], ['visita', 'convivencia'], ['guarda', 'guarda'], ['celular', 'telefone'], ['foto', 'imagem'], ['video', 'imagem']
+  ];
+  function expandQuery(q) {
+    const n = norm(q); const extra = [];
+    SYN.forEach(([k, v]) => { if (n.includes(k)) extra.push(v); });
+    return q + ' ' + extra.join(' ');
+  }
+  function tokensOf(s) { return Array.from(new Set(norm(s).replace(/[^a-z0-9\s-]/g, ' ').split(/\s+/).filter((w) => w.length > 2 && !STOP.has(w)).map(stem).filter((w) => w.length > 2))); }
+  /* Com IA disponível, pede termos jurídicos para reforçar a busca (modelo rápido, resposta em cache). */
+  async function expandQueryAI(question) {
+    if (!sampleFn) return '';
+    try {
+      const terms = await sampleFn.json('Give 4 to 8 Portuguese legal search terms (single words or short phrases, as used in Brazilian statutes) for the question below. Reply with only a JSON array of strings.\n\nQUESTION: ' + question, { modelTier: 'quick' });
+      return Array.isArray(terms) ? terms.filter((x) => typeof x === 'string').join(' ') : '';
+    } catch (e) { return ''; }
+  }
   function selectLaws(question) {
     const q = norm(question);
     const scored = state.catalog.laws.map((l) => {
@@ -756,7 +789,7 @@
     const entry = state.catalog.laws.find((l) => l.id === law.id) || {};
     const ver = entry.versions && entry.versions.length ? entry.versions[entry.versions.length - 1].id : 'v1';
     const anchor = /^\d+$/.test(hit.article.id) ? '#art' + hit.article.id : '';
-    return { lawId: law.id, name: law.name, shortName: law.shortName, article: hit.article.label, heading: hit.article.heading, status: hit.article.status, nota: hit.article.nota, url: law.url + anchor, retrievedAt: law.retrievedAt, version: ver, excerpt: hit.excerpt, n: n };
+    return { lawId: law.id, name: law.name, shortName: law.shortName, article: hit.article.label, heading: hit.article.heading, status: hit.article.status, nota: hit.article.nota, url: law.url + anchor, textUrl: law.textUrl || law.url, source: law.source || '', retrievedAt: law.retrievedAt, version: ver, excerpt: hit.excerpt, n: n };
   }
   providers.oficial = {
     id: 'oficial',
@@ -766,13 +799,15 @@
       if (conv.country !== 'BR') return { mode: 'oficial', kind: 'nosources', summary: t('oficial.jurisdiction', { country: countryName(conv.country) }), nextSteps: [t('oficial.jurisdictionStep')], capturedAt: cap };
       onStep(0);
       const question = (text || '').trim() || (attachments && attachments.length ? t('oficial.docDefaultQuery') : '');
-      let laws = selectLaws(question);
+      const aiTerms = await expandQueryAI(question);
+      const searchText = expandQuery(question) + ' ' + aiTerms;
+      let laws = selectLaws(searchText);
       if (!laws.length) { const picked = await selectLawsAI(question); if (picked && picked.length) laws = picked; }
       if (signal.aborted) throw { code: 'cancelled' };
       if (!laws.length) return emptyOfficial();
       const loaded = await Promise.all(laws.map(loadLaw));
       onStep(1);
-      const hits = searchArticles(loaded, question, 8);
+      const hits = searchArticles(loaded, searchText, 8);
       if (signal.aborted) throw { code: 'cancelled' };
       if (!hits.length) return emptyOfficial();
       const sources = hits.map((h, i) => lawSource(h, i + 1));
@@ -796,7 +831,7 @@
     const prompt = [
       'You are ROSS AI, a legal information assistant. You explain Brazilian law in plain language. You are not a lawyer and this is not legal advice.',
       'Write in ' + t('langName') + '. Be clear, respectful and not overly formal. Short sentences.',
-      'GROUNDING RULES: Answer ONLY from the official excerpts below (current compiled text published by Planalto, captured on ' + fmtDate(state.catalog.generatedAt) + '). Cite them by their numbers. Do not cite articles, laws, deadlines or court decisions that are not in the excerpts. If the excerpts do not answer the question, say so plainly (kind "nosources") and say what kind of rule or document would be needed. Excerpts marked […] are partial.',
+      'GROUNDING RULES: Answer ONLY from the official excerpts below (current consolidated text from official sources, Planalto or the Câmara dos Deputados, captured on ' + fmtDate(state.catalog.generatedAt) + '). Cite them by their numbers. Do not cite articles, laws, deadlines or court decisions that are not in the excerpts. If the excerpts do not answer the question, say so plainly (kind "nosources") and say what kind of rule or document would be needed. Excerpts marked […] are partial.',
       'Never state that someone will win or lose, that a clause is definitely valid or invalid, or that a lawsuit certainly applies. Say what depends on facts, documents or professional interpretation.',
       'If the question is ambiguous, use kind "clarify" with up to three objective questions. If the person asks for a high-impact personalised assessment, a litigation strategy or a definitive conclusion, use kind "limit", explain the limit briefly and refer them to a lawyer, the Defensoria Pública, a union, Procon or the relevant public service. If the situation seems urgent, use kind "urgent" and tell them to seek help without delay.',
       images.length ? 'The attached image(s) are pages of a document. Identify the clause you explain (reference and short quote), separate what the document says from what the law says, and warn if it is incomplete, unreadable or lacks context. One clause is not the conclusion for the whole case.' : '',
@@ -831,7 +866,13 @@
     if (s.nota) meta += '<span><b>' + esc(t('source.note')) + ':</b> ' + esc(s.nota) + '</span>';
     meta += '<span><b>' + esc(t('source.captured')) + ':</b> ' + esc(fmtDate(s.retrievedAt)) + '</span><span><b>' + esc(t('source.version')) + ':</b> ' + esc(s.version) + '</span>';
     const excerpt = s.excerpt ? '<details class="src-excerpt"><summary>' + esc(t('source.excerpt')) + '</summary><p>' + esc(s.excerpt).replace(/\n/g, '<br>') + '</p></details>' : '';
-    return '<li class="src-card" id="src-' + m.id + '-' + n + '"><div class="src-name"><span>' + esc(s.name) + '</span>' + statusBadge(status) + '<span class="badge badge-oficial">' + esc(t('source.official')) + '</span></div><div class="src-meta">' + meta + '</div><div class="src-link"><a href="' + esc(s.url) + '" target="_blank" rel="noopener">' + esc(t('source.open')) + '</a><span class="mono">' + esc(s.url) + '</span></div>' + excerpt + '</li>';
+    const textLine = s.textUrl && s.textUrl !== s.url.replace(/#.*$/, '') ? '<div class="src-link"><span>' + esc(t('source.textFrom')) + ':</span><a href="' + esc(s.textUrl) + '" target="_blank" rel="noopener">' + esc(sourceLabel(s.source)) + '</a></div>' : '';
+    return '<li class="src-card" id="src-' + m.id + '-' + n + '"><div class="src-name"><span>' + esc(s.name) + '</span>' + statusBadge(status) + '<span class="badge badge-oficial">' + esc(sourceLabel(s.source)) + '</span></div><div class="src-meta">' + meta + '</div><div class="src-link"><a href="' + esc(s.url) + '" target="_blank" rel="noopener">' + esc(t('source.open')) + '</a><span class="mono">' + esc(s.url) + '</span></div>' + textLine + excerpt + '</li>';
+  }
+  function sourceLabel(src) {
+    if (/c[âa]mara/i.test(src || '')) return t('source.camara');
+    if (/planalto/i.test(src || '')) return t('source.planalto');
+    return t('source.official');
   }
   function modeBadge(provider) {
     if (provider === 'ai') return '<span class="badge badge-ai">' + esc(t('chat.modeAI')) + '</span>';
@@ -862,13 +903,14 @@
         '<p class="mono">' + esc(sp.approveCmd) + '</p></div>').join('') : '<p class="muted">' + esc(sp.queueEmpty) + '</p><p class="mono muted">' + esc(sp.checkCmd) + '</p>') + '</div>';
     const cards = c.laws.map((l) => {
       const cur = l.versions && l.versions.length ? l.versions[l.versions.length - 1] : null;
-      return '<div class="reg-card" id="reg-' + l.id + '"><h3><span>' + esc(l.name) + '</span>' + statusBadge('vigente') + '<span class="badge badge-oficial">' + esc(t('source.official')) + '</span></h3>' +
+      return '<div class="reg-card" id="reg-' + l.id + '" data-law="' + esc(norm(l.name + ' ' + l.shortName + ' ' + l.number + ' ' + (l.tags || []).join(' '))) + '"><h3><span>' + esc(l.name) + '</span>' + statusBadge('vigente') + '<span class="badge badge-oficial">' + esc(sourceLabel(l.source)) + '</span></h3>' +
         '<dl class="reg-grid">' +
         '<div><dt>' + esc(sp.fields.type) + '</dt><dd>' + esc(sp.types[l.type] || l.type) + '</dd></div>' +
         '<div><dt>' + esc(sp.fields.jurisdiction) + '</dt><dd>' + esc(c.jurisdiction) + '</dd></div>' +
         '<div><dt>' + esc(sp.fields.published) + '</dt><dd>' + esc(fmtDate(l.date)) + '</dd></div>' +
         '<div><dt>' + esc(sp.lexml) + '</dt><dd class="mono">' + esc(l.lexml) + '</dd></div>' +
         '<div><dt>' + esc(sp.fields.link) + '</dt><dd><a href="' + esc(l.url) + '" target="_blank" rel="noopener" class="mono">' + esc(l.url) + '</a></dd></div>' +
+        (l.textUrl && l.textUrl !== l.url ? '<div><dt>' + esc(t('source.textFrom')) + '</dt><dd><a href="' + esc(l.textUrl) + '" target="_blank" rel="noopener">' + esc(sourceLabel(l.source)) + '</a></dd></div>' : '') +
         '<div><dt>' + esc(sp.fields.verified) + '</dt><dd>' + esc(fmtDate(l.retrievedAt)) + '</dd></div>' +
         '<div><dt>' + esc(sp.fields.version) + '</dt><dd>' + esc(cur ? cur.id : 'v1') + '</dd></div>' +
         '<div><dt>' + esc(sp.articles) + '</dt><dd>' + esc(l.articleCount + ' (' + l.vigentes + ' ' + sp.inForce + ', ' + l.revogados + ' ' + sp.repealed + ')') + '</dd></div>' +
@@ -876,7 +918,7 @@
         '</dl>' +
         '<details><summary>' + esc(sp.versions) + ' (' + (l.versions || []).length + ')</summary><ul class="ver-list">' + (l.versions || []).map((v) => '<li><span class="vid' + (cur && v.id === cur.id ? ' is-current' : '') + '">' + esc(v.id) + (cur && v.id === cur.id ? ' · ' + esc(sp.current) : '') + '</span><span class="vdate">' + esc(fmtDate(v.date)) + '</span><span>' + esc(v.note) + '</span></li>').join('') + '</ul></details></div>';
     }).join('');
-    return '<div class="registry"><div class="reg-card"><h3>' + esc(sp.official) + '</h3><p class="muted">' + esc(fmt(sp.officialIntro, { source: c.source, index: c.index, n: c.laws.length, date: fmtDate(c.generatedAt) })) + '</p></div>' + queue + cards + '</div>';
+    return '<div class="registry"><div class="reg-card"><h3>' + esc(sp.official) + '</h3><p class="muted">' + esc(fmt(sp.officialIntro, { index: c.index, n: c.laws.length, date: fmtDate(c.generatedAt) })) + '</p><label class="reg-filter"><span class="sr-only">' + esc(sp.filter) + '</span><input type="search" id="reg-filter" placeholder="' + esc(sp.filterPlaceholder) + '" autocomplete="off"></label><p class="muted" id="reg-count"></p></div>' + queue + cards + '</div>';
   }
 
   /* ---------- Envio ---------- */
@@ -1036,6 +1078,11 @@
     const how = '<div class="reg-card"><h3>' + esc(sp.howTitle) + '</h3><ol class="how-list">' + sp.how.map((x) => '<li>' + esc(x) + '</li>').join('') + '</ol></div>';
     main.innerHTML = pageShell(sp.title, '', '<p class="prose">' + esc(sp.intro) + '</p>' + officialRegistryHTML(sp) + '<details class="demo-registry"><summary>' + esc(sp.demoSection) + '</summary><div class="callout callout-warn">' + ICONS.warn + '<div>' + esc(sp.banner) + '</div></div><div class="registry">' + queue + cards + '</div></details><div class="registry">' + how + '</div>');
     bindBack(main);
+    const rf = $('#reg-filter', main);
+    if (rf) {
+      const applyFilter = () => { const q = norm(rf.value.trim()); let shown = 0; $$('.reg-card[data-law]', main).forEach((card) => { const ok = !q || card.dataset.law.includes(q); card.hidden = !ok; if (ok) shown++; }); $('#reg-count', main).textContent = q ? fmt(sp.filterCount, { n: shown }) : ''; };
+      rf.addEventListener('input', applyFilter);
+    }
     $$('[data-approve]', main).forEach((b) => b.addEventListener('click', () => { const s = sourceById(b.dataset.approve); const n = 'v' + (s.versions.length + 1); state.sourcesReview[s.id] = { status: 'aprovada', date: new Date().toISOString().slice(0, 10), newVersion: n }; save(); toast(sp.approved); renderSources(main); }));
     $$('[data-keep]', main).forEach((b) => b.addEventListener('click', () => { state.sourcesReview[b.dataset.keep] = { status: 'rejeitada', date: new Date().toISOString().slice(0, 10) }; save(); toast(sp.kept); renderSources(main); }));
   }
