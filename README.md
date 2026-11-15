@@ -28,13 +28,13 @@ Configure `GEMINI_API_KEY` (ou `GOOGLE_API_KEY`) em Supabase → Edge Functions 
 
 ## Acompanhamento processual
 
-O menu lateral inclui “Acompanhar processo”. A consulta padrão é gratuita e usa diretamente a API pública do DJEN/CNJ, sem conta ou token do Escavador. A busca é pelo número CNJ de 20 dígitos, com ou sem pontuação; busca por CPF não está implementada.
+O menu lateral inclui “Acompanhar processo”. A consulta padrão é gratuita e usa diretamente a API pública do DJEN/CNJ, sem conta ou token do Escavador. A busca interna é pelo número CNJ de 20 dígitos, com ou sem pontuação. Para localizar pelo CPF, a opção “Buscar por CPF no portal oficial” orienta o acesso ao Jus.br com a própria conta gov.br nível ouro; depois, o usuário cola o número encontrado no ROSS. Esse caminho abre o portal oficial e não importa resultados automaticamente.
 
 A tela apresenta as publicações oficiais retornadas, datas de disponibilização, identificação da fonte e links para conferir os textos. Essa cobertura não equivale a todas as movimentações do processo. Resultado vazio não comprova inexistência do processo. Publicações canceladas e trechos abreviados têm indicação própria.
 
 É possível acompanhar até 20 números neste navegador. A ficha aberta é consultada a cada 15 minutos enquanto a tela estiver visível, com cache de até cinco minutos e respeito aos limites da fonte. Não há avisos com o app fechado ou sincronização entre dispositivos nesta etapa. As consultas ficam separadas do histórico das conversas e não são enviadas ao Gemini.
 
-O servidor está na versão 7. Foi validada uma consulta real com HTTP 200 e três publicações do DJEN, sem chave de API. A documentação está em `docs/acompanhamento-processual.md`.
+O servidor está na versão 8 (controle de uso obrigatório para as chamadas ao modelo). Foi validada uma consulta real com HTTP 200 e três publicações do DJEN, sem chave de API. A documentação está em `docs/acompanhamento-processual.md`.
 
 O adaptador Escavador permanece opcional, habilitado somente por `ROSS_PROCESS_SOURCE=escavador` e pelo segredo `ESCAVADOR_API_TOKEN`, com as condições da conta contratada. Ele não é usado na configuração gratuita padrão. Não há mudança automática para serviços pagos quando uma fonte falha.
 
