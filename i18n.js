@@ -151,6 +151,8 @@ window.ROSS_I18N = {
     },
     errors: {
       title: 'Não foi possível concluir a resposta',
+      interrupted: 'A resposta foi interrompida. Tente novamente para continuar.',
+      attachment_missing: 'Anexe novamente o arquivo para reenviar esta pergunta. O conteúdo não é guardado no histórico.',
       generic: 'Algo deu errado ao preparar a resposta. Tente novamente em instantes.',
       not_granted: 'O Modo IA não foi autorizado neste navegador. A resposta não foi gerada. Você pode permitir no menu de permissões do artifact ou desativar o Modo IA nas configurações.',
       rate_limited: 'O Modo IA atingiu o limite de uso por agora. Tente mais tarde ou use o modo de demonstração.',
@@ -170,11 +172,13 @@ window.ROSS_I18N = {
       title: 'Antes de anexar',
       body: 'Documentos costumam conter dados pessoais, como nome, CPF, endereço e valores. Anexe apenas o que for necessário para a sua pergunta.',
       demoLine: 'Nesta versão de demonstração, o arquivo não é enviado a nenhum servidor nem lido pelo sistema. Apenas o nome, o tamanho e o tipo ficam no histórico local deste navegador.',
-      aiLine: 'Quando a explicação por IA está ativa (dentro do claude.ai), imagens anexadas são enviadas ao modelo pela sua conta, apenas para gerar a resposta. Arquivos PDF não são lidos nesta versão.',
+      aiLine: 'Com IA ativa no site, a pergunta e os anexos (imagens e PDFs) são enviados pelo servidor ao Google Gemini para gerar a resposta. No claude.ai, a explicação usa sua conta.',
       apiLine: 'Imagens e PDFs anexados são enviados ao servidor do ROSS AI e ao modelo de IA apenas para gerar a resposta. Não são armazenados.',
       cancel: 'Cancelar',
       confirm: 'Anexar',
       tooLarge: 'acima de 20 MB. Escolha um arquivo menor.',
+      tooMany: 'limite de 4 arquivos por mensagem.',
+      totalTooLarge: 'os anexos juntos ultrapassam 20 MB. Envie menos arquivos ou reduza o tamanho.',
       badType: 'formato não aceito. Envie PDF, JPG, PNG ou WEBP.',
       skipped: 'Arquivos não anexados:'
     },
@@ -259,10 +263,11 @@ window.ROSS_I18N = {
       jurisdiction: 'A base de fontes oficiais cobre, por enquanto, apenas a legislação federal do Brasil. Ainda não tenho fontes para {country}, por isso não vou arriscar uma resposta.',
       jurisdictionStep: 'Mude a jurisdição para Brasil ou aguarde a inclusão de outras jurisdições na base.',
       docDefaultQuery: 'contrato cláusula multa rescisão cancelamento prazo',
-      empty: 'Não encontrei, nas normas da base, trechos que tratem diretamente disso. Prefiro dizer isso a arriscar uma resposta.',
+      empty: 'Não consegui confirmar trechos suficientes para responder com segurança nesta busca. Isso não significa que não exista uma regra aplicável.',
+      relevanceUnavailable: 'Não consegui concluir a verificação de relevância das fontes. Abaixo estão apenas trechos encontrados por palavras, para conferência; não foi gerada uma conclusão jurídica.',
       emptyQuestions: ['Sobre qual tema é a dúvida: consumo, trabalho, moradia, família, dados pessoais ou outro?', 'Há alguma lei, contrato ou documento específico envolvido?'],
       emptyStep: 'Reformule com mais detalhes ou cite a norma, se souber qual é.',
-      noAI: 'Encontrei estes trechos nas fontes oficiais. A explicação em linguagem simples usa IA e só funciona com o ROSS AI aberto dentro do claude.ai; aqui mostro o texto oficial para você conferir.',
+      noAI: 'Encontrei estes trechos nas fontes oficiais. A explicação por IA não está disponível agora; mostro o texto oficial para você conferir.',
       noAIWarn: 'Trechos selecionados por busca de palavras no texto oficial. Leia o artigo completo no link antes de concluir.'
     },
     pages: {
@@ -279,9 +284,9 @@ window.ROSS_I18N = {
 <li>Suas preferências: idioma, aparência, jurisdição e Modo IA.</li>
 <li>Suas avaliações de respostas (útil ou não útil).</li>
 </ul>
-<p>Esses dados ficam no armazenamento local do navegador (localStorage). Eles não saem do seu dispositivo e não são lidos por outras pessoas que abrirem este aplicativo.</p>
+<p>O histórico fica no armazenamento local do navegador (localStorage). Nos modos com IA, a pergunta, trechos do histórico e anexos selecionados são enviados ao modelo para gerar a resposta.</p>
 <h2>Documentos anexados</h2>
-<p>Antes de anexar, avisamos que documentos podem conter dados pessoais e você pode cancelar. No modo de demonstração, o arquivo não é lido nem enviado a lugar nenhum. Quando a explicação por IA está ativa (modos Fontes oficiais e IA, dentro do claude.ai), a pergunta, os trechos de lei selecionados e as imagens anexadas são enviados ao modelo pela sua própria conta, apenas para gerar a resposta, e não são publicados nem exibidos em páginas públicas.</p>
+<p>Antes de anexar, avisamos que documentos podem conter dados pessoais e você pode cancelar. No modo de demonstração, o arquivo não é lido nem enviado. Com IA ativa no site, a pergunta, trechos do histórico, leis selecionadas e anexos (imagens e PDFs) passam pelo servidor do ROSS AI e são enviados ao Google Gemini para gerar a resposta. O servidor não armazena perguntas nem anexos, e não os publica. Dentro do claude.ai, a explicação usa a conta de quem abre o artifact.</p>
 <h2>Como apagar</h2>
 <ul>
 <li>Cada conversa pode ser apagada no menu, na lista de conversas anteriores.</li>
@@ -530,6 +535,8 @@ window.ROSS_I18N = {
     },
     errors: {
       title: 'The answer could not be completed',
+      interrupted: 'The response was interrupted. Try again to continue.',
+      attachment_missing: 'Attach the file again to retry this question. File contents are not saved in the history.',
       generic: 'Something went wrong while preparing the answer. Try again in a moment.',
       not_granted: 'AI mode was not allowed in this browser, so no answer was generated. You can allow it in the artifact permissions menu or turn AI mode off in settings.',
       rate_limited: 'AI mode reached its usage limit for now. Try later or use the demonstration mode.',
@@ -549,11 +556,13 @@ window.ROSS_I18N = {
       title: 'Before attaching',
       body: 'Documents often contain personal data such as names, ID numbers, addresses and amounts. Attach only what your question needs.',
       demoLine: 'In this demonstration version the file is not sent to any server and is not read by the system. Only its name, size and type stay in this browser’s local history.',
-      aiLine: 'When the AI explanation is active (inside claude.ai), attached images are sent to the model through your account, only to generate the answer. PDF files are not read in this version.',
+      aiLine: 'With AI active on the website, your question and attachments (images and PDFs) are sent through the server to Google Gemini to generate the answer. Inside claude.ai, the explanation uses your account.',
       apiLine: 'Attached images and PDFs are sent to the ROSS AI server and to the AI model only to generate the answer. They are not stored.',
       cancel: 'Cancel',
       confirm: 'Attach',
       tooLarge: 'over 20 MB. Choose a smaller file.',
+      tooMany: 'maximum of 4 files per message.',
+      totalTooLarge: 'the attachments exceed 20 MB combined. Send fewer files or reduce their size.',
       badType: 'format not accepted. Send PDF, JPG, PNG or WEBP.',
       skipped: 'Files not attached:'
     },
@@ -638,10 +647,11 @@ window.ROSS_I18N = {
       jurisdiction: 'The official source base covers, for now, only Brazilian federal legislation. I do not have sources for {country} yet, so I will not risk an answer.',
       jurisdictionStep: 'Switch the jurisdiction to Brazil or wait for other jurisdictions to be added to the base.',
       docDefaultQuery: 'contrato cláusula multa rescisão cancelamento prazo',
-      empty: 'I did not find, in the laws of this base, excerpts that deal directly with this. I would rather say so than risk an answer.',
+      empty: 'I could not confirm enough relevant excerpts to answer safely in this search. This does not mean that no applicable rule exists.',
+      relevanceUnavailable: 'I could not complete the source relevance check. The passages below were found by keyword matching and are provided only for review; no legal conclusion was generated.',
       emptyQuestions: ['What is the question about: consumer, work, housing, family, personal data or other?', 'Is there a specific law, contract or document involved?'],
       emptyStep: 'Rephrase with more detail or name the law, if you know which one.',
-      noAI: 'I found these excerpts in the official sources. The plain-language explanation uses AI and only works with ROSS AI opened inside claude.ai; here I show the official text for you to check.',
+      noAI: 'I found these excerpts in the official sources. The AI explanation is currently unavailable; here is the official text for you to check.',
       noAIWarn: 'Excerpts selected by word search in the official text. Read the full article at the link before concluding.'
     },
     pages: {
@@ -658,9 +668,9 @@ window.ROSS_I18N = {
 <li>Your preferences: language, appearance, jurisdiction and AI mode.</li>
 <li>Your ratings of answers (helpful or not helpful).</li>
 </ul>
-<p>This data lives in the browser’s local storage (localStorage). It does not leave your device and is not read by other people who open this app.</p>
+<p>Your history lives in the browser’s local storage (localStorage). In AI modes, your question, selected history and attachments are sent to the model to generate the answer.</p>
 <h2>Attached documents</h2>
-<p>Before attaching, we warn that documents may contain personal data and you can cancel. In demonstration mode the file is neither read nor sent anywhere. When the AI explanation is active (Official sources and AI modes, inside claude.ai), the question, the selected law excerpts and attached images are sent to the model through your own account, only to generate the answer, and are never published or shown on public pages.</p>
+<p>Before attaching, we warn that documents may contain personal data and you can cancel. In demonstration mode the file is neither read nor sent. With AI active on the website, your question, selected history, law excerpts and attachments (images and PDFs) pass through the ROSS AI server and are sent to Google Gemini to generate the answer. The server does not store or publish questions or attachments. Inside claude.ai, the explanation uses the account of the person opening the artifact.</p>
 <h2>How to delete</h2>
 <ul>
 <li>Each conversation can be deleted from the menu, in the list of previous conversations.</li>

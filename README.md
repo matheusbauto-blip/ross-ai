@@ -2,7 +2,7 @@
 
 Informação jurídica, em linguagem simples. / Legal information, made clear.
 
-Aplicativo web estático: interface de conversa, base de legislação federal brasileira capturada da fonte oficial (Planalto) e explicação em linguagem simples por IA (Claude, pela capacidade `sample` do visualizador de artifacts do claude.ai).
+Aplicativo web estático: interface de conversa, base de legislação federal brasileira capturada da fonte oficial e explicação em linguagem simples por IA (Google Gemini no site; capacidade `sample` no visualizador de artifacts do claude.ai).
 
 ## Como rodar
 
@@ -18,15 +18,15 @@ python3 -m http.server 8765
 
 ## Backend (API própria)
 
-A explicação em linguagem simples usa o Claude. Dentro do claude.ai, pela capacidade `sample` (conta de quem abre o artifact). No site, pela função `supabase/functions/ross-ai/index.ts` (Supabase Edge Function), cujo endereço está em `config.js`. A função recebe a pergunta e os trechos de lei já selecionados pelo app, chama a API do Claude (`claude-opus-5-5` para a resposta, `claude-haiku-5-5` para preparar a busca) com saída estruturada e devolve o JSON que a interface renderiza. Ela também aceita imagens e PDFs anexados.
+A explicação em linguagem simples usa o Google Gemini no site, pela função `supabase/functions/ross-ai/index.ts` (Supabase Edge Function), cujo endereço está em `config.js`. A função recebe a pergunta e os trechos de lei já selecionados pelo app, chama o Gemini (`gemini-3.5-flash` para a resposta, `gemini-3.1-flash-lite` para preparar a busca), valida a saída estruturada e devolve o JSON que a interface renderiza. Ela também aceita imagens e PDFs anexados. Dentro do claude.ai, permanece a capacidade `sample` da conta de quem abre o artifact.
 
 Proteções: só aceita chamadas das origens listadas, limita pedidos por IP e por dia (tabela `ross_ai_usage`, migração em `supabase/migrations/`) e não guarda perguntas nem documentos.
 
-Para publicar ou atualizar a função é preciso o segredo `ANTHROPIC_API_KEY` no projeto Supabase (Edge Functions → Secrets). Variáveis opcionais: `ROSS_ALLOWED_ORIGINS`, `ROSS_ANSWER_MODEL`, `ROSS_HELPER_MODEL`, `ROSS_IP_DAILY_LIMIT`, `ROSS_GLOBAL_DAILY_LIMIT`, `ROSS_SALT`.
+Configure `GEMINI_API_KEY` (ou `GOOGLE_API_KEY`) em Supabase → Edge Functions → Secrets. Alternativamente, guarde a chave no Vault com o nome `ross_ai_google_api_key` e aplique `supabase/schema/google-key.sql`: a função de leitura usa os privilégios de quem chama e permite execução somente a `service_role`. As variáveis de ambiente têm prioridade. Nunca coloque a chave em `config.js`, no Git ou no navegador. Variáveis opcionais: `ROSS_ALLOWED_ORIGINS`, `ROSS_ANSWER_MODEL`, `ROSS_HELPER_MODEL`, `ROSS_IP_DAILY_LIMIT`, `ROSS_GLOBAL_DAILY_LIMIT`, `ROSS_SALT`. Ao implantar, inclua também o módulo `gemini.mjs`.
 
 ## Modos de resposta
 
-- **Fontes oficiais** (padrão): seleciona normas no catálogo, busca artigos vigentes no texto capturado do Planalto e pede ao Claude uma explicação restrita a esses trechos. Cada fonte citada mostra artigo, situação, link oficial, data da captura e versão. Sem a IA (fora do claude.ai), a resposta mostra os próprios trechos oficiais.
+- **Fontes oficiais** (padrão): seleciona normas no catálogo, busca artigos no texto oficial capturado e pede à IA uma explicação restrita a esses trechos. Cada fonte citada mostra artigo, situação, link oficial, data da captura e versão. Sem a IA configurada, a resposta mostra os próprios trechos oficiais.
 - **Demonstração**: respostas roteirizadas com fontes fictícias.
 - **IA sem fontes**: resposta geral do modelo, marcada como não verificada.
 
@@ -52,6 +52,16 @@ node scripts/ingest-laws.mjs --approve  # aplica as mudanças conferidas e regis
 
 A fila de conferência aparece na página **Base de fontes** do app. A busca é local (palavras-chave com peso por raridade, apenas artigos vigentes); a IA recebe só os trechos selecionados e é instruída a não citar nada fora deles.
 
+Na busca do site, os IDs de normas sugeridos pelo modelo são preservados junto às correspondências de palavras inteiras. Os artigos usam a mesma normalização em pergunta e texto; siglas não correspondem a fragmentos de palavras. A leitura também recupera caracteres UTF-8 decodificados incorretamente em algumas capturas.
+
+Antes da explicação, uma segunda chamada ao modelo rápido seleciona os trechos relevantes dentre candidatos de cada norma. Só IDs presentes nessa lista são aceitos. Uma seleção vazia pede mais contexto, e uma falha nessa verificação suspende a conclusão gerada por IA. Não encontrar trechos não é apresentado como inexistência de legislação aplicável.
+
+`node --test tests/*.test.mjs` verifica recuperação de artigos em cenários das 66 normas do catálogo, colisão traseira sem expansão por IA, colisões de palavras e siglas, referências inexistentes, texto corrompido, busca no repositório e integração com o provedor. Esses testes verificam o mecanismo de busca; não garantem a correção jurídica de toda resposta possível.
+
+Para os testes de interação das telas, execute `node qa/prepare-dom.mjs` e `node --test qa/ui.test.mjs`. A preparação baixa uma versão fixa do ambiente DOM e confere sua integridade. Esses testes percorrem as telas em português e inglês, envio e reenvio, anexos, recuperação do histórico e busca/leitura no repositório; não substituem uma revisão visual em navegador.
+
+Os anexos têm limite de quatro arquivos e 20 MB no total por mensagem. Se um envio falhar, o arquivo permanece apenas em memória para uma nova tentativa; após recarregar o app, é necessário anexá-lo novamente. Respostas interrompidas passam a mostrar a opção de nova tentativa ao restaurar o histórico.
+
 ## Arquivos
 
 - `index.html` — documento completo do site; `artifact.html` — mesmo conteúdo para o artifact; `config.js` — endereço da API.
@@ -65,7 +75,7 @@ A fila de conferência aparece na página **Base de fontes** do app. A busca é 
 
 ## Provedores de resposta
 
-`app.js` define `providers.oficial` (busca local + Claude), `providers.demo` (roteirizado, fontes fictícias) e `providers.ai` (Claude sem fontes). Para trocar a busca local por um backend (por exemplo, busca semântica em servidor), crie um provedor com a mesma assinatura:
+`app.js` define `providers.oficial` (busca + IA), `providers.demo` (roteirizado, fontes fictícias) e `providers.ai` (IA sem fontes). Para trocar a busca local por um backend (por exemplo, busca semântica em servidor), crie um provedor com a mesma assinatura:
 
 ```js
 respond({ text, attachments, conv, lang, onStep, signal }) → Promise<answer>
@@ -77,4 +87,4 @@ O objeto `answer` usa os campos lidos por `answerHTML`: `kind`, `summary`, `sour
 ## Privacidade no protótipo
 
 Conversas, nomes de anexos e preferências ficam no `localStorage` do navegador. Arquivos não são lidos nem enviados no modo de
-demonstração. No Modo IA, imagens anexadas vão ao modelo pela conta da própria pessoa, apenas para gerar a resposta.
+demonstração. Nos modos com IA no site, perguntas, trechos selecionados e anexos passam pelo servidor e são enviados ao Google Gemini para gerar a resposta. O servidor não persiste perguntas nem anexos.

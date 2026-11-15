@@ -78,6 +78,15 @@
       if (data.mode === undefined && data.aiMode) state.mode = 'ai';
       if (!['oficial', 'demo', 'ai'].includes(state.mode)) state.mode = 'oficial';
       if (!window.ROSS_I18N[state.lang]) state.lang = DEFAULT_LANG;
+      if (!Array.isArray(state.conversations)) state.conversations = [];
+      state.conversations.forEach((conversation) => {
+        if (!Array.isArray(conversation.messages)) conversation.messages = [];
+        conversation.messages.forEach((message) => {
+          if (message.role === 'assistant' && message.status === 'loading') {
+            message.status = 'error'; message.error = t('errors.interrupted');
+          }
+        });
+      });
     } catch (e) { /* armazenamento indisponível: segue sem histórico */ }
   }
   let saveTimer = null;
@@ -272,15 +281,16 @@
     ta.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) { e.preventDefault(); state.draft = ta.value; refresh(); if (!send.disabled) form.requestSubmit(); } });
     form.addEventListener('submit', (e) => { e.preventDefault(); const text = ta.value.trim(); if (!text && !state.pending.length) return; submitMessage(text); });
     $('#btn-attach').addEventListener('click', () => pickFiles());
-    $$('select[data-role]', form).forEach((s) => s.addEventListener('change', () => {
+    form.addEventListener('change', (event) => {
+      const s = event.target.closest('select[data-role]');
+      if (!s || !form.contains(s)) return;
       if (s.dataset.role === 'country') { state.country = s.value; state.region = ''; }
       else state.region = s.value;
       save();
       const left = $('.composer-left', form);
       $$('.select-wrap', left).forEach((w) => w.remove());
       left.insertAdjacentHTML('beforeend', jurisdictionSelectsHTML(state.country, state.region, 'home'));
-      $$('select[data-role]', form).forEach((n) => n.addEventListener('change', () => { if (n.dataset.role === 'country') { state.country = n.value; state.region = ''; } else state.region = n.value; save(); bindComposer(mode); }));
-    }));
+    });
     renderAttachList();
     grow(); refresh();
     form._refresh = refresh;
@@ -295,15 +305,19 @@
 
   /* ---------- Anexos ---------- */
   const MAX_FILE = 20 * 1024 * 1024;
+  const MAX_FILES = 4;
   const OK_TYPES = ['application/pdf', 'image/jpeg', 'image/png', 'image/webp'];
   function pickFiles() { const inp = $('#file-input'); inp.value = ''; inp.click(); }
   function onFilesChosen(files) {
     const ok = [], skipped = [];
+    let totalBytes = state.pending.reduce((sum, file) => sum + file.size, 0);
     Array.from(files).forEach((f) => {
       const type = f.type || (f.name.toLowerCase().endsWith('.pdf') ? 'application/pdf' : '');
       if (f.size > MAX_FILE) skipped.push(f.name + ': ' + t('attachModal.tooLarge'));
       else if (!OK_TYPES.includes(type)) skipped.push(f.name + ': ' + t('attachModal.badType'));
-      else ok.push({ id: uid(), name: f.name, size: f.size, type: type, file: f });
+      else if (state.pending.length + ok.length >= MAX_FILES) skipped.push(f.name + ': ' + t('attachModal.tooMany'));
+      else if (totalBytes + f.size > MAX_FILE) skipped.push(f.name + ': ' + t('attachModal.totalTooLarge'));
+      else { ok.push({ id: uid(), name: f.name, size: f.size, type: type, file: f }); totalBytes += f.size; }
     });
     if (!ok.length && !skipped.length) return;
     showAttachModal(ok, skipped);
@@ -721,23 +735,50 @@
      Fluxo: escolher normas no catálogo → carregar o JSON da norma → pontuar artigos vigentes → montar trechos →
      (com IA) pedir explicação restrita aos trechos; (sem IA) mostrar os próprios trechos com link oficial. */
   const lawCache = {};
+  async function sourceJSON(path) {
+    const embedded = window.ROSS_EMBEDDED_DATA;
+    if (embedded && Object.prototype.hasOwnProperty.call(embedded, path)) return embedded[path];
+    const res = await fetch(path);
+    if (!res.ok) throw { code: 'law_fetch', message: 'HTTP ' + res.status };
+    return res.json();
+  }
   async function loadCatalog() {
     try {
-      const res = await fetch('data/catalog.json'); if (!res.ok) throw new Error('HTTP ' + res.status);
-      state.catalog = await res.json();
-      try { const p = await fetch('data/pending.json'); state.lawPending = p.ok ? await p.json() : null; } catch (e) { state.lawPending = null; }
+      state.catalog = await sourceJSON('data/catalog.json');
+      try { state.lawPending = await sourceJSON('data/pending.json'); } catch (e) { state.lawPending = null; }
       if (['home', 'settings', 'sources'].includes(state.view)) render({ keep: true });
     } catch (e) { state.catalog = null; }
   }
   async function loadLaw(entry) {
     if (lawCache[entry.id]) return lawCache[entry.id];
-    const res = await fetch('data/' + entry.file);
-    if (!res.ok) throw { code: 'law_fetch', message: 'HTTP ' + res.status };
-    const law = await res.json(); lawCache[entry.id] = law; return law;
+    const raw = await sourceJSON('data/' + entry.file);
+    const law = Object.assign({}, raw, { articles: raw.articles.map((article) => Object.assign({}, article, {
+      text: repairEncoding(article.text), heading: repairEncoding(article.heading), label: repairEncoding(article.label)
+    })) });
+    lawCache[entry.id] = law; return law;
   }
-  const norm = (s) => String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+  function repairEncoding(value) {
+    let text = String(value || '');
+    const cp1252 = '€\u0081‚ƒ„…†‡ˆ‰Š‹Œ\u008dŽ\u008f\u0090‘’“”•–—˜™š›œ\u009džŸ';
+    const pattern = /[\u00c2-\u00f4](?:[\u0080-\u00bf]|[€‚ƒ„…†‡ˆ‰Š‹ŒŽ‘’“”•–—˜™š›œžŸ]){1,3}/g;
+    for (let pass = 0; pass < 3; pass++) {
+      const repaired = text.replace(pattern, (run) => {
+        const encoded = Array.from(run).map((char) => {
+          const index = cp1252.indexOf(char);
+          const byte = index < 0 ? char.charCodeAt(0) : 128 + index;
+          return '%' + byte.toString(16).padStart(2, '0');
+        }).join('');
+        try { return decodeURIComponent(encoded); } catch (e) { return run; }
+      });
+      if (repaired === text) break;
+      text = repaired;
+    }
+    return text;
+  }
+  const norm = (s) => repairEncoding(s).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
   const STOP = new Set('a o os as um uma uns umas de do da dos das em no na nos nas por para com sem sob sobre e ou que se nao ao aos sao ser foi esta estao estou meu minha meus minhas seu sua seus suas este isto esse essa isso aquele aquela aquilo ele ela eles elas eu voce nos lhe me te como quando onde qual quais quem mais menos muito pouco ja tambem so pode posso poderia devo deve dever tenho tem ter ha fazer faco faz fiz era sendo sido pelo pela pelos pelas num numa dele dela deles delas ate entre apos antes depois ainda mesmo mesma outro outra outros outras todo toda todos todas qualquer caso casos sobre sim nao the of and to in is it my can what how does this that for with about are was were have has been'.split(' '));
-  /* Radicalização leve para português: a busca compara por prefixo, então "dirig" alcança dirigir, dirigindo, dirigente. */
+  /* Apply the same normalization to queries and article words. Substring
+     matches such as "bat" in "batedores" are not evidence of relevance. */
   function stem(w) {
     if (w.length > 5 && /oes$/.test(w)) w = w.slice(0, -3) + 'ao';
     if (w.length > 4 && /ns$/.test(w)) w = w.slice(0, -2) + 'm';
@@ -756,7 +797,7 @@
     ['loja', 'fornecedor'], ['golpe', 'estelionato fraude'], ['roubo', 'furto roubo'], ['roubaram', 'furto roubo'], ['pensao', 'alimentos'], ['heranca', 'sucessao'], ['aposentar', 'aposentadoria'], ['inss', 'previdencia beneficio segurado'],
     ['plano de saude', 'operadora cobertura'], ['cancelar', 'rescisao cancelamento'], ['devolver', 'devolucao restituicao arrependimento'], ['comprei', 'compra consumidor fornecedor'], ['internet', 'distancia eletronico'],
     ['escola', 'ensino educacao'], ['preso', 'prisao flagrante'], ['barulho', 'sossego perturbacao'], ['vizinho', 'vizinhanca'], ['cachorro', 'animal'], ['gato', 'animal'], ['defeito', 'vicio'], ['troca', 'substituicao'], ['juros', 'mora'],
-    ['filho', 'filhos menor crianca'], ['marido', 'conjuge'], ['esposa', 'conjuge'], ['divorcio', 'divorcio dissolucao'], ['visita', 'convivencia'], ['guarda', 'guarda'], ['celular', 'telefone'], ['foto', 'imagem'], ['video', 'imagem']
+    ['filho', 'filhos menor crianca'], ['marido', 'conjuge'], ['esposa', 'conjuge'], ['divorcio', 'divorcio dissolucao'], ['uniao estavel', 'entidade familiar convivencia duradoura publica continua familia'], ['visita', 'convivencia'], ['guarda', 'guarda'], ['celular', 'telefone'], ['foto', 'imagem'], ['video', 'imagem']
   ];
   function expandQuery(q) {
     const n = norm(q); const extra = [];
@@ -764,6 +805,28 @@
     return q + ' ' + extra.join(' ');
   }
   function tokensOf(s) { return Array.from(new Set(norm(s).replace(/[^a-z0-9\s-]/g, ' ').split(/\s+/).filter((w) => w.length > 2 && !STOP.has(w)).map(stem).filter((w) => w.length > 2))); }
+  // Match whole terms: the environmental registry acronym CAR must not match
+  // "carro", and generic keyword counts must not discard the model's law IDs.
+  function containsTerm(text, term) {
+    const value = norm(term).trim().replace(/\s+/g, ' ');
+    if (!value) return false;
+    const escaped = value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    return new RegExp('(^|[^a-z0-9])' + escaped + '($|[^a-z0-9])').test(norm(text).replace(/\s+/g, ' '));
+  }
+  function searchIntent(question) {
+    const q = norm(question);
+    const collision = /\b(?:batida|batidas|bateram|bateu|bati|bater|colisao|colisoes|abalroamento|engavetamento)\b/.test(q);
+    const vehicle = /\b(?:carro|carros|veiculo|veiculos|moto|motocicleta|caminhao|traseira|para-choque)\b/.test(q);
+    if (!(collision && vehicle) && !/\bengavetamento\b|\bacidente de transito\b/.test(q)) return null;
+    return {
+      laws: ['l9503', 'l10406'],
+      terms: 'acidente de trânsito colisão veículo condutor distância de segurança lateral frontal negligência imprudência causar dano reparação indenização ato ilícito',
+      focus: {
+        l9503: [/distancia de seguranca lateral e frontal/, /dominio de .*veiculo.*atencao e cuidados/],
+        l10406: [/negligencia ou imprudencia/, /por ato ilicito.*causar dano/, /fica obrigado a repara/],
+      },
+    };
+  }
   /* Com IA disponível, pede termos jurídicos para reforçar a busca (modelo rápido, resposta em cache). */
   async function expandQueryAI(question) {
     if (!sampleFn) return '';
@@ -772,16 +835,18 @@
       return Array.isArray(terms) ? terms.filter((x) => typeof x === 'string').join(' ') : '';
     } catch (e) { return ''; }
   }
-  function selectLaws(question) {
+  function selectLaws(question, suggestedIds, originalQuestion) {
     const q = norm(question);
+    const intent = searchIntent(originalQuestion || question);
     const scored = state.catalog.laws.map((l) => {
       let sc = 0;
-      (l.tags || []).forEach((tag) => { const tg = norm(tag); if (q.includes(tg)) sc += tg.includes(' ') ? 3 : 2; });
-      if (q.includes(norm(l.shortName))) sc += 6;
-      const num = (norm(l.number).match(/\d[\d.]*/) || [''])[0]; if (num && q.includes(num)) sc += 6;
+      (l.tags || []).forEach((tag) => { const tg = norm(tag); if (containsTerm(q, tg)) sc += tg.includes(' ') ? 3 : 2; });
+      if (containsTerm(q, l.shortName)) sc += 6;
+      const num = (norm(l.number).match(/\d[\d.]*/) || [''])[0]; if (num && containsTerm(q, num)) sc += 6;
       return { l, sc };
     }).filter((x) => x.sc > 0).sort((a, b) => b.sc - a.sc);
-    return scored.slice(0, 3).map((x) => x.l);
+    const ids = (intent ? intent.laws : []).concat(Array.isArray(suggestedIds) ? suggestedIds : [], scored.map((x) => x.l.id));
+    return Array.from(new Set(ids)).map((id) => state.catalog.laws.find((l) => l.id === id)).filter(Boolean).slice(0, 6);
   }
   async function selectLawsAI(question) {
     if (!sampleFn) return null;
@@ -801,27 +866,39 @@
     if (last < lines.length - 1) out += '\n[…]';
     return out.length > maxChars ? out.slice(0, maxChars) + '…' : out;
   }
-  function searchArticles(laws, question, limit) {
-    const qTokens = tokensOf(question);
+  function searchArticles(laws, question, limit, originalQuestion, characterBudget) {
+    const intent = searchIntent(originalQuestion || question);
+    const qTokens = tokensOf(question + (intent ? ' ' + intent.terms : ''));
     if (!qTokens.length) return [];
     const hits = [];
     laws.forEach((law) => {
       const arts = law.articles.filter((a) => a.status === 'vigente');
       const N = arts.length;
       const normed = arts.map((a) => norm(a.text));
-      const df = qTokens.map((tk) => normed.reduce((c, tx) => c + (tx.includes(tk) ? 1 : 0), 0));
+      const frequencies = arts.map((a) => {
+        const counts = new Map();
+        norm(a.text).replace(/[^a-z0-9\s-]/g, ' ').split(/\s+/).filter((word) => word.length > 2 && !STOP.has(word)).forEach((word) => {
+          const token = stem(word); counts.set(token, (counts.get(token) || 0) + 1);
+        });
+        return counts;
+      });
+      const df = qTokens.map((tk) => frequencies.reduce((count, words) => count + (words.has(tk) ? 1 : 0), 0));
       arts.forEach((a, i) => {
         let score = 0, matched = 0;
-        qTokens.forEach((tk, j) => { if (!df[j]) return; const occ = normed[i].split(tk).length - 1; if (occ) { matched++; score += (1 + Math.min(occ, 4) * 0.25) * Math.log(1 + N / df[j]); } });
+        qTokens.forEach((tk, j) => { if (!df[j]) return; const occ = frequencies[i].get(tk) || 0; if (occ) { matched++; score += (1 + Math.min(occ, 4) * 0.25) * Math.log(1 + N / df[j]); } });
         if (!matched) return;
         score *= Math.pow(matched / qTokens.length, 1.5);
         score /= Math.log(20 + a.text.length / 80);
+        if (intent && intent.focus[law.id]) {
+          const text = normed[i].replace(/\s+/g, ' ');
+          score += intent.focus[law.id].filter((pattern) => pattern.test(text)).length * 8;
+        }
         hits.push({ law, a, score });
       });
     });
     hits.sort((x, y) => y.score - x.score);
     const out = []; let chars = 0;
-    for (const h of hits) { if (out.length >= limit) break; const ex = excerptFor(h.a, qTokens, 2200); if (chars + ex.length > 15000) continue; chars += ex.length; out.push({ law: h.law, article: h.a, excerpt: ex, score: h.score }); }
+    for (const h of hits) { if (out.length >= limit) break; const ex = excerptFor(h.a, qTokens, 2200); if (chars + ex.length > (characterBudget || 15000)) continue; chars += ex.length; out.push({ law: h.law, article: h.a, excerpt: repairEncoding(ex), score: h.score }); }
     return out;
   }
   function lawSource(hit, n) {
@@ -830,6 +907,37 @@
     const ver = entry.versions && entry.versions.length ? entry.versions[entry.versions.length - 1].id : 'v1';
     const anchor = /^\d+$/.test(hit.article.id) ? '#art' + hit.article.id : '';
     return { lawId: law.id, name: law.name, shortName: law.shortName, article: hit.article.label, heading: hit.article.heading, status: hit.article.status, nota: hit.article.nota, url: law.url + anchor, textUrl: law.textUrl || law.url, source: law.source || '', retrievedAt: law.retrievedAt, version: ver, excerpt: hit.excerpt, n: n };
+  }
+  function candidateHits(laws, query, question) {
+    // A long article or a large code must not consume the whole recall budget
+    // before other selected laws reach the independent relevance check.
+    return laws.flatMap((law) => searchArticles([law], query, 36, question, 80000));
+  }
+  function relevanceCatalog(sources, query) {
+    const terms = new Set(tokensOf(query));
+    return sources.slice(0, 200).map((source, index) => {
+      const text = repairEncoding(source.excerpt).replace(/\s+/g, ' ');
+      let best = text.slice(0, 155), score = -1;
+      for (let offset = 0; offset < text.length; offset += 90) {
+        const snippet = text.slice(offset, offset + 155);
+        const matched = tokensOf(snippet).filter((token) => terms.has(token)).length;
+        if (matched > score) { score = matched; best = snippet; }
+      }
+      return { id: 'passage-' + (index + 1), name: (source.shortName.slice(0, 30) + ' ' + source.article + ': ' + best).slice(0, 200) };
+    });
+  }
+  function validatedSelection(sources, ids) {
+    return Array.from(new Set(Array.isArray(ids) ? ids : [])).filter((id) => /^passage-[1-9]\d*$/.test(id))
+      .map((id) => sources[Number(id.slice(8)) - 1]).filter(Boolean).slice(0, 3)
+      .map((source, index) => Object.assign({}, source, { n: index + 1 }));
+  }
+  async function selectRelevantSources(question, query, sources, signal) {
+    const catalog = relevanceCatalog(sources, query);
+    const result = await apiCall('prepare', {
+      question: 'RELEVÂNCIA DE TRECHOS JURÍDICOS. A pergunta é: ' + question + '\nCada item do catálogo representa um artigo ou trecho real. Em laws, selecione até 3 IDs passage-N cujos textos ajudam diretamente a responder à pergunta. Compare o conteúdo, não só o nome da lei ou palavras coincidentes. Ignore assuntos apenas parecidos. Se nenhum trecho servir, retorne laws vazio. Não acrescente IDs.',
+      catalog,
+    }, signal);
+    return validatedSelection(sources.slice(0, 200), result.laws);
   }
   providers.oficial = {
     id: 'oficial',
@@ -860,23 +968,32 @@
           if (e && e.code === 'api_not_configured') modelUnavailable = true;
         }
       }
-      const searchText = expandQuery(question) + ' ' + aiTerms;
-      let laws = selectLaws(searchText);
-      if (!laws.length && apiLaws && apiLaws.length) laws = apiLaws;
+      const intent = searchIntent(question);
+      const searchText = expandQuery(question) + ' ' + aiTerms + (intent ? ' ' + intent.terms : '');
+      let laws = selectLaws(searchText, apiLaws && apiLaws.map((l) => l.id), question);
       if (!laws.length) { const picked = await selectLawsAI(question); if (picked && picked.length) laws = picked; }
       if (signal.aborted) throw { code: 'cancelled' };
       const loaded = await Promise.all(laws.map(loadLaw));
       onStep(1);
-      const hits = searchArticles(loaded, searchText, 8);
+      const hits = candidateHits(loaded, searchText, question);
       if (signal.aborted) throw { code: 'cancelled' };
       const localSources = hits.map((h, i) => lawSource(h, i + 1));
       const seen = new Set(localSources.map((s) => s.url.replace(/#.*$/, '') + '|' + s.article));
-      const sources = localSources.concat(importedSources.filter((s) => {
+      let sources = localSources.concat(importedSources.filter((s) => {
         const key = s.url.replace(/#.*$/, '') + '|' + s.article;
         if (seen.has(key)) return false; seen.add(key); return true;
-      })).slice(0, 8).map((s, i) => Object.assign({}, s, { n: i + 1 }));
+      })).slice(0, 200).map((s, i) => Object.assign({}, s, { n: i + 1 }));
       if (!sources.length) return emptyOfficial();
       if (modelUnavailable || (!sampleFn && !API_URL)) return retrievalOnly(sources);
+      if (!sampleFn && API_URL) {
+        try { sources = await selectRelevantSources(question, searchText, sources, signal); }
+        catch (e) {
+          if (signal.aborted) throw { code: 'cancelled' };
+          if (e && e.code === 'rate_limited') throw e;
+          return retrievalOnly(sources, 'oficial.relevanceUnavailable');
+        }
+        if (!sources.length) return emptyOfficial();
+      } else sources = sources.slice(0, 8);
       onStep(2);
       try {
         const data = sampleFn ? await askOfficial(question, sources, conv, attachments, signal) : await askOfficialAPI(question, sources, conv, attachments, signal);
@@ -885,9 +1002,9 @@
     }
   };
   function emptyOfficial() { return { mode: 'oficial', kind: 'nosources', summary: t('oficial.empty'), questions: t('oficial.emptyQuestions'), nextSteps: [t('oficial.emptyStep')], capturedAt: state.catalog.generatedAt }; }
-  function retrievalOnly(sources) {
+  function retrievalOnly(sources, reason) {
     const top = sources.slice(0, 5);
-    return { mode: 'oficial', kind: 'answer', corpus: top.some((s) => s.imported), summary: t('corpus.noAI'), sourcesSay: top.map((s) => ({ title: s.shortName + ' · ' + s.article, text: s.excerpt.length > 700 ? s.excerpt.slice(0, 700) + '…' : s.excerpt, ref: s.n })), sources: top, warnings: [t('oficial.noAIWarn')], capturedAt: state.catalog.generatedAt };
+    return { mode: 'oficial', kind: 'answer', corpus: top.some((s) => s.imported), summary: t(reason || 'oficial.noAI'), sourcesSay: top.map((s) => ({ title: s.shortName + ' · ' + s.article, text: s.excerpt.length > 700 ? s.excerpt.slice(0, 700) + '…' : s.excerpt, ref: s.n })), sources: top, warnings: [t('oficial.noAIWarn')], capturedAt: state.catalog.generatedAt };
   }
   async function askOfficial(question, sources, conv, attachments, signal) {
     const exc = sources.map((s) => '[' + s.n + '] ' + s.name + ' — ' + s.article + (s.heading ? ' (' + s.heading + ')' : '') + (s.nota ? ' [' + s.nota + ']' : '') + '\n"""\n' + s.excerpt + '\n"""').join('\n\n');
@@ -924,6 +1041,7 @@
     return res.answer || {};
   }
   function normalizeOfficial(d, sources, attachments) {
+    if (d && d.kind === 'nosources') return emptyOfficial();
     const a = normalizeAI(d, attachments);
     a.mode = 'oficial'; a.capturedAt = state.catalog.generatedAt; a.corpus = sources.some((s) => s.imported);
     const byN = Object.fromEntries(sources.map((s) => [s.n, s]));
@@ -1025,6 +1143,7 @@
     scrollToEnd();
     await runProvider(provider, conv, botMsg, { text: text, attachments: attachments });
   }
+  const retryInputs = new WeakMap();
   async function runProvider(provider, conv, botMsg, input) {
     const ctl = new AbortController();
     state.busy = { ctl: ctl, id: botMsg.id };
@@ -1032,8 +1151,10 @@
     const onStep = (i) => { botMsg.step = i; const node = $('.msg[data-id="' + botMsg.id + '"] .answer'); if (node) node.innerHTML = loadingHTML(provider.id, i); };
     try {
       const answer = await provider.respond({ text: input.text, attachments: input.attachments, conv: conv, lang: state.lang, onStep: onStep, signal: ctl.signal });
+      retryInputs.delete(botMsg);
       botMsg.status = 'done'; botMsg.answer = answer; botMsg.provider = provider.id; delete botMsg.error;
     } catch (e) {
+      retryInputs.set(botMsg, input);
       const code = e && e.code;
       botMsg.status = 'error';
       botMsg.error = (code && t('errors.' + code) !== 'errors.' + code) ? t('errors.' + code) : (e && e.message && code !== 'demo_error' ? t('errors.generic') : t('errors.generic'));
@@ -1053,9 +1174,14 @@
     if (state.busy) return;
     const idx = conv.messages.indexOf(botMsg);
     const prevUser = conv.messages.slice(0, idx).reverse().find((m) => m.role === 'user');
-    const input = botMsg.lastInput || { text: prevUser ? prevUser.text : '', attachments: prevUser ? prevUser.attachments : [] };
+    const input = retryInputs.get(botMsg) || botMsg.lastInput || { text: prevUser ? prevUser.text : '', attachments: prevUser ? prevUser.attachments : [] };
     if (RX.error.test(input.text || '')) input.text = input.text.replace(RX.error, '').trim();
     const provider = botMsg.forced ? providers.demo : activeProvider();
+    if (provider.id !== 'demo' && (input.attachments || []).some((file) => !file.file)) {
+      botMsg.error = t('errors.attachment_missing');
+      const node = $('.msg[data-id="' + botMsg.id + '"]'); if (node) node.replaceWith(renderMessage(botMsg, conv));
+      toast(botMsg.error); return;
+    }
     botMsg.status = 'loading'; botMsg.step = 0; botMsg.provider = provider.id; delete botMsg.error;
     const node = $('.msg[data-id="' + botMsg.id + '"]'); if (node) node.replaceWith(renderMessage(botMsg, conv));
     await runProvider(provider, conv, botMsg, input);
