@@ -463,3 +463,6 @@ img { max-width: 100%; }
   .corpus-query-row { flex-wrap: wrap; }
   .corpus-query-row .btn { width: 100%; }
 }
+
+/* Acervo importado (repositório comunitário): selo distinto do texto oficial */
+.badge-imported { background: var(--surface-2); color: var(--fg-2); border-color: var(--border); }

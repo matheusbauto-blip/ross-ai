@@ -1237,7 +1237,7 @@
       '<a href="' + esc(corpusRepoURL(path, ref)) + '" target="_blank" rel="noopener noreferrer">' + esc(t('corpus.openSnapshot')) + '</a></div>';
   }
   function corpusSourceHTML(s, n, m) {
-    return '<li class="src-card" id="src-' + m.id + '-' + n + '"><div class="src-name"><span>' + esc(s.name) + '</span><span class="badge badge-oficial">ctresb/leis</span></div>' +
+    return '<li class="src-card" id="src-' + m.id + '-' + n + '"><div class="src-name"><span>' + esc(s.name) + '</span><span class="badge badge-imported">' + esc(t('corpus.importedBadge')) + '</span></div>' +
       '<div class="src-meta"><span>' + esc(s.article) + '</span><span>' + esc(s.corpusVersion) + '</span><span>' + esc(t('corpus.currency')) + '</span>' +
       (s.retrievedAt ? '<span>' + esc(t('source.captured') + ': ' + fmtDate(s.retrievedAt)) + '</span>' : '') + '</div>' +
       corpusLinks(s.url, s.repositoryPath, s.repositoryRef) + '<details class="src-excerpt"><summary>' + esc(t('source.excerpt')) + '</summary><p>' + esc(s.excerpt).replace(/\n/g, '<br>') + '</p></details></li>';
@@ -1246,7 +1246,7 @@
     const c = state.corpus;
     const ufOptions = GEO.regions.BR || regionsFor('BR') || [];
     const stats = c.stats && c.stats.error ? t('corpus.unavailable') : c.stats ? t('corpus.count', { n: Number(c.stats.documents || 0).toLocaleString(state.lang) }) : t('corpus.loadingCount');
-    const resultHTML = c.results.map((r) => '<article class="corpus-result"><div class="corpus-result-head"><h2>' + esc(r.title) + '</h2><span class="badge ' + (r.is_partial ? 'badge-historico' : 'badge-oficial') + '">' + esc(r.is_partial ? t('corpus.partial') : t('corpus.imported')) + '</span></div>' +
+    const resultHTML = c.results.map((r) => '<article class="corpus-result"><div class="corpus-result-head"><h2>' + esc(r.title) + '</h2><span class="badge ' + (r.is_partial ? 'badge-historico' : 'badge-imported') + '">' + esc(r.is_partial ? t('corpus.partial') : t('corpus.imported')) + '</span></div>' +
       '<p class="corpus-meta">' + esc([t('corpus.' + r.scope), r.uf, r.municipality, r.article].filter(Boolean).join(' · ')) + '</p>' +
       (r.summary ? '<p>' + esc(r.summary) + '</p>' : '') +
       '<details class="corpus-excerpt"><summary>' + esc(t('corpus.readExcerpt')) + '</summary><p>' + esc(r.excerpt) + '</p></details>' +
