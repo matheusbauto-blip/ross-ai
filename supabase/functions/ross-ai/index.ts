@@ -200,7 +200,7 @@ function systemPrompt(lang: string, grounded: boolean) {
 /* ---------- operações ---------- */
 async function opPrepare(apiKey: string, body: Record<string, unknown>) {
   const question = str(body.question, 2000);
-  const catalog = arr(body.catalog).slice(0, 200).map((l: Record<string, unknown>) => `${str(l.id, 40)}: ${str(l.name, 200)}`).join("\n");
+  const catalog = arr(body.catalog).slice(0, 200).map((l: Record<string, unknown>) => `${str(l.id, 40)}: ${str(l.name, 400)}`).join("\n");
   const response = await generateGemini({
     apiKey,
     model: HELPER_MODEL,

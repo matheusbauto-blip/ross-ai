@@ -673,3 +673,13 @@ test('a client-side deadline ends an endless wait with a distinct, retryable mes
   assert.ok(document.querySelector('.error-card [data-retry]'));
   assert.equal(api.state.busy, null);
 });
+
+test('generic clarification questions appear only when the model gave no explanation of its own', t => {
+  const { api } = setup(t);
+  const specific = api.normalizeOfficial({ kind: 'nosources', summary: 'Os trechos tratam de responsabilidade por danos, não dos prazos para reclamar de um defeito.', questions: [], sourcesSay: [], sources: [], warnings: [] }, officialSources, []);
+  assert.deepEqual(specific.questions, []);
+  assert.equal(specific.nextSteps.length, 1);
+  const empty = api.normalizeOfficial({ kind: 'nosources', summary: '', questions: [], sourcesSay: [], sources: [], warnings: [] }, officialSources, []);
+  assert.match(empty.summary, /Não consegui confirmar trechos suficientes/);
+  assert.equal(empty.questions.length, 2);
+});

@@ -40,6 +40,20 @@ Essas mudanças estão em `app.js`, `styles.css` e `qa/ui.test.mjs`. A documenta
 | Resposta em processamento não podia ser interrompida. | Botão “Parar” no compositor (no lugar de “Enviar” enquanto há resposta em andamento) e no cartão de carregamento; prazo de espera de 3 minutos no cliente com mensagem própria (`errors.timeout`). O texto de cancelamento avisa que um pedido já enviado pode ter sido processado e contado. | `qa/ui.test.mjs`: “a running answer can be stopped…” e “a client-side deadline ends an endless wait…”. |
 | Proteção do corpo dependia de `Content-Length`. | A função lê o corpo com limite de bytes (`readBounded`) antes de interpretar o JSON; ultrapassar o limite devolve 413 `too_large` sem consultar cota nem modelo. O limite pode ser ajustado por `ROSS_MAX_BODY_BYTES`. | `tests/process-route.test.mjs`: “an oversized body without Content-Length is refused…”. Em teste real contra a função publicada (versão 9), um envio de 30 MB em chunks foi encerrado pelo gateway com HTTP 502 após cerca de 40 s, sem interpretar o corpo nem consultar cota ou modelo; o 413 é observado no handler isolado. |
 
+## Ajuste de recuperação após caso real — 15/11/2026
+
+Pergunta real: “comprei um celular faz 2 semanas e ele deu problrma na bateria”. A resposta publicada foi “sem fontes”, embora o Código de Defesa do Consumidor (arts. 18 e 26) esteja no catálogo. Reprodução local: a busca por palavras encontrava os arts. 18 e 26, mas o catálogo enviado à seleção de relevância mostrava só um fragmento de 155 caracteres com palavras coincidentes (ex.: “§ 2° Obstam a decadência…”), e a seleção escolheu os arts. 12 e 14 (fato do produto); o modelo de resposta, sem os prazos, declarou que os trechos não tratavam de defeitos.
+
+| Mudança | Validação |
+| --- | --- |
+| O catálogo de relevância mostra o início de cada artigo (o que ele regula) e, após “…”, o trecho mais próximo da pergunta, em até 380 caracteres; a função aceita nomes de até 400 caracteres (versão 10). | `tests/legal-search.test.mjs`: “the relevance catalog shows what each article regulates…”. |
+| A intenção “produto com defeito” reconhece “deu problema”, “está com problema”, “estragou”, “não carrega” (com tolerância a erro de digitação em “problema”) e produtos comuns (celular, notebook, geladeira…) além de “comprei/loja/produto”. “Problema da dívida” não é defeito. | “a phone that developed a battery problem retrieves the CDC defect and deadline rules even without AI terms”. |
+| Com intenção reconhecida, os artigos que a regulam acompanham a seleção automática (até dois, além dos escolhidos); a resposta cita só o que usar. | “a recognised intent keeps its governing articles in the selection…”. |
+| “celular” deixa de ser sinônimo de “telefone” (que puxava venda por telefone) e passa a “produto, aparelho”. | Reprodução local da pergunta. |
+| Sem fontes, as perguntas genéricas (“sobre qual tema é a dúvida…”) só aparecem quando o modelo não deu explicação própria. | `qa/ui.test.mjs`: “generic clarification questions appear only when…”. |
+
+A pergunta não foi reenviada ao modelo real durante a correção; a validação é por reprodução local da busca e pelos testes.
+
 ## Pendências prioritárias (registro original)
 
 | Prioridade | Achado e evidência | Correção indicada |
@@ -91,7 +105,7 @@ Comando da suíte completa:
 ROSS_DOM_MODULE=/tmp/ross-qa-dom/linkedom-worker.mjs node --test --test-concurrency=1 tests/*.test.mjs qa/ui.test.mjs
 ```
 
-Após as correções de 15/11/2026, a suíte completa passou com **158 testes** (115 unitários e 43 de interface).
+Após as correções de 15/11/2026, a suíte completa passou com **162 testes** (118 unitários e 44 de interface).
 
 Foram verificadas também a sintaxe dos arquivos JavaScript e a consistência das alterações. As reproduções adicionais usaram um DOM simulado; as duas falhas do handler usaram banco e provedor substituídos por simuladores. Não foram enviados documentos privados ou pedidos de teste ao modelo real durante a varredura.
 

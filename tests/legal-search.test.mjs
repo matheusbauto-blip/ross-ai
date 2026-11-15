@@ -110,3 +110,41 @@ for (const [category, id, question, expectedArticle] of categoryCases) {
     assert.ok(candidates.every(hit => hit.article.status === 'vigente'));
   });
 }
+
+test('a phone that developed a battery problem retrieves the CDC defect and deadline rules even without AI terms', () => {
+  for (const question of ['comprei um celular faz 2 semanas e ele deu problema na bateria', 'comprei um celular faz 2 semanas e ele deu problrma na bateria', 'meu notebook novo está com problema na tela']) {
+    assert.ok(search.searchIntent(question), 'defect intent expected for: ' + question);
+    const result = retrieve(question);
+    assert.deepEqual(result.laws.slice(0, 1), ['l8078']);
+    const refs = result.hits.slice(0, 4).map(hit => hit.law.id + ':' + hit.article.id);
+    for (const ref of ['l8078:18', 'l8078:26']) assert.ok(refs.includes(ref), ref + ' expected in the top hits for: ' + question + ' (got ' + refs.join(', ') + ')');
+  }
+  assert.equal(search.searchIntent('comprei um celular e quero parcelar o problema da dívida'), null);
+});
+
+test('the relevance catalog shows what each article regulates, not only a fragment with matching words', () => {
+  const result = retrieve('comprei um celular faz 2 semanas e ele deu problema na bateria', 'vício do produto garantia legal defeito de fabricação', ['l8078']);
+  const sources = result.hits.map((hit, index) => ({ n: index + 1, lawId: hit.law.id, shortName: hit.law.shortName, article: hit.article.label, excerpt: hit.excerpt }));
+  const catalog = search.relevanceCatalog(sources, 'vício do produto garantia legal defeito de fabricação');
+  const art26 = catalog[sources.findIndex(source => source.article === 'Art. 26')];
+  assert.match(art26.name, /Art\. 26: Art\. 26\. O direito de reclamar pelos vícios aparentes/);
+  assert.ok(art26.name.length <= 380);
+  const art18 = catalog[sources.findIndex(source => source.article === 'Art. 18')];
+  assert.match(art18.name, /respondem solidariamente pelos vícios/);
+});
+
+test('a recognised intent keeps its governing articles in the selection even when the automatic pick omits them', async () => {
+  const question = 'comprei um celular faz 2 semanas e ele deu problema na bateria';
+  const result = retrieve(question, 'vício do produto garantia legal defeito de fabricação reparação de danos', ['l8078']);
+  const sources = result.hits.map((hit, index) => ({ n: index + 1, lawId: hit.law.id, shortName: hit.law.shortName, article: hit.article.label, excerpt: hit.excerpt }));
+  const art12 = sources.findIndex(source => source.article === 'Art. 12') + 1;
+  context.apiCall = async () => ({ laws: ['passage-' + art12] });
+  const selected = await search.selectRelevantSources(question, search.expandQuery(question), sources, null);
+  const articles = selected.map(source => source.article);
+  assert.ok(articles.includes('Art. 18') && articles.includes('Art. 26') && articles.includes('Art. 12'), articles.join(', '));
+  assert.ok(selected.length <= 5);
+  assert.deepEqual(selected.map(source => source.n), selected.map((_, index) => index + 1));
+  context.apiCall = async () => ({ laws: [] });
+  const none = await search.selectRelevantSources('como funciona a herança de um imóvel?', 'herança imóvel', sources.slice(0, 2), null);
+  assert.equal(none.length, 0, 'without a recognised intent the automatic selection stands');
+});
