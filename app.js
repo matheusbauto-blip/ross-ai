@@ -62,6 +62,7 @@
     currentId: null,
     pending: [],
     draft: '',
+    drafts: new Map(),
     aiAvailable: false,
     aiLimits: null,
     hostTheme: null,
@@ -78,6 +79,8 @@
       if (data.mode === undefined && data.aiMode) state.mode = 'ai';
       if (!['oficial', 'demo', 'ai'].includes(state.mode)) state.mode = 'oficial';
       if (!window.ROSS_I18N[state.lang]) state.lang = DEFAULT_LANG;
+      state.region = brazilRegion(state.country, state.region);
+      state.country = 'BR';
       if (!Array.isArray(state.conversations)) state.conversations = [];
       state.conversations.forEach((conversation) => {
         if (!Array.isArray(conversation.messages)) conversation.messages = [];
@@ -136,19 +139,27 @@
   function regionsFor(code) { const c = GEO.countries.find((x) => x.code === code); return c && c.regions ? GEO.regions[c.regions] : null; }
   function regionName(country, region) { const list = regionsFor(country); if (!list || !region) return ''; const r = list.find((x) => x[0] === region); return r ? r[1] : region; }
   function jurisdictionLabel(country, region) { const rn = regionName(country, region); return countryName(country) + (rn ? ' · ' + rn : ''); }
+  function brazilRegion(country, region) { return country === 'BR' && (regionsFor('BR') || []).some((r) => r[0] === region) ? region : ''; }
 
   /* ---------- Conversas ---------- */
   function currentConv() { return state.conversations.find((c) => c.id === state.currentId) || null; }
+  function rememberDraft() { state.drafts.set(state.currentId || 'home', state.draft); }
+  function restoreDraft() { state.draft = state.drafts.get(state.currentId || 'home') || ''; }
   function newConversation(opts) {
-    const conv = { id: uid(), title: '', createdAt: Date.now(), updatedAt: Date.now(), country: (opts && opts.country) || state.country, region: (opts && opts.region) || state.region, messages: [] };
+    rememberDraft();
+    const country = (opts && opts.country) || state.country;
+    const region = opts && opts.region !== undefined ? opts.region : state.region;
+    const conv = { id: uid(), title: '', createdAt: Date.now(), updatedAt: Date.now(), country: 'BR', region: brazilRegion(country, region), messages: [] };
     state.conversations.unshift(conv);
     state.currentId = conv.id;
+    restoreDraft();
     save();
     return conv;
   }
   function deleteConversation(id) {
+    state.drafts.delete(id);
     state.conversations = state.conversations.filter((c) => c.id !== id);
-    if (state.currentId === id) { state.currentId = null; if (state.view === 'chat') state.view = 'home'; }
+    if (state.currentId === id) { state.currentId = null; restoreDraft(); if (state.view === 'chat') state.view = 'home'; }
     save();
   }
   function touch(conv) { conv.updatedAt = Date.now(); state.conversations.sort((a, b) => b.updatedAt - a.updatedAt); save(); }
@@ -162,7 +173,7 @@
   }
 
   /* ---------- Shell: barra superior e drawer ---------- */
-  const PAGE_TOKENS = { privacy: 'privacidade', terms: 'termos', help: 'ajuda', sources: 'fontes', settings: 'configuracoes', search: 'pesquisar' };
+  const PAGE_TOKENS = { privacy: 'privacidade', terms: 'termos', help: 'ajuda', sources: 'fontes', settings: 'configuracoes', search: 'pesquisar', processes: 'processos' };
 
   function brandHTML(cls) { return '<span class="brand ' + (cls || '') + '" aria-label="ROSS AI"><span>ROSS</span><span class="ai">AI</span></span>'; }
 
@@ -197,7 +208,7 @@
       '<button type="button" class="nav-item" data-go="home">' + ICONS.plus + '<span class="grow">' + esc(t('nav.newChat')) + '</span></button>' +
       '<div class="drawer-sec">' + esc(t('nav.history')) + '</div>' + convs +
       '<div class="drawer-sec">ROSS AI</div>' +
-      item('search', 'book', t('corpus.title')) + item('sources', 'book', t('nav.sources')) + item('settings', 'gear', t('nav.settings')) + item('privacy', 'shield', t('nav.privacy')) + item('terms', 'doc', t('nav.terms')) + item('help', 'help', t('nav.help')) +
+      item('processes', 'doc', t('processes.title')) + item('search', 'book', t('corpus.title')) + item('sources', 'book', t('nav.sources')) + item('settings', 'gear', t('nav.settings')) + item('privacy', 'shield', t('nav.privacy')) + item('terms', 'doc', t('nav.terms')) + item('help', 'help', t('nav.help')) +
       '</div>' +
       '<div class="drawer-foot">' + esc(t('nav.demoTag')) + ' · ' + esc(t('tagline')) + '</div>';
     $('#btn-drawer-close').addEventListener('click', () => openDrawer(false));
@@ -229,8 +240,10 @@
 
   /* ---------- Navegação ---------- */
   function go(view, opts) {
+    rememberDraft();
     if (view === 'home') { state.currentId = null; state.pending = []; }
     state.view = view;
+    restoreDraft();
     const token = PAGE_TOKENS[view];
     try { if (token) { if (location.hash !== '#' + token) history.replaceState(null, '', '#' + token); } else if (location.hash) history.replaceState(null, '', location.pathname + location.search); } catch (e) { /* ignora */ }
     save();
@@ -240,7 +253,9 @@
   function openConversation(id) {
     const conv = state.conversations.find((c) => c.id === id);
     if (!conv) return;
+    rememberDraft();
     state.currentId = id; state.view = 'chat'; state.pending = [];
+    restoreDraft();
     save(); render();
     scrollToEnd(true);
   }
@@ -264,9 +279,10 @@
       '</div></div></form>';
   }
   function jurisdictionSelectsHTML(country, region, prefix) {
-    const regions = regionsFor(country);
-    return '<span class="select-wrap"><label class="sr-only" for="' + prefix + '-country">' + esc(t('composer.country')) + '</label><select id="' + prefix + '-country" data-role="country">' +
-      GEO.countries.map((c) => '<option value="' + c.code + '"' + (c.code === country ? ' selected' : '') + '>' + esc(L(c.name)) + '</option>').join('') + '</select></span>' +
+    const regions = regionsFor('BR');
+    region = brazilRegion(country, region);
+    return '<span class="select-wrap country-fixed"><label class="sr-only" for="' + prefix + '-country">' + esc(t('composer.country')) + '</label><select id="' + prefix + '-country" data-role="country" disabled>' +
+      '<option value="BR" selected>' + esc(countryName('BR')) + '</option></select></span>' +
       (regions ? '<span class="select-wrap"><label class="sr-only" for="' + prefix + '-region">' + esc(t('composer.region')) + '</label><select id="' + prefix + '-region" data-role="region"><option value="">' + esc(t('composer.regionAll')) + '</option>' +
         regions.map((r) => '<option value="' + r[0] + '"' + (r[0] === region ? ' selected' : '') + '>' + esc(r[1]) + '</option>').join('') + '</select></span>' : '');
   }
@@ -459,7 +475,7 @@
     if (a.options && a.options.length) h += section(t('sections.options'), '<ul class="opt-grid">' + a.options.map((o) => '<li><strong>' + esc(o.title) + '</strong><p>' + esc(o.text) + '</p></li>').join('') + '</ul>');
     if (a.canDo && a.canDo.length) h += section(t('sections.canDo'), list(a.canDo));
     if (a.depends && a.depends.length) h += section(t('sections.depends'), list(a.depends));
-    if (a.sources && a.sources.length) h += section(isAI ? t('sections.sourcesAI') : t('sections.sources'), '<ol class="src-list">' + a.sources.map((s, i) => sourceCardHTML(s, i + 1, m, isAI)).join('') + '</ol>');
+    if (a.sources && a.sources.length) h += '<section class="ans-sec"><details class="sources-disclosure"><summary><span>' + esc(isAI ? t('sections.sourcesAI') : t('sections.sources')) + '</span><svg class="sources-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m6 9 6 6 6-6"/></svg></summary><ol class="src-list">' + a.sources.map((s, i) => sourceCardHTML(s, i + 1, m, isAI)).join('') + '</ol></details></section>';
     else if (a.kind === 'answer' || a.kind === 'document') h += section(t('sections.sources'), '<p class="muted">' + esc(t('sections.noSources')) + '</p>');
     if (a.nextSteps && a.nextSteps.length) h += section(t('sections.next'), '<ol>' + a.nextSteps.map((x) => '<li>' + esc(x) + '</li>').join('') + '</ol>');
     if (a.limitNotice) h += callout('neutral', '<b>' + esc(t('sections.limit')) + '</b><br>' + esc(a.limitNotice.text) + (a.limitNotice.referrals && a.limitNotice.referrals.length ? list(a.limitNotice.referrals) : ''));
@@ -516,7 +532,7 @@
       const q = m.answer.quickReplies[Number(b.dataset.quick)];
       if (q.action === 'attach') pickFiles(); else if (q.send) submitMessage(q.send);
     }));
-    $$('a.ref', node).forEach((a) => a.addEventListener('click', (e) => { e.preventDefault(); const target = document.getElementById(a.getAttribute('href').slice(1)); if (target) { target.scrollIntoView({ behavior: 'smooth', block: 'center' }); target.style.outline = '2px solid var(--accent)'; setTimeout(() => { target.style.outline = ''; }, 1400); } }));
+    $$('a.ref', node).forEach((a) => a.addEventListener('click', (e) => { e.preventDefault(); const target = document.getElementById(a.getAttribute('href').slice(1)); if (target) { const disclosure = target.closest('.sources-disclosure'); if (disclosure) disclosure.open = true; target.scrollIntoView({ behavior: 'smooth', block: 'center' }); target.style.outline = '2px solid var(--accent)'; setTimeout(() => { target.style.outline = ''; }, 1400); } }));
   }
 
   function answerToText(a, m) {
@@ -643,6 +659,7 @@
     return new Promise((resolve, reject) => { const r = new FileReader(); r.onload = () => resolve(String(r.result).split(',')[1] || ''); r.onerror = () => reject(r.error); r.readAsDataURL(file); });
   }
   async function apiCall(op, payload, signal) {
+    if (op === 'process_lookup' && !API_URL) throw { code: 'process_not_configured' };
     let res;
     try {
       res = await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(Object.assign({ op: op }, payload)), signal: signal });
@@ -650,6 +667,8 @@
     let data = null; try { data = await res.json(); } catch (e) { data = null; }
     if (res.status === 429) throw { code: 'rate_limited' };
     if (res.status === 503 && data && data.error === 'api_not_configured') throw { code: 'api_not_configured' };
+    if (!res.ok && op === 'process_lookup' && data && data.error === 'unknown_op') throw { code: 'process_not_configured' };
+    if (!res.ok && data && typeof data.error === 'string' && /^process_(?:not_configured|credentials|credits|not_found|restricted|invalid_number|invalid_page|unavailable)$/.test(data.error)) throw { code: data.error };
     if (!res.ok) throw { code: 'api_error', message: data && data.error ? data.error : 'HTTP ' + res.status };
     if (data && data.error) throw { code: data.error === 'refusal' ? 'refusal' : data.error === 'invalid_json' ? 'invalid_json' : 'api_error', message: data.error };
     return data;
@@ -681,10 +700,10 @@
     async respond({ text, attachments, conv, onStep, signal }) {
       if (!sampleFn && API_URL) {
         onStep(0);
-        const history = conv.messages.filter((m) => m.role !== 'system' && m.status === 'done').slice(-6).map((m) => ({ role: m.role, text: m.role === 'user' ? (m.text || '') : (m.answer && m.answer.summary ? m.answer.summary : '') }));
+        const history = historyForModel(conv, text || '');
         const files = await apiAttachments(attachments);
         onStep(1);
-        const res = await apiCall('answer', { lang: t('langName'), jurisdiction: jurisdictionLabel(conv.country, conv.region), question: text || '', history: history, excerpts: [], attachments: files }, signal);
+        const res = await apiCall('answer', { lang: t('langName'), jurisdiction: jurisdictionLabel(conv.country, conv.region), question: plainAnswerQuestion(text || ''), history: history, excerpts: [], attachments: files }, signal);
         onStep(2);
         const d = res.answer || {};
         if (Array.isArray(d.mentions) && d.mentions.length && !(Array.isArray(d.sources) && d.sources.length)) d.sources = d.mentions.map((m) => ({ name: m.name, article: m.article, status: 'unverified' }));
@@ -692,7 +711,7 @@
       }
       if (!sampleFn) throw { code: 'unavailable' };
       onStep(0);
-      const history = conv.messages.filter((m) => m.role !== 'system' && m.status !== 'error' && m.status !== 'loading').slice(-8);
+      const history = priorTurns(conv, text || '');
       const transcript = history.map((m) => (m.role === 'user' ? 'PERSON: ' + (m.text || '') + (m.attachments && m.attachments.length ? ' [attached: ' + m.attachments.map((f) => f.name).join(', ') + ']' : '') : 'ROSS AI: ' + (m.answer && m.answer.summary ? m.answer.summary : ''))).join('\n');
       const limits = state.aiLimits;
       const imgTypes = limits && limits.images && limits.images.mediaTypes ? limits.images.mediaTypes : [];
@@ -703,7 +722,7 @@
       if (transcript) prompt += 'CONVERSATION SO FAR:\n' + transcript + '\n\n';
       if (images.length) prompt += 'The attached image(s) are pages of a document the person wants to understand.\n';
       if (unread.length) prompt += 'The person attached file(s) that cannot be read in this version: ' + unread.join(', ') + '. Say so and ask them to paste the relevant text or attach an image.\n';
-      prompt += 'NEW MESSAGE FROM THE PERSON:\n' + (text || '(no text, only attachment)');
+      prompt += 'NEW MESSAGE FROM THE PERSON:\n' + plainAnswerQuestion(text || '(no text, only attachment)');
       onStep(1);
       const opts = { cache: false, signal: signal, modelTier: 'default' };
       if (images.length) opts.images = images;
@@ -820,7 +839,16 @@
     const q = norm(question);
     const collision = /\b(?:batida|batidas|bateram|bateu|bati|bater|colisao|colisoes|abalroamento|engavetamento)\b/.test(q);
     const vehicle = /\b(?:carro|carros|veiculo|veiculos|moto|motocicleta|caminhao|traseira|para-choque)\b/.test(q);
-    if (!(collision && vehicle) && !/\bengavetamento\b|\bacidente de transito\b/.test(q)) return null;
+    if (!(collision && vehicle) && !/\bengavetamento\b|\bacidente de transito\b/.test(q)) {
+      const purchase = /\b(?:comprei|compramos|adquiri|compra|loja|produto|fabricante|garantia)\b/.test(q);
+      const defect = /\b(?:defeito|defeitos|vicio|vicios|quebrou|manchas?)\b|\bparou de funcionar\b|\bnao (?:liga|funciona)\b|\bpontos? (?:pretos|mortos)\b/.test(q);
+      if (purchase && defect) return {
+        laws: ['l8078'],
+        terms: 'vício qualidade produto durável fornecedor conserto reparação garantia sanar vício reclamar decadência',
+        focus: { l8078: [/vicios de qualidade ou quantidade/, /nao sendo o vicio sanado/, /reclamar pelos vicios aparentes/] },
+      };
+      return null;
+    }
     return {
       laws: ['l9503', 'l10406'],
       terms: 'acidente de trânsito colisão veículo condutor distância de segurança lateral frontal negligência imprudência causar dano reparação indenização ato ilícito',
@@ -942,6 +970,47 @@
     }, signal);
     return validatedSelection(sources.slice(0, 200), result.laws);
   }
+  function priorTurns(conv, currentQuestion) {
+    const turns = (Array.isArray(conv.messages) ? conv.messages : []).filter((message) =>
+      message.role === 'user' || (message.role === 'assistant' && message.status === 'done'));
+    const last = turns[turns.length - 1];
+    if (last && last.role === 'user' && String(last.text || '').trim() === String(currentQuestion || '').trim()) turns.pop();
+    return turns.slice(-8);
+  }
+  function historyForModel(conv, currentQuestion) {
+    return priorTurns(conv, currentQuestion).slice(-6).map((message) => ({
+      role: message.role,
+      text: message.role === 'user' ? (message.text || '') : (message.answer && message.answer.summary ? message.answer.summary : ''),
+    }));
+  }
+  function plainAnswerQuestion(question) {
+    return question + '\n\nESCOPO DESTA VERSÃO: O ROSS AI atende apenas ao Direito brasileiro. Não apresente leis brasileiras como se fossem de outro país. Se o pedido depender de legislação estrangeira, explique brevemente a limitação; se houver dúvida sobre a aplicação no Brasil, peça o esclarecimento necessário.' +
+      '\n\nESTILO PARA PÚBLICO GERAL: No campo summary (Em resumo), use duas ou três frases curtas e linguagem cotidiana. Comece aplicando a regra ao problema relatado e diga o próximo passo sustentado pelos trechos. Explique termos técnicos em palavras comuns, como "vício" por "defeito". Evite definições abstratas, "garantia legal de adequação" sem explicar e aberturas como "de acordo com os trechos da lei". Use os fatos informados, sem transformar uma hipótese em certeza, diagnosticar a causa de um defeito ou prometer resultado. Não acrescente prazos, direitos ou conclusões que os trechos não sustentem. Respeite um pedido específico de formato ou detalhamento da pessoa.';
+  }
+  function isRephraseRequest(question) {
+    const text = norm(question);
+    if (!/\b(?:explique|explica|explicar|explicacao|simplifique|simplifica|simplificar|resuma|resumir|resumo|repita|repetir|reformule|reformular|detalhe|detalhar|explain|simplify|rephrase|summarize|repeat)\b|\bnao (?:entendi|entendo|compreendi)\b|\b(?:didn t|don t) understand\b/.test(text)) return false;
+    const styleWords = new Set('explique explica explicar explicacao simplifique simplifica simplificar resuma resumir resumo repita repetir reformule reformular detalhe detalhar entendi entendo compreendi compreendo novamente novo favor favorzinho maneira forma palavras facil faceis simples simplificada simplificado claro clara clareza melhor resumido resumida curto curta direto direta detalhes detalhada detalhado pouco poucas poucos topicos exemplo exemplos portugues linguagem juridiques juridico juridica crianca criancas anos ano cinco isso aquilo resposta anterior voce poderia consegue conseguir diga dizer diferente diferentes favor explain simpler simply simple simplify rephrase summarize summary repeat again understand please more less plain language words other shorter easier previous answer you could would'.split(' '));
+    return (text.match(/[a-z0-9]+/g) || []).every((word) => STOP.has(word) || styleWords.has(word) || (/^\d+$/.test(word) && Number(word) <= 18));
+  }
+  function conversationContext(conv, question) {
+    const turns = priorTurns(conv, question);
+    const previous = turns.slice().reverse().find((message) => message.role === 'assistant' && message.answer);
+    const topic = turns.slice().reverse().find((message) => message.role === 'user' && message.text && !isRephraseRequest(message.text));
+    const rephrase = isRephraseRequest(question);
+    const query = rephrase && topic ? topic.text : question;
+    const recent = turns.slice(-4).map((message) => (message.role === 'user' ? 'Pessoa: ' + message.text : 'Resposta anterior: ' + (message.answer && message.answer.summary || '')).slice(0, 380)).join('\n');
+    const searchQuestion = turns.length ? 'Pergunta atual: ' + String(query).slice(0, 700) + '\nPedido atual da pessoa: ' + question.slice(0, 400) + '\nUse o histórico apenas para resolver referências e continuidades; respeite uma mudança de assunto explícita.\nHistórico recente:\n' + recent.slice(-800) : question;
+    let sources = [];
+    if (rephrase && previous && previous.answer.mode === 'oficial') {
+      const previousIndex = conv.messages.indexOf(previous);
+      const intervening = conv.messages.slice(previousIndex + 1).some((message) => message.role === 'system' || (message.role === 'user' && message.text !== question && !isRephraseRequest(message.text)));
+      if (!intervening) sources = (previous.answer.sources || []).filter((source) => source.lawId && typeof source.excerpt === 'string' && source.excerpt.trim() && !['revogado', 'repealed', 'vetado'].includes(source.status)).slice(0, 8).map((source, index) => Object.assign({}, source, { n: index + 1 }));
+    }
+    let answerQuestion = rephrase && previous ? 'PEDIDO DE REFORMULAÇÃO, SEM MUDAR O ASSUNTO.\nAssunto da conversa: ' + String(query).slice(0, 1000) + '\nPedido da pessoa: ' + question + '\nReexplique a resposta anterior conforme esse pedido, com linguagem cotidiana. Não trate isso como uma nova dúvida sem assunto. Não acrescente direitos, prazos ou conclusões ausentes dos trechos fornecidos. Preserve as limitações e incertezas da resposta anterior.\nResposta a reformular:\n' + answerToText(previous.answer, previous).slice(0, 3000) : question;
+    if (rephrase && previous && previous.answer.kind === 'nosources' && topic) answerQuestion = 'Dúvida original: ' + query + '\nPedido da pessoa: ' + question + '\nA busca anterior não encontrou trechos suficientes. Use os trechos agora fornecidos para explicar a dúvida original de forma simples, se eles a responderem. Preserve eventuais limitações; não reinicie uma conversa sem assunto.';
+    return { rephrase, topic, previous, query, searchQuestion, answerQuestion, sources };
+  }
   providers.oficial = {
     id: 'oficial',
     async respond({ text, attachments, conv, onStep, signal }) {
@@ -950,10 +1019,23 @@
       if (conv.country !== 'BR') return { mode: 'oficial', kind: 'nosources', summary: t('oficial.jurisdiction', { country: countryName(conv.country) }), nextSteps: [t('oficial.jurisdictionStep')], capturedAt: cap };
       onStep(0);
       const question = (text || '').trim() || (attachments && attachments.length ? t('oficial.docDefaultQuery') : '');
+      const context = conversationContext(conv, question);
+      if (context.rephrase && !context.topic && !context.previous) return Object.assign(emptyOfficial(), { kind: 'clarify', summary: t('oficial.rephraseMissing'), questions: [t('oficial.rephraseQuestion')] });
+      if (context.sources.length) {
+        onStep(1);
+        if (!sampleFn && !API_URL) return retrievalOnly(context.sources);
+        onStep(2);
+        try {
+          const data = sampleFn ? await askOfficial(context.answerQuestion, context.sources, conv, attachments, signal, question) : await askOfficialAPI(context.answerQuestion, context.sources, conv, attachments, signal, question);
+          const answer = normalizeOfficial(data, context.sources, attachments);
+          answer.warnings = Array.from(new Set((context.previous.answer.warnings || []).concat(answer.warnings || [])));
+          return answer;
+        } catch (e) { if (e && e.code === 'api_not_configured') return retrievalOnly(context.sources); throw e; }
+      }
       let aiTerms = '', apiLaws = null, modelUnavailable = false, importedSources = [];
       if (API_URL) {
         try {
-          const result = await apiCall('search', { query: expandQuery(question).slice(0, 500), scope: conv.region ? '' : 'federal', uf: conv.region || '', forAnswer: true }, signal);
+          const result = await apiCall('search', { query: expandQuery(context.query).slice(0, 500), scope: conv.region ? '' : 'federal', uf: conv.region || '', forAnswer: true }, signal);
           importedSources = (Array.isArray(result.results) ? result.results : []).map((r) => ({
             lawId: 'corpus-' + r.id, imported: true, name: r.title, shortName: r.title, article: r.article, heading: r.heading,
             status: 'nao_confirmada', url: r.source_url, textUrl: r.source_url, retrievedAt: r.captured_at,
@@ -963,22 +1045,22 @@
           }));
         } catch (e) { if (signal.aborted) throw { code: 'cancelled' }; /* the bundled official texts remain available */ }
       }
-      if (sampleFn) aiTerms = await expandQueryAI(question);
+      if (sampleFn) aiTerms = await expandQueryAI(context.searchQuestion);
       else if (API_URL) {
-        try { const p = await apiCall('prepare', { question: question, catalog: state.catalog.laws.map((l) => ({ id: l.id, name: l.name })) }, signal); aiTerms = (Array.isArray(p.terms) ? p.terms : []).join(' '); apiLaws = (Array.isArray(p.laws) ? p.laws : []).map((id) => state.catalog.laws.find((l) => l.id === id)).filter(Boolean); }
+        try { const p = await apiCall('prepare', { question: context.searchQuestion, catalog: state.catalog.laws.map((l) => ({ id: l.id, name: l.name })) }, signal); aiTerms = (Array.isArray(p.terms) ? p.terms : []).join(' '); apiLaws = (Array.isArray(p.laws) ? p.laws : []).map((id) => state.catalog.laws.find((l) => l.id === id)).filter(Boolean); }
         catch (e) {
           if (e && (e.code === 'cancelled' || e.code === 'rate_limited')) throw e;
           if (e && e.code === 'api_not_configured') modelUnavailable = true;
         }
       }
-      const intent = searchIntent(question);
-      const searchText = expandQuery(question) + ' ' + aiTerms + (intent ? ' ' + intent.terms : '');
-      let laws = selectLaws(searchText, apiLaws && apiLaws.map((l) => l.id), question);
-      if (!laws.length) { const picked = await selectLawsAI(question); if (picked && picked.length) laws = picked; }
+      const intent = searchIntent(context.query);
+      const searchText = expandQuery(context.query) + ' ' + aiTerms + (intent ? ' ' + intent.terms : '');
+      let laws = selectLaws(searchText, apiLaws && apiLaws.map((l) => l.id), context.query);
+      if (!laws.length) { const picked = await selectLawsAI(context.searchQuestion); if (picked && picked.length) laws = picked; }
       if (signal.aborted) throw { code: 'cancelled' };
       const loaded = await Promise.all(laws.map(loadLaw));
       onStep(1);
-      const hits = candidateHits(loaded, searchText, question);
+      const hits = candidateHits(loaded, searchText, context.query);
       if (signal.aborted) throw { code: 'cancelled' };
       const localSources = hits.map((h, i) => lawSource(h, i + 1));
       const seen = new Set(localSources.map((s) => s.url.replace(/#.*$/, '') + '|' + s.article));
@@ -989,7 +1071,7 @@
       if (!sources.length) return emptyOfficial();
       if (modelUnavailable || (!sampleFn && !API_URL)) return retrievalOnly(sources);
       if (!sampleFn && API_URL) {
-        try { sources = await selectRelevantSources(question, searchText, sources, signal); }
+        try { sources = await selectRelevantSources(context.searchQuestion, searchText, sources, signal); }
         catch (e) {
           if (signal.aborted) throw { code: 'cancelled' };
           if (e && e.code === 'rate_limited') throw e;
@@ -999,7 +1081,7 @@
       } else sources = sources.slice(0, 8);
       onStep(2);
       try {
-        const data = sampleFn ? await askOfficial(question, sources, conv, attachments, signal) : await askOfficialAPI(question, sources, conv, attachments, signal);
+        const data = sampleFn ? await askOfficial(context.answerQuestion, sources, conv, attachments, signal, question) : await askOfficialAPI(context.answerQuestion, sources, conv, attachments, signal, question);
         return normalizeOfficial(data, sources, attachments);
       } catch (e) { if (e && e.code === 'api_not_configured') return retrievalOnly(sources); throw e; }
     }
@@ -1009,9 +1091,9 @@
     const top = sources.slice(0, 5);
     return { mode: 'oficial', kind: 'answer', corpus: top.some((s) => s.imported), summary: t(reason || 'oficial.noAI'), sourcesSay: top.map((s) => ({ title: s.shortName + ' · ' + s.article, text: s.excerpt.length > 700 ? s.excerpt.slice(0, 700) + '…' : s.excerpt, ref: s.n })), sources: top, warnings: [t('oficial.noAIWarn')], capturedAt: state.catalog.generatedAt };
   }
-  async function askOfficial(question, sources, conv, attachments, signal) {
+  async function askOfficial(question, sources, conv, attachments, signal, currentQuestion) {
     const exc = sources.map((s) => '[' + s.n + '] ' + s.name + ' — ' + s.article + (s.heading ? ' (' + s.heading + ')' : '') + (s.nota ? ' [' + s.nota + ']' : '') + '\n"""\n' + s.excerpt + '\n"""').join('\n\n');
-    const history = conv.messages.filter((m) => m.role !== 'system' && m.status === 'done').slice(-6).map((m) => (m.role === 'user' ? 'PERSON: ' + (m.text || '') : 'ROSS AI: ' + (m.answer && m.answer.summary ? m.answer.summary : ''))).join('\n');
+    const history = historyForModel(conv, currentQuestion || question).map((message) => (message.role === 'user' ? 'PERSON: ' : 'ROSS AI: ') + message.text).join('\n');
     const limits = state.aiLimits; const imgTypes = limits && limits.images && limits.images.mediaTypes ? limits.images.mediaTypes : [];
     const images = [], unread = [];
     (attachments || []).forEach((f) => { if (f.file && imgTypes.includes(f.type)) images.push(f.file); else unread.push(f.name); });
@@ -1026,18 +1108,18 @@
       'Context: ' + jurisdictionLabel(conv.country, conv.region) + '. Today is ' + fmtDate(Date.now()) + '.',
       history ? 'CONVERSATION SO FAR:\n' + history : '',
       'OFFICIAL EXCERPTS:\n' + exc,
-      'QUESTION: ' + question,
+      'QUESTION: ' + plainAnswerQuestion(question),
       'Reply with ONLY one JSON object: {"kind":"answer"|"clarify"|"limit"|"urgent"|"document"|"nosources","summary":string,"sourcesSay":[{"title":string,"text":string,"ref":number}],"depends":[string],"sources":[{"ref":number,"why":string}],"nextSteps":[string],"questions":[string],"document":{"notes":[string],"excerpts":[{"ref":string,"quote":string,"inDocument":string,"inLaw":string}],"warnings":[string]}|null,"limitNotice":{"text":string,"referrals":[string]}|null,"warnings":[string]}. Every "ref" is an excerpt number. At most 5 items per array; use empty arrays or null when not applicable.'
     ].filter(Boolean).join('\n\n');
     const opts = { cache: false, signal: signal, modelTier: 'default' };
     if (images.length) opts.images = images;
     return sampleFn.json(prompt, opts);
   }
-  async function askOfficialAPI(question, sources, conv, attachments, signal) {
-    const history = conv.messages.filter((m) => m.role !== 'system' && m.status === 'done').slice(-6).map((m) => ({ role: m.role, text: m.role === 'user' ? (m.text || '') : (m.answer && m.answer.summary ? m.answer.summary : '') }));
+  async function askOfficialAPI(question, sources, conv, attachments, signal, currentQuestion) {
+    const history = historyForModel(conv, currentQuestion || question);
     const files = await apiAttachments(attachments);
     const res = await apiCall('answer', {
-      lang: t('langName'), jurisdiction: jurisdictionLabel(conv.country, conv.region), question: question, history: history,
+      lang: t('langName'), jurisdiction: jurisdictionLabel(conv.country, conv.region), question: plainAnswerQuestion(question), history: history,
       excerpts: sources.map((s) => ({ n: s.n, name: s.name, article: s.article, heading: s.heading, nota: s.nota, excerpt: s.excerpt })),
       attachments: files, capturedAt: fmtDate(state.catalog.generatedAt)
     }, signal);
@@ -1130,10 +1212,12 @@
 
   async function submitMessage(text, extraAttachments, forcedProvider) {
     if (state.busy) return;
+    const draftKey = state.currentId || 'home';
     let conv = currentConv();
     if (!conv || state.view !== 'chat') conv = newConversation();
     const attachments = (extraAttachments || state.pending).map((f) => ({ id: f.id, name: f.name, size: f.size, type: f.type, file: f.file }));
     state.pending = []; state.draft = '';
+    state.drafts.delete(draftKey); state.drafts.delete(conv.id);
     const userMsg = { id: uid(), role: 'user', text: text, attachments: attachments.map((f) => ({ name: f.name, size: f.size, type: f.type })), createdAt: Date.now() };
     conv.messages.push(userMsg);
     if (!conv.title) conv.title = (text || (attachments[0] && attachments[0].name) || t('chat.untitled')).slice(0, 60);
@@ -1152,8 +1236,11 @@
     state.busy = { ctl: ctl, id: botMsg.id };
     const sendBtn = $('#btn-send'); if (sendBtn) sendBtn.disabled = true;
     const onStep = (i) => { botMsg.step = i; const node = $('.msg[data-id="' + botMsg.id + '"] .answer'); if (node) node.innerHTML = loadingHTML(provider.id, i); };
+    const position = conv.messages.indexOf(botMsg);
+    if (!botMsg.jurisdiction) botMsg.jurisdiction = { country: conv.country, region: conv.region };
+    const requestConv = Object.assign({}, conv, botMsg.jurisdiction, { messages: conv.messages.slice(0, position < 0 ? conv.messages.length : position) });
     try {
-      const answer = await provider.respond({ text: input.text, attachments: input.attachments, conv: conv, lang: state.lang, onStep: onStep, signal: ctl.signal });
+      const answer = await provider.respond({ text: input.text, attachments: input.attachments, conv: requestConv, lang: state.lang, onStep: onStep, signal: ctl.signal });
       retryInputs.delete(botMsg);
       botMsg.status = 'done'; botMsg.answer = answer; botMsg.provider = provider.id; delete botMsg.error;
     } catch (e) {
@@ -1343,7 +1430,7 @@
       const box = el('<div class="inline-confirm" role="alertdialog"><span>' + esc(s.deleteAllConfirm) + '</span><div class="row"><button type="button" class="btn btn-danger btn-sm" data-yes>' + esc(t('chat.yesDelete')) + '</button><button type="button" class="btn btn-secondary btn-sm" data-no>' + esc(t('chat.cancel')) + '</button></div></div>');
       const host = $('#set-data'); $$('.inline-confirm', host).forEach((n) => n.remove()); host.appendChild(box);
       $('[data-no]', box).addEventListener('click', () => box.remove());
-      $('[data-yes]', box).addEventListener('click', () => { state.conversations = []; state.feedback = {}; state.currentId = null; save(); toast(s.deleted); render({ keep: true }); });
+      $('[data-yes]', box).addEventListener('click', () => { state.conversations = []; state.feedback = {}; state.currentId = null; state.drafts.clear(); state.draft = ''; save(); toast(s.deleted); render({ keep: true }); });
     });
   }
 
@@ -1392,6 +1479,7 @@
 
   /* ---------- Render principal ---------- */
   function render(opts) {
+    if (state.view !== 'processes' && window.ROSS_TRACKER) window.ROSS_TRACKER.leave();
     document.documentElement.lang = state.lang;
     renderTopbar();
     const main = $('#main');
@@ -1401,6 +1489,7 @@
       case 'settings': renderSettings(main); break;
       case 'sources': renderSources(main); break;
       case 'search': renderCorpus(main); break;
+      case 'processes': window.ROSS_TRACKER.render(main, { t, esc, fmtDate, apiCall, pageShell, bindBack }); break;
       case 'privacy': case 'terms': case 'help': renderStatic(main, state.view); break;
       default: renderHome(main);
     }

@@ -17,7 +17,7 @@ const css = await read('styles.css');
 html = html.replace(/<link rel="stylesheet" href="styles\.css(?:\?[^"]*)?">/, () => '<style>' + css + '</style>');
 const config = script(await read('config.js')) + '\n' + script('window.ROSS_EMBEDDED_DATA=' + JSON.stringify(data).replace(/</g, '\\u003c') + ';');
 html = html.replace(/<script src="config\.js(?:\?[^"]*)?"><\/script>/, () => config);
-for (const file of ['i18n.js', 'demo-data.js', 'app.js']) {
+for (const file of ['i18n.js', 'demo-data.js', 'process-tracker.js', 'app.js']) {
   const content = script(await read(file));
   html = html.replace(new RegExp('<script src="' + file.replace('.', '\\.') + '(?:\\?[^"]*)?"></script>'), () => content);
 }

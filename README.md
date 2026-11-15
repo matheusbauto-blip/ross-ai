@@ -4,9 +4,11 @@ Informação jurídica, em linguagem simples. / Legal information, made clear.
 
 Aplicativo web estático: interface de conversa, base de legislação federal brasileira capturada da fonte oficial e explicação em linguagem simples por IA (Google Gemini no site; capacidade `sample` no visualizador de artifacts do claude.ai).
 
+O atendimento desta etapa está limitado ao Brasil, com seleção de estado e Distrito Federal. Preferências antigas de outros países não são usadas em novas conversas; o histórico anterior conserva sua identificação. A abrangência do acervo continua parcial.
+
 ## Como rodar
 
-Site publicado: https://matheusbauto-blip.github.io/ross-ai/ (GitHub Pages). O fluxo `.github/workflows/pages.yml` publica a cada push na `main`: copia só os arquivos do site e carimba o commit nos endereços dos arquivos (`app.js?v=abc1234`, também nas buscas de dados), para que cada atualização chegue sem cache antigo. Localmente o carimbo fica como `__ROSS_VERSION__`, sem efeito.
+Site publicado: https://matheusbauto-blip.github.io/ross-ai/ (GitHub Pages). Para deixar uma edição pronta sem publicar, execute `node scripts/build-release.mjs`: `dist/` recebe apenas os arquivos públicos, com identificador de versão nos endereços para evitar cache antigo. As instruções de publicação posterior estão em `docs/publicacao.md`. Localmente o carimbo fica como `__ROSS_VERSION__`, sem efeito.
 
 Localmente, sirva a pasta com um servidor estático e abra `index.html`:
 
@@ -24,7 +26,23 @@ Proteções: só aceita chamadas das origens listadas, limita pedidos por IP e p
 
 Configure `GEMINI_API_KEY` (ou `GOOGLE_API_KEY`) em Supabase → Edge Functions → Secrets. Alternativamente, guarde a chave no Vault com o nome `ross_ai_google_api_key` e aplique `supabase/schema/google-key.sql`: a função de leitura usa os privilégios de quem chama e permite execução somente a `service_role`. As variáveis de ambiente têm prioridade. Nunca coloque a chave em `config.js`, no Git ou no navegador. Variáveis opcionais: `ROSS_ALLOWED_ORIGINS`, `ROSS_ANSWER_MODEL`, `ROSS_HELPER_MODEL`, `ROSS_IP_DAILY_LIMIT`, `ROSS_GLOBAL_DAILY_LIMIT`, `ROSS_SALT`. Ao implantar, inclua também o módulo `gemini.mjs`.
 
+## Acompanhamento processual
+
+O menu lateral inclui “Acompanhar processo”. A tela valida o número CNJ, consulta a capa e as movimentações disponíveis, permite paginação e salva até 20 acompanhamentos neste navegador. A ficha aberta é consultada novamente a cada 15 minutos enquanto a tela estiver visível; esta etapa não possui alertas com o app fechado, monitoramento remoto ou sincronização entre dispositivos.
+
+Os dados reais dependem de uma conta habilitada no Escavador Business e do segredo `ESCAVADOR_API_TOKEN` no servidor. Não coloque o token em `config.js`, no Git ou no navegador. O código da função deve incluir `process-provider.mjs` antes de publicar a nova interface. Sem essa configuração, a tela informa a indisponibilidade e não cria resultados fictícios. A documentação de ativação está em `docs/acompanhamento-processual.md`.
+
+Em 15/11/2026, a integração foi ativada no servidor na versão 6. O teste real retornou `process_not_configured`, confirmando a ausência do segredo necessário. A nova interface permanece preparada, sem publicação. Cadastrar o token nos segredos do servidor não exige nova implantação.
+
+As consultas são apenas de leitura da base disponível no provedor. Não há cadastro automático de monitoramentos pagos, pedido de atualização nos tribunais ou download de autos. A data de consulta ao serviço e a data de verificação reportada pelo provedor são exibidas separadamente. A integração não envia números de processos ao Gemini e não mistura os dados consultados com o histórico das conversas.
+
 ## Modos de resposta
+
+A redação atual é voltada ao público geral: o resumo aplica a regra ao relato, explica termos técnicos em palavras comuns e preserva as condições e limites das fontes. Pedidos como "explique de maneira mais fácil" usam o assunto e as referências da conversa anterior.
+
+Rascunhos ficam separados por conversa durante a sessão. Cada resposta usa o estado e o histórico disponíveis no momento daquele pedido; uma nova tentativa de mensagem antiga não recebe mensagens posteriores. Uma alteração de estado na interface se aplica aos pedidos seguintes e não muda a consulta já em andamento.
+
+Para o cadastro futuro, está previsto um perfil de comunicação para público geral ou profissionais do Direito. O público geral mantém a linguagem simples; o perfil profissional pode receber terminologia jurídica e maior detalhamento. A implementação das contas e dessa escolha fica para uma etapa posterior; os critérios de fundamentação nas fontes continuam iguais para ambos.
 
 - **Fontes oficiais** (padrão): seleciona normas no catálogo, busca artigos no texto oficial capturado e pede à IA uma explicação restrita a esses trechos. Cada fonte citada mostra artigo, situação, link oficial, data da captura e versão. Sem a IA configurada, a resposta mostra os próprios trechos oficiais.
 - **Demonstração**: respostas roteirizadas com fontes fictícias.

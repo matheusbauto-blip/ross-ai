@@ -1,6 +1,7 @@
 .DS_Store
 .claude/settings.local.json
 node_modules/
+dist/
 .corpus-import/
 .corpus-source/
 .env

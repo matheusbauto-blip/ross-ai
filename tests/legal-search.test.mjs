@@ -59,6 +59,12 @@ test('consumer withdrawal still retrieves the CDC rule', () => {
   assert.ok(result.hits.some(hit => hit.law.id === 'l8078' && hit.article.id === '49'));
 });
 
+test('a recently bought TV with black spots retrieves product defect rules rather than only general warranty definitions', () => {
+  const result = retrieve('comprei uma tv a 2 semanas e hoje ela ja apareceu com pontos pretos');
+  assert.equal(result.laws[0], 'l8078');
+  for (const id of ['18', '26']) assert.ok(result.hits.some(hit => hit.law.id === 'l8078' && hit.article.id === id), 'CDC art. ' + id);
+});
+
 test('repairs UTF-8 text decoded as Latin-1 or Windows-1252 without changing valid Portuguese', () => {
   assert.equal(search.repairEncoding('Art. 1Âº Ã‰ convivÃªncia pÃºblica e contÃ­nua.'), 'Art. 1º É convivência pública e contínua.');
   assert.equal(search.repairEncoding('AÇÃO, São Paulo, Ângelo, reparação e € 10.'), 'AÇÃO, São Paulo, Ângelo, reparação e € 10.');

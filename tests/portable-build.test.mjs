@@ -14,7 +14,8 @@ test('portable bundle preserves literal JavaScript replacement patterns and comp
     const html = readFileSync(output, 'utf8');
     assert.doesNotMatch(html, /<script\s+src=/);
     const scripts = Array.from(html.matchAll(/<script>([\s\S]*?)<\/script>/g), match => match[1]);
-    assert.equal(scripts.length, 5);
+    assert.equal(scripts.length, 6);
+    assert.ok(scripts.some(script => script.includes('window.ROSS_TRACKER')));
     for (const script of scripts) assert.doesNotThrow(() => new vm.Script(script));
     const app = readFileSync('app.js', 'utf8').replace(/<\/script/gi, '<\\/script');
     assert.equal(scripts.at(-1), app);

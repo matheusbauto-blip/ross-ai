@@ -19,6 +19,8 @@ import { z } from "npm:zod@4.1.12";
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { generateGemini, GeminiError } from "./gemini.mjs";
 import { eligibleForAnswer, repositoryExcerpts } from "./repository-excerpts.mjs";
+import { lookupProcess, processNumber, ProcessError } from "./process-provider.mjs";
+import { lookupDjen } from "./djen-provider.mjs";
 
 const ANSWER_MODEL = Deno.env.get("ROSS_ANSWER_MODEL") ?? "gemini-3.5-flash";
 const HELPER_MODEL = Deno.env.get("ROSS_HELPER_MODEL") ?? "gemini-3.1-flash-lite";
@@ -85,14 +87,14 @@ async function googleApiKey() {
   return !error && typeof data === "string" && data ? data : null;
 }
 
-async function checkQuota(req: Request, search = false) {
+async function checkQuota(req: Request, search = false, strict = false) {
   const url = Deno.env.get("SUPABASE_URL"); const key = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
-  if (!url || !key) return { allowed: true };
+  if (!url || !key) return { allowed: !strict, unavailable: strict };
   const ip = (req.headers.get("x-forwarded-for") ?? "").split(",")[0].trim() || "unknown";
   const ipHash = await sha256((Deno.env.get("ROSS_SALT") ?? "ross-ai") + "|" + (search ? "search|" : "ai|") + ip);
   const sb = createClient(url, key, { auth: { persistSession: false } });
   const { data, error } = await sb.rpc("ross_ai_bump", { p_ip_hash: ipHash, p_ip_limit: search ? IP_LIMIT * 5 : IP_LIMIT, p_global_limit: search ? GLOBAL_LIMIT * 5 : GLOBAL_LIMIT });
-  if (error) { console.error("quota error", error.message); return { allowed: true }; }
+  if (error) { console.error("quota error", error.message); return { allowed: !strict, unavailable: strict }; }
   return { allowed: !!(data as { allowed?: boolean })?.allowed };
 }
 
@@ -260,6 +262,20 @@ Deno.serve(async (req: Request) => {
   let body: Record<string, unknown>;
   try { body = await req.json(); if (!body || Array.isArray(body) || typeof body !== "object") throw new Error(); } catch { return json(400, { error: "invalid_json" }, origin); }
   const op = str(body.op, 20);
+  if (op === "process_lookup") {
+    try {
+      const number = processNumber(body.number);
+      const source = Deno.env.get("ROSS_PROCESS_SOURCE") || "djen";
+      const apiKey = Deno.env.get("ESCAVADOR_API_TOKEN");
+      if (!["djen", "escavador"].includes(source) || (source === "escavador" && !apiKey)) return json(503, { error: "process_not_configured" }, origin);
+      const quota = await checkQuota(req, true, true);
+      if (!quota.allowed) return json(quota.unavailable ? 503 : 429, { error: quota.unavailable ? "process_unavailable" : "rate_limited" }, origin);
+      return json(200, source === "djen" ? await lookupDjen({ number, page: body.page }) : await lookupProcess({ number, page: body.page, apiKey }), origin);
+    } catch (error) {
+      if (error instanceof ProcessError) return json(error.status, { error: error.code }, origin);
+      return json(502, { error: "process_unavailable" }, origin);
+    }
+  }
   if (op === "search" || op === "corpus_stats" || op === "repository_read") {
     try {
       if (op !== "corpus_stats" && !(await checkQuota(req, true)).allowed) return json(429, { error: "rate_limited" }, origin);

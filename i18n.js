@@ -2,6 +2,28 @@
    Para adicionar um idioma, copie um bloco e traduza. A chave do idioma segue BCP 47. */
 window.ROSS_I18N = {
   'pt-BR': {
+    processes: {
+      title: 'Acompanhar processo', intro: 'Consulte um processo pelo número e veja as movimentações disponíveis.',
+      number: 'Número do processo', hint: 'Informe os 20 dígitos ou cole o número completo, com pontos e traço.',
+      search: 'Consultar processo', loading: 'Consultando…', invalid: 'Confira o número do processo. Ele deve ter 20 dígitos e dígitos verificadores válidos.',
+      notConfigured: 'A consulta de processos ainda não foi ativada no ROSS. Nenhum resultado foi obtido. Tente novamente após a ativação do serviço.',
+      unavailable: 'Não foi possível consultar o processo agora. Tente novamente em instantes.',
+      notFound: 'O processo não foi encontrado nesta consulta. Confira o número. Isso não significa que o processo não exista.',
+      restricted: 'Não é possível mostrar este processo nesta consulta pública. Verifique o acesso no tribunal.',
+      rateLimited: 'O limite de consultas foi atingido por agora. Tente novamente mais tarde.',
+      source: 'Dados fornecidos por', consultedAt: 'Consulta ao serviço', verifiedAt: 'Última verificação informada pela fonte',
+      parties: 'Partes informadas', court: 'Unidade de origem', className: 'Classe', subject: 'Assunto', lastMovement: 'Última movimentação informada',
+      unknownDate: 'Data não informada', tribunalUnknown: 'Tribunal não informado',
+      freshness: 'Os dados refletem a edição disponível no serviço e podem ter atraso em relação ao tribunal. Uma consulta ao serviço não equivale a uma nova verificação no tribunal.',
+      follow: 'Acompanhar neste navegador', unfollow: 'Parar acompanhamento', refresh: 'Consultar novamente', openSource: 'Abrir fonte',
+      history: 'Movimentações', movementsUnavailable: 'Os dados do processo foram encontrados, mas as movimentações não puderam ser carregadas. Tente consultar novamente.',
+      emptyMovements: 'Nenhuma movimentação foi retornada nesta consulta.', more: 'Ver movimentações anteriores',
+      savedTitle: 'Processos acompanhados', emptySaved: 'Você ainda não adicionou processos ao acompanhamento.',
+      localNotice: 'Os números acompanhados ficam neste navegador. A ficha aberta é verificada a cada 15 minutos enquanto esta tela estiver visível. Não há avisos com o app fechado nesta etapa.',
+      remove: 'Remover acompanhamento', limit: 'Você pode acompanhar até 20 processos neste navegador.',
+      storageError: 'Não foi possível salvar os acompanhamentos neste navegador. Eles continuam disponíveis nesta sessão, mas podem se perder ao fechar a página.',
+      newMovements: 'Encontradas {n} movimentação(ões) que não apareciam na última consulta.'
+    },
     corpus: {
       title: 'Pesquisar legislação', homeHint: 'Encontre normas por assunto, número, estado ou município.',
       readRepository: 'Ler texto do repositório', hideText: 'Ocultar texto',
@@ -197,7 +219,7 @@ window.ROSS_I18N = {
       aiOn: 'Ativado',
       aiOff: 'Desativado',
       data: 'Seus dados',
-      dataHelp: 'Conversas, nomes de anexos e avaliações ficam apenas neste navegador.',
+      dataHelp: 'Conversas, nomes de anexos, avaliações e números de processos acompanhados ficam neste navegador. Os acompanhamentos podem ser removidos na tela de processos.',
       deleteAll: 'Apagar todas as conversas',
       deleteAllConfirm: 'Apagar todas as conversas e registros de anexos deste navegador? Isso não pode ser desfeito.',
       deleted: 'Todas as conversas foram apagadas.',
@@ -265,6 +287,8 @@ window.ROSS_I18N = {
       docDefaultQuery: 'contrato cláusula multa rescisão cancelamento prazo',
       empty: 'Não consegui confirmar trechos suficientes para responder com segurança nesta busca. Isso não significa que não exista uma regra aplicável.',
       relevanceUnavailable: 'Não consegui concluir a verificação de relevância das fontes. Abaixo estão apenas trechos encontrados por palavras, para conferência; não foi gerada uma conclusão jurídica.',
+      rephraseMissing: 'Posso explicar de um jeito mais simples. Primeiro, preciso saber qual é a sua dúvida ou qual resposta você quer que eu reformule.',
+      rephraseQuestion: 'Qual assunto ou resposta você gostaria que eu explicasse de outra maneira?',
       emptyQuestions: ['Sobre qual tema é a dúvida: consumo, trabalho, moradia, família, dados pessoais ou outro?', 'Há alguma lei, contrato ou documento específico envolvido?'],
       emptyStep: 'Reformule com mais detalhes ou cite a norma, se souber qual é.',
       noAI: 'Encontrei estes trechos nas fontes oficiais. A explicação por IA não está disponível agora; mostro o texto oficial para você conferir.',
@@ -285,6 +309,8 @@ window.ROSS_I18N = {
 <li>Suas avaliações de respostas (útil ou não útil).</li>
 </ul>
 <p>O histórico fica no armazenamento local do navegador (localStorage). Nos modos com IA, a pergunta, trechos do histórico e anexos selecionados são enviados ao modelo para gerar a resposta.</p>
+<h2>Acompanhamento de processos</h2>
+<p>Em “Acompanhar processo”, os números selecionados, a sigla do tribunal, a data da consulta e identificadores de movimentações ficam neste navegador. Remova um acompanhamento nessa tela para excluir seu registro. Os números consultados passam pelo servidor do ROSS e são enviados ao Escavador para consultar dados processuais; essa consulta não usa o modelo de IA. As fichas e os textos das movimentações não são guardados pelo ROSS em um cadastro de clientes nesta etapa. A fonte mantém seus próprios dados e condições de tratamento.</p>
 <h2>Documentos anexados</h2>
 <p>Antes de anexar, avisamos que documentos podem conter dados pessoais e você pode cancelar. No modo de demonstração, o arquivo não é lido nem enviado. Com IA ativa no site, a pergunta, trechos do histórico, leis selecionadas e anexos (imagens e PDFs) passam pelo servidor do ROSS AI e são enviados ao Google Gemini para gerar a resposta. O servidor não armazena perguntas nem anexos, e não os publica. Dentro do claude.ai, a explicação usa a conta de quem abre o artifact.</p>
 <h2>Como apagar</h2>
@@ -386,6 +412,28 @@ window.ROSS_I18N = {
   },
 
   'en': {
+    processes: {
+      title: 'Track a proceeding', intro: 'Look up a Brazilian court proceeding by number and read its available events.',
+      number: 'Proceeding number', hint: 'Enter 20 digits or paste the full number, including punctuation.',
+      search: 'Look up proceeding', loading: 'Looking up…', invalid: 'Check the proceeding number. It must contain 20 digits with valid check digits.',
+      notConfigured: 'Proceeding lookup has not been activated in ROSS yet. No result was obtained. Try again after the service is activated.',
+      unavailable: 'The proceeding could not be retrieved right now. Please try again shortly.',
+      notFound: 'No proceeding was found in this lookup. Check the number. This does not establish that the proceeding does not exist.',
+      restricted: 'This proceeding cannot be displayed in a public lookup. Check access with the court.',
+      rateLimited: 'The lookup limit has been reached. Please try again later.',
+      source: 'Data provided by', consultedAt: 'Service queried', verifiedAt: 'Last verification reported by source',
+      parties: 'Reported parties', court: 'Originating court unit', className: 'Class', subject: 'Subject', lastMovement: 'Last reported event',
+      unknownDate: 'Date not provided', tribunalUnknown: 'Court not provided',
+      freshness: 'The service provides its available edition, which may lag behind the court. A service lookup does not mean the court was checked again.',
+      follow: 'Track in this browser', unfollow: 'Stop tracking', refresh: 'Look up again', openSource: 'Open source',
+      history: 'Events', movementsUnavailable: 'The proceeding was found, but its events could not be retrieved. Please try again.',
+      emptyMovements: 'No events were returned by this lookup.', more: 'View earlier events',
+      savedTitle: 'Tracked proceedings', emptySaved: 'You have not added any proceedings to track yet.',
+      localNotice: 'Tracked numbers stay in this browser. The open proceeding is checked every 15 minutes while this screen is visible. This version does not send alerts when the app is closed.',
+      remove: 'Remove tracking', limit: 'You can track up to 20 proceedings in this browser.',
+      storageError: 'Tracking could not be saved in this browser. It remains available for this session but may be lost when you close the page.',
+      newMovements: '{n} event(s) were found that did not appear in the previous lookup.'
+    },
     corpus: {
       title: 'Search legislation', homeHint: 'Find legal texts by topic, number, state or municipality.',
       readRepository: 'Read text from repository', hideText: 'Hide text',
@@ -581,7 +629,7 @@ window.ROSS_I18N = {
       aiOn: 'On',
       aiOff: 'Off',
       data: 'Your data',
-      dataHelp: 'Conversations, attachment names and ratings stay in this browser only.',
+      dataHelp: 'Conversations, attachment names, ratings and tracked proceeding numbers stay in this browser. Remove tracking from the proceedings screen.',
       deleteAll: 'Delete all conversations',
       deleteAllConfirm: 'Delete all conversations and attachment records from this browser? This cannot be undone.',
       deleted: 'All conversations were deleted.',
@@ -649,6 +697,8 @@ window.ROSS_I18N = {
       docDefaultQuery: 'contrato cláusula multa rescisão cancelamento prazo',
       empty: 'I could not confirm enough relevant excerpts to answer safely in this search. This does not mean that no applicable rule exists.',
       relevanceUnavailable: 'I could not complete the source relevance check. The passages below were found by keyword matching and are provided only for review; no legal conclusion was generated.',
+      rephraseMissing: 'I can explain it more simply. First, I need to know your question or which answer you want me to rephrase.',
+      rephraseQuestion: 'Which topic or answer would you like me to explain differently?',
       emptyQuestions: ['What is the question about: consumer, work, housing, family, personal data or other?', 'Is there a specific law, contract or document involved?'],
       emptyStep: 'Rephrase with more detail or name the law, if you know which one.',
       noAI: 'I found these excerpts in the official sources. The AI explanation is currently unavailable; here is the official text for you to check.',
@@ -669,6 +719,8 @@ window.ROSS_I18N = {
 <li>Your ratings of answers (helpful or not helpful).</li>
 </ul>
 <p>Your history lives in the browser’s local storage (localStorage). In AI modes, your question, selected history and attachments are sent to the model to generate the answer.</p>
+<h2>Proceeding tracking</h2>
+<p>Under “Track a proceeding”, selected numbers, court abbreviations, query dates and event identifiers stay in this browser. Remove a tracked proceeding there to delete its record. Queried numbers pass through the ROSS server to Escavador for proceeding lookup; this lookup does not use the AI model. Proceeding cards and event texts are not saved in a ROSS customer database in this version. The source maintains its own data and processing terms.</p>
 <h2>Attached documents</h2>
 <p>Before attaching, we warn that documents may contain personal data and you can cancel. In demonstration mode the file is neither read nor sent. With AI active on the website, your question, selected history, law excerpts and attachments (images and PDFs) pass through the ROSS AI server and are sent to Google Gemini to generate the answer. The server does not store or publish questions or attachments. Inside claude.ai, the explanation uses the account of the person opening the artifact.</p>
 <h2>How to delete</h2>
