@@ -130,6 +130,32 @@ test('leaving process tracking ignores late responses and does not overwrite the
   assert.equal(document.querySelector('#composer-input').value, 'Rascunho da conversa');
 });
 
+test('free DJEN lookup labels its limited coverage and displays cancellation updates without duplicating publications', async t => {
+  let cancelled = false;
+  const { api, document, window, change } = setup(t, async () => Response.json({ ...processResponse(), coverage: 'publications', process: { number: processNumber, tribunal: 'TRF1', provider: 'CNJ · DJEN', verifiedAt: '', lastMovementAt: '2026-11-13' }, movements: [{ id: 'djen-1', version: cancelled ? 'cancelled' : 'active', cancelled, date: '2026-11-13', text: 'Publicação de teste', source: 'DJEN', url: 'https://comunica.pje.jus.br/' }] }));
+  api.go('processes'); change('#process-number', processNumber);
+  document.querySelector('#process-form').dispatchEvent(new window.Event('submit', { bubbles: true, cancelable: true }));
+  await tick(); await tick();
+  assert.match(document.querySelector('#process-result').textContent, /Consulta gratuita/);
+  assert.match(document.querySelector('#process-result').textContent, /não representa todo o histórico/);
+  assert.equal(document.querySelector('.process-history h3').textContent, 'Publicações do DJEN');
+  document.querySelector('#process-follow').click(); cancelled = true;
+  document.querySelector('#process-refresh').click(); await tick(); await tick();
+  assert.match(document.querySelector('#process-result').textContent, /novas ou alteradas/);
+  assert.match(document.querySelector('.process-history').textContent, /cancelada/);
+  assert.equal(document.querySelectorAll('.process-history li').length, 1);
+});
+
+test('an empty DJEN response remains trackable and does not claim that the proceeding was not found', async t => {
+  const { api, document, window, change } = setup(t, async () => Response.json({ coverage: 'publications', found: false, process: { number: processNumber, provider: 'CNJ · DJEN' }, movements: [], nextPage: null }));
+  api.go('processes'); change('#process-number', processNumber);
+  document.querySelector('#process-form').dispatchEvent(new window.Event('submit', { bubbles: true, cancelable: true }));
+  await tick(); await tick();
+  assert.match(document.querySelector('.process-history').textContent, /não significa que o processo não exista/);
+  assert.ok(document.querySelector('#process-follow'));
+  assert.equal(document.querySelector('#process-error').textContent, '');
+});
+
 test('changing jurisdiction repeatedly does not multiply Enter submission handlers', t => {
   const { document, window, change } = setup(t);
   change('#home-region', 'MG'); change('#home-region', 'SP'); change('#home-region', 'GO');

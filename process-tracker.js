@@ -21,7 +21,7 @@
       saved = (Array.isArray(data) ? data : []).slice(0, MAX_SAVED).flatMap(item => {
         try {
           const number = processNumber(item.number); if (seen.has(number)) return []; seen.add(number);
-          return [{ number, tribunal: typeof item.tribunal === 'string' ? item.tribunal.slice(0, 100) : '', checkedAt: typeof item.checkedAt === 'string' ? item.checkedAt : '', keys: Array.isArray(item.keys) ? item.keys.filter(key => typeof key === 'string').slice(0, 100) : [] }];
+          return [{ number, provider: ['djen', 'escavador'].includes(item.provider) ? item.provider : '', tribunal: typeof item.tribunal === 'string' ? item.tribunal.slice(0, 100) : '', checkedAt: typeof item.checkedAt === 'string' ? item.checkedAt : '', keys: Array.isArray(item.keys) ? item.keys.filter(key => typeof key === 'string').slice(0, 100) : [] }];
         } catch { return []; }
       });
     } catch { saved = []; state.storageError = true; }
@@ -80,7 +80,7 @@
       if (followed) saved = saved.filter(item => item.number !== p.number);
       else {
         if (saved.length >= MAX_SAVED) { state.error = tr('limit'); paint(); return; }
-        saved.push({ number: p.number, tribunal: p.tribunal, checkedAt: result.fetchedAt, keys: result.movements.map(movementKey) });
+        saved.push({ number: p.number, provider: publications ? 'djen' : 'escavador', tribunal: p.tribunal, checkedAt: result.fetchedAt, keys: result.movements.map(movementKey) });
       }
       persist(); paint(); schedule();
     });
@@ -103,10 +103,12 @@
       const merged = new Map(); old.concat(data.movements).forEach(item => merged.set(item.id || movementKey(item), item)); data.movements = Array.from(merged.values());
       const item = saved.find(item => item.number === number);
       if (item && !page && !data.movementsUnavailable) {
+        const provider = data.coverage === 'publications' ? 'djen' : 'escavador';
+        if (item.provider !== provider) item.keys = [];
         const keys = data.movements.map(movementKey);
         const added = item.keys.length ? keys.filter(key => !item.keys.includes(key)).length : 0;
         if (added) state.notice = tr(data.coverage === 'publications' ? 'newPublications' : 'newMovements', { n: added });
-        item.keys = Array.from(new Set(keys.concat(item.keys))).slice(0, 100); item.checkedAt = data.fetchedAt; persist();
+        item.provider = provider; item.keys = Array.from(new Set(keys.concat(item.keys))).slice(0, 100); item.checkedAt = data.fetchedAt; persist();
       }
       state.result = data;
     } catch (error) {

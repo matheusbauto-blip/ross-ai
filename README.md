@@ -28,13 +28,15 @@ Configure `GEMINI_API_KEY` (ou `GOOGLE_API_KEY`) em Supabase → Edge Functions 
 
 ## Acompanhamento processual
 
-O menu lateral inclui “Acompanhar processo”. A tela valida o número CNJ, consulta a capa e as movimentações disponíveis, permite paginação e salva até 20 acompanhamentos neste navegador. A ficha aberta é consultada novamente a cada 15 minutos enquanto a tela estiver visível; esta etapa não possui alertas com o app fechado, monitoramento remoto ou sincronização entre dispositivos.
+O menu lateral inclui “Acompanhar processo”. A consulta padrão é gratuita e usa diretamente a API pública do DJEN/CNJ, sem conta ou token do Escavador. A busca é pelo número CNJ de 20 dígitos, com ou sem pontuação; busca por CPF não está implementada.
 
-Os dados reais dependem de uma conta habilitada no Escavador Business e do segredo `ESCAVADOR_API_TOKEN` no servidor. Não coloque o token em `config.js`, no Git ou no navegador. O código da função deve incluir `process-provider.mjs` antes de publicar a nova interface. Sem essa configuração, a tela informa a indisponibilidade e não cria resultados fictícios. A documentação de ativação está em `docs/acompanhamento-processual.md`.
+A tela apresenta as publicações oficiais retornadas, datas de disponibilização, identificação da fonte e links para conferir os textos. Essa cobertura não equivale a todas as movimentações do processo. Resultado vazio não comprova inexistência do processo. Publicações canceladas e trechos abreviados têm indicação própria.
 
-Em 15/11/2026, a integração foi ativada no servidor na versão 6. O teste real retornou `process_not_configured`, confirmando a ausência do segredo necessário. A nova interface permanece preparada, sem publicação. Cadastrar o token nos segredos do servidor não exige nova implantação.
+É possível acompanhar até 20 números neste navegador. A ficha aberta é consultada a cada 15 minutos enquanto a tela estiver visível, com cache de até cinco minutos e respeito aos limites da fonte. Não há avisos com o app fechado ou sincronização entre dispositivos nesta etapa. As consultas ficam separadas do histórico das conversas e não são enviadas ao Gemini.
 
-As consultas são apenas de leitura da base disponível no provedor. Não há cadastro automático de monitoramentos pagos, pedido de atualização nos tribunais ou download de autos. A data de consulta ao serviço e a data de verificação reportada pelo provedor são exibidas separadamente. A integração não envia números de processos ao Gemini e não mistura os dados consultados com o histórico das conversas.
+O servidor está na versão 7. Foi validada uma consulta real com HTTP 200 e três publicações do DJEN, sem chave de API. A documentação está em `docs/acompanhamento-processual.md`.
+
+O adaptador Escavador permanece opcional, habilitado somente por `ROSS_PROCESS_SOURCE=escavador` e pelo segredo `ESCAVADOR_API_TOKEN`, com as condições da conta contratada. Ele não é usado na configuração gratuita padrão. Não há mudança automática para serviços pagos quando uma fonte falha.
 
 ## Modos de resposta
 

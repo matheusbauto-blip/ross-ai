@@ -1,67 +1,56 @@
-# Acompanhar processo — implementação inicial
+# Acompanhar processo — consulta gratuita do DJEN
 
-O acesso fica no menu dos três traços, em “Acompanhar processo”, e também em `#processos`. A função fica separada da conversa e do planejamento de “Meu caso”.
+O acesso fica no menu dos três traços, em “Acompanhar processo”, e em `#processos`. A função fica separada das conversas e do planejamento de “Meu caso”.
 
-## Estado da ativação em 15/11/2026
+## Funcionamento atual
 
-O servidor Supabase `ross-ai` foi atualizado para a **versão 6**, com a operação `process_lookup` ativa. A interface continua preparada para publicação posterior.
+A fonte padrão é a API pública oficial do Diário de Justiça Eletrônico Nacional, mantida pelo CNJ. A integração consulta publicações diretamente, sem contratar o Escavador, sem chave de API e sem chamadas ao Gemini.
 
-Verificação real do servidor após a atualização:
+O usuário informa o número CNJ de 20 dígitos, com ou sem pontuação. A busca por CPF não está implementada. A verificação do dígito pelo algoritmo Módulo 97 confirma a integridade da numeração, não a existência do processo.
 
-- Número CNJ inválido: HTTP 400, `process_invalid_number`.
-- Consulta com número CNJ válido: HTTP 503, `process_not_configured`.
-- Estatísticas do acervo: HTTP 200, 235 documentos.
+A tela mostra as publicações retornadas, suas datas de disponibilização, órgão, classe quando informada, texto e link da fonte. Publicação cancelada recebe indicação própria. Um texto abreviado mostra um aviso e mantém o acesso à fonte. As datas não são convertidas automaticamente em prazos jurídicos.
 
-O resultado confirma que o código está ativo e que falta configurar a credencial do fornecedor. Não confirma uma consulta real ao Escavador. Não foi criada ou contratada uma conta no serviço processual.
+A cobertura é identificada como publicações do DJEN, e não como histórico completo de movimentações ou autos. Uma consulta sem publicações não declara que o processo inexiste. O número pode ser acompanhado para consultas futuras mesmo com resultado vazio.
 
-A etapa externa necessária é obter um token da conta do Escavador e cadastrá-lo diretamente em [Edge Function Secrets do ROSS](https://supabase.com/dashboard/project/aksilqskpplfwmcrapcu/functions/secrets), com o nome `ESCAVADOR_API_TOKEN`. O valor deve ser o token da conta, sem o prefixo `Bearer`. O código adiciona esse prefixo ao enviar a requisição. Não é necessário colocar o segredo no site nem reenviá-lo pela conversa.
+Até 20 números podem ser acompanhados neste navegador. Persistem somente número, fonte, sigla do tribunal, data da consulta e identificadores de publicações. Partes e textos não são salvos em um cadastro de clientes. A ficha acompanhada que estiver aberta é consultada novamente a cada 15 minutos enquanto a tela estiver visível. Mudanças de fonte ou tentativas repetidas não misturam os contextos. Cancelamentos contam como alterações da publicação.
 
-Após salvar o segredo, a função consegue lê-lo sem nova implantação. Ainda é necessário verificar uma consulta autorizada com o fornecedor e sua cobertura, custo e atualização.
+A etapa atual não oferece avisos com o navegador fechado, sincronização entre dispositivos, consulta por CPF ou acesso a processos sigilosos. “Meu caso” permanece uma função planejada e opcional.
 
-## Comportamento implementado
+## Servidor e validação real
 
-- Validação do número CNJ com 20 dígitos e algoritmo Módulo 97 Base 10. A verificação matemática não confirma a existência do processo.
-- Consulta de capa e movimentações por número, com tratamento de não encontrado, sigilo, credencial ausente, limite, indisponibilidade e resposta parcial.
-- Ficha com partes informadas, tribunal, unidade, classe e assunto quando fornecidos pela fonte. Sem inferir vitória, fase ou situação jurídica a partir de um campo predito.
-- Movimentações com texto original, data e fonte; paginação por cursor e remoção de duplicatas.
-- Até 20 acompanhamentos locais. Persistem apenas número, sigla do tribunal, data de consulta e identificadores de eventos. Partes e textos de movimentações permanecem somente em memória.
-- Consulta automática da ficha acompanhada que estiver aberta, a cada 15 minutos e com a tela visível. Novos identificadores são comparados com a consulta anterior e o resultado aparece na tela.
-- Cancelamento ao sair da tela e descarte de respostas atrasadas. Uma consulta de outro número não conserva a ficha do número anterior.
-- Nenhum processo é criado no cadastro de casos e nenhuma consulta processual é enviada ao modelo de IA.
+O servidor Supabase `ross-ai` está ativo na versão 7. A operação POST `process_lookup` usa DJEN por padrão.
 
-Esta implementação não oferece avisos com o navegador fechado, sincronização entre dispositivos ou captura direta em tempo real no tribunal. Não anuncia esses comportamentos na interface. Também não ativa monitoramentos cobrados pelo provedor.
+Em 15/11/2026, uma consulta real ao servidor retornou HTTP 200, fonte `CNJ · DJEN`, cobertura `publications` e três publicações correspondentes ao número pesquisado. Os links de certidão e o texto legível também foram conferidos no adaptador real. A validação não dependeu de token do Escavador.
 
-## Integração real
+A suíte completa passou com **142 testes**, incluindo validação CNJ, fonte correta, prevenção de mistura de processos, resultado vazio, cancelamento, paginação, cache, limites de uso, entrada pelo menu e isolamento da conversa.
 
-O adaptador inicial é Escavador Business API v2, com os endpoints documentados:
+O frontend com os avisos e ajustes finais está no pacote atualizado. Preparar o pacote não publica a nova interface.
 
-- `GET /api/v2/processos/numero_cnj/{numero}`
-- `GET /api/v2/processos/numero_cnj/{numero}/movimentacoes`
+## Integração e limites
 
-Para ativar:
+A consulta faz apenas GET ao endpoint público de produção:
 
-1. Obter uma conta e um token válidos no Escavador, com acesso às consultas de capa e de movimentações. Conferir o contrato, a cobertura e os custos antes de habilitar uso por clientes.
-2. Cadastrar `ESCAVADOR_API_TOKEN` nos segredos da função Supabase `ross-ai`. Manter o segredo fora do código e do pacote público.
-3. Preparar a função com `index.ts`, `gemini.mjs`, `repository-excerpts.mjs` e `process-provider.mjs`. A nova operação POST é `process_lookup` com `number` e, opcionalmente, `page`.
-4. Para o projeto atual, o código do servidor já foi ativado na versão 6. Uma nova implantação só é necessária para alterar o código ou usar outro projeto. A interface preparada continua utilizando a URL de API existente.
-5. Testar um processo público autorizado, conferir o número e as datas com a fonte e verificar consulta, paginação, remoção e indisponibilidade.
+`https://comunicaapi.pje.jus.br/api/v1/comunicacao`
 
-Sem o segredo, o servidor devolve `process_not_configured`. Uma função antiga sem a nova operação também não atende a consulta. O frontend apresenta indisponibilidade; não interpreta isso como processo inexistente nem gera movimentações fictícias.
+Parâmetros: `numeroProcesso`, `pagina` e `itensPorPagina`. Não são utilizados os endpoints de login, inclusão ou cancelamento, exclusivos dos tribunais.
 
-O controle de uso existente é exigido para esta operação. Se não puder ser verificado, a consulta ao provedor não é enviada. Endereços de paginação retornados pelo provedor nunca são usados como destinos arbitrários: somente tokens da origem e rota esperadas são aceitos.
+O servidor aceita apenas números válidos e paginação limitada; não recebe um endereço arbitrário para buscar. Publicações retornadas com outro número são rejeitadas. Conteúdo HTML é convertido em texto e escapado na interface.
 
-## Fonte e atualização
+Há cache de até cinco minutos, compartilhamento de pedidos simultâneos iguais, limite local de chamadas e pausa após HTTP 429. Não há troca de IP ou origem para contornar os controles. O horário original da consulta é preservado no cache. A fonte limita a busca a 10.000 registros; essa limitação é indicada na tela quando aplicável.
 
-Os dados consultados são os indexados no Escavador, e podem ter atraso em relação ao tribunal. Reconsultar a API não solicita, por si só, uma nova captura no tribunal. A tela mostra separadamente a consulta ao serviço e a última verificação informada pelo provedor. Campos ausentes permanecem sem informação.
+O controle de uso do ROSS continua sendo exigido. Uma falha na fonte ou nesse controle é apresentada como indisponibilidade; não gera publicações fictícias nem muda silenciosamente para uma integração paga.
 
-Fontes consultadas em 15/11/2026:
+Ao preparar uma nova implantação, incluir `index.ts`, `gemini.mjs`, `repository-excerpts.mjs`, `process-provider.mjs` e `djen-provider.mjs`.
 
-- [Consulta de processos — Escavador](https://api.escavador.com/v2/docs/consulta-de-processos)
-- [Autenticação e integração — Escavador](https://api.escavador.com/v2/docs/)
-- [Numeração única — CNJ](https://www.cnj.jus.br/programas-e-acoes/numeracao-unica/perguntas-frequentes/)
+## Integração paga opcional
 
-## Evolução posterior
+O adaptador Escavador foi preservado para uma eventual contratação. Só é selecionado quando o operador define `ROSS_PROCESS_SOURCE=escavador` e cadastra `ESCAVADOR_API_TOKEN` no servidor. Ele permanece sujeito às permissões, cobertura e custos da conta. Sem essa seleção, a consulta usa DJEN e não lê dados pelo Escavador.
 
-Alertas com o app fechado exigem armazenamento privado vinculado à conta, controle de acesso por cliente, contratação/configuração de monitoramento, recebimento autenticado de callbacks e entrega de notificações. A disponibilidade dessa etapa deve ser identificada separadamente da consulta local. O vínculo com “Meu caso” será opcional quando essa função existir.
+A API pública DataJud não foi ativada: possui condições próprias de uso, distintas das do DJEN. Não se presume que uma interface pública permita qualquer uso comercial.
 
-Os testes de implementação usam respostas simuladas. As verificações reais do servidor estão registradas no início deste documento. Não foi possível validar uma consulta ao fornecedor sem sua credencial. Não houve contratação do serviço nem publicação da nova interface.
+## Referências
+
+- [Documentação oficial da API do DJEN](https://comunicaapi.pje.jus.br/swagger/index.html)
+- [Especificação OpenAPI oficial](https://comunicaapi.pje.jus.br/swagger/djen.yml)
+- [Comunicações processuais — CNJ](https://www.cnj.jus.br/programas-e-acoes/processo-judicial-eletronico-pje/comunicacoes-processuais/)
+- [Consulta pública do DJEN](https://comunica.pje.jus.br/)

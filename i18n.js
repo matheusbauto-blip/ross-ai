@@ -3,7 +3,15 @@
 window.ROSS_I18N = {
   'pt-BR': {
     processes: {
-      title: 'Acompanhar processo', intro: 'Consulte um processo pelo número e veja as movimentações disponíveis.',
+      title: 'Acompanhar processo', intro: 'Consulte pelo número do processo e acompanhe as publicações oficiais disponíveis.',
+      unknownSource: 'Fonte não informada', publications: 'Publicações do DJEN', availableAt: 'Disponibilizado em',
+      publicationCoverage: 'Consulta gratuita ao Diário de Justiça Eletrônico Nacional (DJEN/CNJ). Esta tela acompanha publicações oficiais e não representa todo o histórico de movimentações do processo.',
+      publicationCourt: 'Órgão da publicação mais recente nesta página', lastPublication: 'Disponibilização mais recente nesta página',
+      publicationFreshness: 'As datas são de disponibilização no DJEN. Consultas repetidas podem reutilizar dados obtidos há até 5 minutos; a data de consulta ao serviço é preservada.',
+      emptyPublications: 'Nenhuma publicação do DJEN foi retornada nesta consulta. Isso não significa que o processo não exista. Você pode acompanhar o número para verificar futuras publicações.',
+      morePublications: 'Ver publicações anteriores', limitedResults: 'A fonte limita esta pesquisa a 10.000 registros. O resultado não deve ser considerado um histórico completo do processo.',
+      cancelledPublication: 'Publicação informada como cancelada. Confira a atualização na fonte.', excerptNotice: 'Trecho abreviado. Abra a fonte para ler a publicação completa.',
+      newPublications: 'Há {n} publicação(ões) novas ou alteradas em relação à última consulta.',
       number: 'Número do processo', hint: 'Informe os 20 dígitos ou cole o número completo, com pontos e traço.',
       search: 'Consultar processo', loading: 'Consultando…', invalid: 'Confira o número do processo. Ele deve ter 20 dígitos e dígitos verificadores válidos.',
       notConfigured: 'A consulta de processos ainda não foi ativada no ROSS. Nenhum resultado foi obtido. Tente novamente após a ativação do serviço.',
@@ -310,7 +318,7 @@ window.ROSS_I18N = {
 </ul>
 <p>O histórico fica no armazenamento local do navegador (localStorage). Nos modos com IA, a pergunta, trechos do histórico e anexos selecionados são enviados ao modelo para gerar a resposta.</p>
 <h2>Acompanhamento de processos</h2>
-<p>Em “Acompanhar processo”, os números selecionados, a sigla do tribunal, a data da consulta e identificadores de movimentações ficam neste navegador. Remova um acompanhamento nessa tela para excluir seu registro. Os números consultados passam pelo servidor do ROSS e são enviados ao Escavador para consultar dados processuais; essa consulta não usa o modelo de IA. As fichas e os textos das movimentações não são guardados pelo ROSS em um cadastro de clientes nesta etapa. A fonte mantém seus próprios dados e condições de tratamento.</p>
+<p>Em “Acompanhar processo”, os números selecionados, a sigla do tribunal, a data da consulta, a fonte e identificadores de publicações ficam neste navegador. Remova um acompanhamento nessa tela para excluir seu registro. Os números consultados passam pelo servidor do ROSS e são enviados ao CNJ/DJEN na consulta gratuita padrão. O Escavador é uma integração opcional, usada apenas quando configurada pelo responsável. A consulta não usa o modelo de IA. Resultados do DJEN podem ficar em cache por até cinco minutos para reduzir chamadas; textos e partes não são guardados em um cadastro de clientes. A fonte mantém seus próprios dados e condições de tratamento.</p>
 <h2>Documentos anexados</h2>
 <p>Antes de anexar, avisamos que documentos podem conter dados pessoais e você pode cancelar. No modo de demonstração, o arquivo não é lido nem enviado. Com IA ativa no site, a pergunta, trechos do histórico, leis selecionadas e anexos (imagens e PDFs) passam pelo servidor do ROSS AI e são enviados ao Google Gemini para gerar a resposta. O servidor não armazena perguntas nem anexos, e não os publica. Dentro do claude.ai, a explicação usa a conta de quem abre o artifact.</p>
 <h2>Como apagar</h2>
@@ -413,7 +421,15 @@ window.ROSS_I18N = {
 
   'en': {
     processes: {
-      title: 'Track a proceeding', intro: 'Look up a Brazilian court proceeding by number and read its available events.',
+      title: 'Track a proceeding', intro: 'Use the proceeding number to find and track available official publications.',
+      unknownSource: 'Source not provided', publications: 'DJEN publications', availableAt: 'Made available on',
+      publicationCoverage: 'Free lookup of the National Electronic Justice Gazette (DJEN/CNJ). This screen tracks official publications, which do not represent the complete proceeding event history.',
+      publicationCourt: 'Court unit in the latest publication on this page', lastPublication: 'Latest availability date on this page',
+      publicationFreshness: 'Dates refer to availability in DJEN. Repeated lookups may reuse data retrieved up to 5 minutes earlier; the original service query date is preserved.',
+      emptyPublications: 'This lookup returned no DJEN publications. This does not establish that the proceeding does not exist. You can track the number to check for future publications.',
+      morePublications: 'View earlier publications', limitedResults: 'The source limits this search to 10,000 records. These results should not be considered a complete proceeding history.',
+      cancelledPublication: 'The source marks this publication as cancelled. Check the source for updates.', excerptNotice: 'Shortened excerpt. Open the source to read the complete publication.',
+      newPublications: '{n} new or changed publication(s) since the previous lookup.',
       number: 'Proceeding number', hint: 'Enter 20 digits or paste the full number, including punctuation.',
       search: 'Look up proceeding', loading: 'Looking up…', invalid: 'Check the proceeding number. It must contain 20 digits with valid check digits.',
       notConfigured: 'Proceeding lookup has not been activated in ROSS yet. No result was obtained. Try again after the service is activated.',
@@ -720,7 +736,7 @@ window.ROSS_I18N = {
 </ul>
 <p>Your history lives in the browser’s local storage (localStorage). In AI modes, your question, selected history and attachments are sent to the model to generate the answer.</p>
 <h2>Proceeding tracking</h2>
-<p>Under “Track a proceeding”, selected numbers, court abbreviations, query dates and event identifiers stay in this browser. Remove a tracked proceeding there to delete its record. Queried numbers pass through the ROSS server to Escavador for proceeding lookup; this lookup does not use the AI model. Proceeding cards and event texts are not saved in a ROSS customer database in this version. The source maintains its own data and processing terms.</p>
+<p>Under “Track a proceeding”, selected numbers, court abbreviations, query dates, source and publication identifiers stay in this browser. Remove tracking there to delete its record. Queried numbers pass through the ROSS server to CNJ/DJEN for the default free lookup. Escavador is an optional integration used only when configured by the operator. Lookup does not use the AI model. DJEN results may be cached for up to five minutes to reduce requests; texts and parties are not saved in a customer database. The source maintains its own data and processing terms.</p>
 <h2>Attached documents</h2>
 <p>Before attaching, we warn that documents may contain personal data and you can cancel. In demonstration mode the file is neither read nor sent. With AI active on the website, your question, selected history, law excerpts and attachments (images and PDFs) pass through the ROSS AI server and are sent to Google Gemini to generate the answer. The server does not store or publish questions or attachments. Inside claude.ai, the explanation uses the account of the person opening the artifact.</p>
 <h2>How to delete</h2>
