@@ -10,7 +10,7 @@ O resultado fica em `dist/`. A pasta contém apenas a página, os arquivos públ
 
 ## Como o site está publicado
 
-Desde 16/11/2026 o GitHub Pages serve a branch `gh-pages`, que contém apenas o resultado de `build-release.mjs` (página, arquivos públicos, catálogo e `release.json`). A branch `main` guarda o código-fonte e não é mais servida diretamente.
+Desde 15/11/2026 o GitHub Pages serve a branch `gh-pages`, que contém apenas o resultado de `build-release.mjs` (página, arquivos públicos, catálogo e `release.json`). A branch `main` guarda o código-fonte e não é mais servida diretamente.
 
 Para publicar uma nova versão:
 
