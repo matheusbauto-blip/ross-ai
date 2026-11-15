@@ -350,6 +350,11 @@ img { max-width: 100%; }
 .process-form label { font-weight: 600; }
 .process-query { display: flex; gap: 8px; }
 .process-query input { flex: 1; min-width: 0; padding: 12px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface); color: var(--fg); font: inherit; }
+.process-cpf { padding: 16px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); }
+.process-cpf > summary { cursor: pointer; font-weight: 600; color: var(--accent-ink); }
+.process-cpf-content { display: flex; flex-direction: column; gap: 12px; padding-top: 12px; }
+.process-cpf-content ol { display: flex; flex-direction: column; gap: 8px; padding-left: 24px; }
+.process-cpf-content .row { display: flex; flex-wrap: wrap; gap: 8px; }
 .process-card { padding: 20px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); }
 .process-card header, .process-card .row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .process-card h2, .process-saved h2 { font-size: var(--fs-md); overflow-wrap: anywhere; }

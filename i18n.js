@@ -13,6 +13,15 @@ window.ROSS_I18N = {
       cancelledPublication: 'Publicação informada como cancelada. Confira a atualização na fonte.', excerptNotice: 'Trecho abreviado. Abra a fonte para ler a publicação completa.',
       newPublications: 'Há {n} publicação(ões) novas ou alteradas em relação à última consulta.',
       number: 'Número do processo', hint: 'Informe os 20 dígitos ou cole o número completo, com pontos e traço.',
+      cpfTitle: 'Buscar por CPF no portal oficial',
+      cpfIntro: 'Encontre o número do processo gratuitamente no Jus.br, portal do Poder Judiciário. A pesquisa por CPF acontece lá; depois, volte para acompanhar as publicações no ROSS.',
+      cpfStepLogin: 'Abra o Jus.br e entre com sua conta gov.br nível ouro.',
+      cpfStepSearch: 'Escolha “Consultar processos”, selecione “CPF da Parte”, informe o CPF e clique em “Buscar”.',
+      cpfStepReturn: 'Copie o número de 20 dígitos do processo encontrado e cole no campo acima. Consulte e escolha “Acompanhar neste navegador”.',
+      cpfOpen: 'Abrir Jus.br (nova aba)', cpfReturn: 'Já tenho o número',
+      cpfPrivacy: 'Informe CPF, senha e códigos de acesso somente no portal oficial. Este atalho não envia esses dados ao ROSS nem importa resultados automaticamente.',
+      cpfCoverage: 'A consulta depende dos sistemas integrados e das permissões do seu acesso. Um resultado vazio não confirma que não existem processos.',
+      cpfRedirect: 'Para pesquisar por CPF, use “Buscar por CPF no portal oficial”. Neste campo, cole o número do processo encontrado no Jus.br.',
       search: 'Consultar processo', loading: 'Consultando…', invalid: 'Confira o número do processo. Ele deve ter 20 dígitos e dígitos verificadores válidos.',
       notConfigured: 'A consulta de processos ainda não foi ativada no ROSS. Nenhum resultado foi obtido. Tente novamente após a ativação do serviço.',
       unavailable: 'Não foi possível consultar o processo agora. Tente novamente em instantes.',
@@ -55,6 +64,7 @@ window.ROSS_I18N = {
     tagline: 'Informação jurídica, em linguagem simples.',
     taglineAlt: 'Legal information, made clear.',
     home: {
+      catalogLoading: 'Carregando a base de leis…',
       headline: 'Entenda informações jurídicas com mais clareza.',
       placeholder: 'O que você gostaria de entender?',
       examples: [
@@ -190,13 +200,14 @@ window.ROSS_I18N = {
       invalid_json: 'O modelo respondeu em um formato inesperado. Tente novamente.',
       images_unavailable: 'Este ambiente não permite enviar imagens ao modelo. Cole o texto do trecho na mensagem.',
       image_rejected: 'Uma das imagens não foi aceita pelo modelo. Tente outro formato ou tamanho.',
-      unavailable: 'O Modo IA não está disponível neste ambiente. A resposta foi gerada no modo de demonstração.',
+      unavailable: 'O Modo IA não está disponível neste ambiente. Nenhuma resposta foi gerada. Tente novamente ou escolha outro modo em Configurações.',
+      quota_unavailable: 'Não foi possível verificar o limite de uso agora, e por segurança a pergunta não foi enviada à IA. Tente novamente em instantes.',
       law_fetch: 'Não foi possível carregar o texto da norma. Verifique a conexão e tente novamente.',
       api_not_configured: 'O servidor de IA ainda não tem a chave da API configurada. A resposta não foi gerada.',
       api_error: 'O servidor de IA não respondeu. Tente novamente em instantes.',
       refusal: 'O modelo não pôde responder a este pedido. Reformule a pergunta ou procure um profissional.',
       truncated: 'A resposta ficou longa demais e foi interrompida. Tente uma pergunta mais específica.',
-      catalog_unavailable: 'A base de leis não está carregada neste ambiente.'
+      catalog_unavailable: 'Não foi possível carregar a base de leis. Verifique a conexão e tente novamente.'
     },
     attachModal: {
       title: 'Antes de anexar',
@@ -232,7 +243,7 @@ window.ROSS_I18N = {
       deleteAllConfirm: 'Apagar todas as conversas e registros de anexos deste navegador? Isso não pode ser desfeito.',
       deleted: 'Todas as conversas foram apagadas.',
       about: 'Sobre',
-      aboutText: 'ROSS AI, versão de demonstração 0.1. Fontes fictícias, sem conexão com bases jurídicas reais.',
+      aboutText: 'ROSS AI, versão inicial. Explica a legislação federal brasileira com trechos de fontes oficiais (Planalto e Câmara dos Deputados) e um acervo importado identificado como não verificado. Ferramenta de informação, sem substituir um profissional.',
       count: '{n} conversa(s) armazenada(s).',
       mode: 'Modo de resposta',
       modeHelp: 'Fontes oficiais usa o texto das normas capturado do Planalto e explica com IA. Demonstração usa fontes fictícias. IA sem fontes gera respostas gerais, marcadas como não verificadas.',
@@ -300,108 +311,133 @@ window.ROSS_I18N = {
       emptyQuestions: ['Sobre qual tema é a dúvida: consumo, trabalho, moradia, família, dados pessoais ou outro?', 'Há alguma lei, contrato ou documento específico envolvido?'],
       emptyStep: 'Reformule com mais detalhes ou cite a norma, se souber qual é.',
       noAI: 'Encontrei estes trechos nas fontes oficiais. A explicação por IA não está disponível agora; mostro o texto oficial para você conferir.',
-      noAIWarn: 'Trechos selecionados por busca de palavras no texto oficial. Leia o artigo completo no link antes de concluir.'
+      noAIWarn: 'Trechos selecionados por busca de palavras no texto oficial. Leia o artigo completo no link antes de concluir.',
+      droppedClaims: 'Removi {n} afirmação(ões) da explicação porque citavam trechos que não foram consultados.',
+      unlinked: 'A explicação não indicou em quais trechos se baseia. Trate-a como não confirmada e confira o texto da lei antes de concluir.',
+      documentNoLaw: 'Li o documento, mas não encontrei na base trechos de lei que fundamentem uma conclusão jurídica. A explicação abaixo trata do que está escrito no documento; nenhuma norma citada foi verificada.',
+      documentUnread: 'O documento não pôde ser analisado agora porque a explicação por IA está indisponível. Tente novamente mais tarde ou cole o trecho que quer entender.',
+      documentDefaultQuestion: 'Explique o que este documento diz e o que é importante observar.',
+      historyFiles: 'arquivos anexados',
+      historyDocument: 'Documento analisado nesta resposta',
+      historyReattach: 'O arquivo original não foi reenviado. Se a pergunta depender de partes do documento que não aparecem acima, peça que a pessoa anexe o arquivo novamente.'
     },
     pages: {
       privacy: {
         title: 'Privacidade',
-        updated: 'Atualizado em 12 de novembro de 2026. Versão de demonstração.',
+        updated: 'Atualizado em 15 de novembro de 2026.',
         html: `
 <h2>Em resumo</h2>
-<p>O ROSS AI pede apenas o necessário para responder. Nesta versão de demonstração, tudo o que você escreve fica armazenado somente neste navegador. Nada é enviado a servidores do ROSS AI.</p>
-<h2>O que fica armazenado</h2>
+<p>O ROSS AI pede apenas o necessário para responder. O histórico das conversas fica neste navegador. Para gerar as explicações, a pergunta, trechos recentes da conversa, os trechos de lei selecionados e os anexos passam pelo servidor do ROSS AI e são enviados ao Google Gemini. O servidor não guarda perguntas nem anexos.</p>
+<h2>O que fica neste navegador</h2>
 <ul>
 <li>O texto das suas perguntas e das respostas.</li>
-<li>O nome, o tamanho e o tipo dos arquivos anexados. O conteúdo dos arquivos não é armazenado.</li>
-<li>Suas preferências: idioma, aparência, jurisdição e Modo IA.</li>
-<li>Suas avaliações de respostas (útil ou não útil).</li>
+<li>O nome, o tamanho e o tipo dos arquivos anexados. O conteúdo dos arquivos não é guardado; para perguntar de novo sobre um arquivo, pode ser preciso anexá-lo outra vez.</li>
+<li>Suas preferências: idioma, aparência, estado e modo de resposta.</li>
+<li>Suas avaliações de respostas (útil ou não útil), que não são enviadas a ninguém.</li>
 </ul>
-<p>O histórico fica no armazenamento local do navegador (localStorage). Nos modos com IA, a pergunta, trechos do histórico e anexos selecionados são enviados ao modelo para gerar a resposta.</p>
-<h2>Acompanhamento de processos</h2>
-<p>Em “Acompanhar processo”, os números selecionados, a sigla do tribunal, a data da consulta, a fonte e identificadores de publicações ficam neste navegador. Remova um acompanhamento nessa tela para excluir seu registro. Os números consultados passam pelo servidor do ROSS e são enviados ao CNJ/DJEN na consulta gratuita padrão. O Escavador é uma integração opcional, usada apenas quando configurada pelo responsável. A consulta não usa o modelo de IA. Resultados do DJEN podem ficar em cache por até cinco minutos para reduzir chamadas; textos e partes não são guardados em um cadastro de clientes. A fonte mantém seus próprios dados e condições de tratamento.</p>
+<p>Esses dados ficam no armazenamento local do navegador (localStorage) e não são lidos por outras pessoas que usam o ROSS AI em outros aparelhos.</p>
+<h2>O que passa pelo servidor</h2>
+<ul>
+<li><strong>Explicações por IA</strong>: a pergunta, até seis mensagens anteriores resumidas, os trechos de lei escolhidos e os anexos (imagens e PDFs) são enviados ao Google Gemini apenas para gerar a resposta.</li>
+<li><strong>Busca de leis</strong>: os termos da pesquisa são usados para consultar a base de leis do ROSS AI. Essa busca não usa o modelo de IA.</li>
+<li><strong>Controle de uso</strong>: para limitar abusos, o servidor conta pedidos por dia usando um código derivado do endereço de rede (hash), sem guardar o endereço em si.</li>
+<li><strong>Acompanhar processo</strong>: os números consultados vão ao servidor e daí ao CNJ/DJEN. Os números acompanhados, a data da consulta e identificadores das publicações ficam neste navegador. A consulta não usa o modelo de IA, e os resultados podem ficar em cache no servidor por até cinco minutos.</li>
+</ul>
+<p>Dentro do claude.ai, a explicação por IA usa a conta de quem abre o aplicativo, e não o servidor do ROSS AI.</p>
 <h2>Documentos anexados</h2>
-<p>Antes de anexar, avisamos que documentos podem conter dados pessoais e você pode cancelar. No modo de demonstração, o arquivo não é lido nem enviado. Com IA ativa no site, a pergunta, trechos do histórico, leis selecionadas e anexos (imagens e PDFs) passam pelo servidor do ROSS AI e são enviados ao Google Gemini para gerar a resposta. O servidor não armazena perguntas nem anexos, e não os publica. Dentro do claude.ai, a explicação usa a conta de quem abre o artifact.</p>
+<p>Antes de anexar, o aplicativo avisa que documentos podem conter dados pessoais, e você pode cancelar. Anexe apenas o necessário para a pergunta e evite dados de terceiros que não sejam importantes.</p>
 <h2>Como apagar</h2>
 <ul>
 <li>Cada conversa pode ser apagada no menu, na lista de conversas anteriores.</li>
 <li>Em Configurações, é possível apagar todas as conversas de uma vez.</li>
-<li>Limpar os dados de navegação do seu navegador também remove tudo.</li>
+<li>Em “Acompanhar processo”, remova um número para excluir seu registro.</li>
+<li>Limpar os dados de navegação do navegador também remove tudo.</li>
 </ul>
 <h2>O que não fazemos</h2>
 <ul>
-<li>Não vendemos nem compartilhamos dados.</li>
+<li>Não vendemos dados.</li>
 <li>Não exibimos documentos privados em páginas públicas.</li>
-<li>Não usamos seus documentos para treinar modelos.</li>
 <li>Não pedimos dados além dos necessários para responder.</li>
 </ul>
-<h2>Versão futura</h2>
-<p>Quando o ROSS AI passar a guardar conversas em servidores, esta página será atualizada antes da mudança, explicando onde os dados ficam, por quanto tempo e como pedir a exclusão.</p>
+<p>O Google trata os dados enviados ao Gemini conforme as condições do serviço contratado pelo responsável pelo ROSS AI.</p>
 <h2>Contato</h2>
-<p>Dúvidas sobre privacidade: <span class="mono">privacidade@exemplo.invalid</span> (endereço fictício de demonstração).</p>`
+<p>Para dúvidas sobre o serviço, abra um chamado em <a href="https://github.com/matheusbauto-blip/ross-ai/issues" target="_blank" rel="noopener">https://github.com/matheusbauto-blip/ross-ai/issues</a>. O chamado é público: não inclua dados pessoais, números de processo ou documentos.</p>`
       },
       terms: {
         title: 'Termos de uso',
-        updated: 'Atualizado em 12 de novembro de 2026. Versão de demonstração.',
+        updated: 'Atualizado em 15 de novembro de 2026.',
         html: `
 <h2>O que é o ROSS AI</h2>
-<p>O ROSS AI é uma ferramenta de informação e compreensão jurídica. Ele explica leis, contratos e documentos em linguagem simples, aponta as fontes consultadas e avisa quando a resposta depende de análise profissional.</p>
+<p>O ROSS AI é uma ferramenta de informação e compreensão jurídica sobre o Direito brasileiro. Ele explica leis, contratos e documentos em linguagem simples, mostra os trechos de lei consultados e avisa quando a resposta depende de análise profissional.</p>
 <p>O ROSS AI não é um escritório de advocacia, não presta consultoria jurídica e não cria relação entre advogado e cliente.</p>
+<h2>De onde vêm as respostas</h2>
+<ul>
+<li><strong>Fontes oficiais</strong>: trechos da legislação federal capturados do Portal da Legislação do Planalto e da Legislação Informatizada da Câmara dos Deputados, com data de captura e link para conferir.</li>
+<li><strong>Acervo importado</strong>: textos de um repositório comunitário, marcados como “vigência não verificada”.</li>
+<li><strong>Explicação por IA</strong>: o Google Gemini (ou o Claude, dentro do claude.ai) escreve a explicação a partir desses trechos. A IA pode errar; afirmações que citam trechos não consultados são removidas, mas isso não garante a correção de toda resposta.</li>
+<li><strong>IA sem fontes</strong> e <strong>Demonstração</strong>: modos opcionais nas Configurações. O primeiro gera respostas gerais não verificadas; o segundo usa exemplos fictícios.</li>
+</ul>
+<p>A cobertura ainda é parcial: legislação federal selecionada, parte da estadual e nenhuma municipal. A data de captura não confirma, sozinha, que uma norma continua em vigor.</p>
 <h2>O que o serviço não faz</h2>
 <ul>
 <li>Não garante resultados. Ninguém pode prometer que uma ação será ganha ou perdida.</li>
 <li>Não afirma que uma cláusula é definitivamente válida ou inválida, nem que um processo certamente cabe.</li>
 <li>Não substitui advogados, defensores públicos, sindicatos ou órgãos públicos.</li>
-<li>Não impede processos nem cumpre prazos por você.</li>
+<li>Não impede processos nem cumpre prazos por você. A consulta de processos mostra publicações do DJEN, que não equivalem ao histórico completo do processo.</li>
 </ul>
-<h2>Fontes e versão de demonstração</h2>
-<p>Cada resposta jurídica deve indicar as fontes consultadas, com jurisdição, data e situação (vigente, histórica, projeto de lei ou não confirmada). Nesta versão de demonstração, as fontes são fictícias e as respostas são identificadas como demonstração. Respostas do Modo IA são geradas sem consulta a fontes oficiais e vêm marcadas como não verificadas.</p>
 <h2>Uso adequado</h2>
 <ul>
 <li>Confira as fontes antes de tomar decisões.</li>
 <li>Em situações urgentes, procure atendimento profissional ou o órgão competente sem demora.</li>
 <li>Anexe apenas documentos que você tem o direito de usar e evite dados de terceiros desnecessários.</li>
+<li>Há limite diário de perguntas por aparelho para manter o serviço disponível.</li>
 </ul>
 <h2>Responsabilidade</h2>
 <p>As respostas podem conter erros ou estar desatualizadas. As decisões tomadas com base nelas são de responsabilidade de quem as toma. Recomendamos buscar orientação profissional para avaliações personalizadas.</p>
 <h2>Alterações</h2>
 <p>Estes termos podem mudar. A data no topo indica a versão em vigor.</p>
 <h2>Contato</h2>
-<p><span class="mono">contato@exemplo.invalid</span> (endereço fictício de demonstração).</p>`
+<p>Abra um chamado em <a href="https://github.com/matheusbauto-blip/ross-ai/issues" target="_blank" rel="noopener">https://github.com/matheusbauto-blip/ross-ai/issues</a>. O chamado é público: não inclua dados pessoais ou documentos.</p>`
       },
       help: {
         title: 'Ajuda',
-        updated: 'Guia rápido da versão de demonstração.',
+        updated: 'Guia rápido do ROSS AI.',
         html: `
 <h2>Como perguntar</h2>
 <ul>
 <li>Escreva com suas palavras. Não precisa usar termos técnicos.</li>
-<li>Diga o país e, se souber, o estado. As regras mudam conforme o lugar e a data.</li>
+<li>O ROSS AI atende ao Direito brasileiro. Se a situação depender de um estado, escolha-o no campo abaixo da mensagem.</li>
 <li>Se a dúvida for sobre um trecho, cole o texto ou anexe o documento.</li>
+<li>Para uma explicação mais simples da resposta anterior, peça “explique de forma mais fácil”.</li>
 </ul>
 <h2>Como anexar documentos</h2>
-<p>Use o clipe no campo de mensagem para anexar PDFs ou imagens. Antes do envio, você verá um aviso sobre dados pessoais e poderá cancelar. O nome do arquivo aparece acima da mensagem e pode ser removido.</p>
+<p>Use o clipe no campo de mensagem para anexar PDFs ou imagens (até 4 arquivos e 20 MB por mensagem). Antes do envio, você verá um aviso sobre dados pessoais e poderá cancelar. Mesmo quando a busca não encontra lei aplicável, o documento é lido e a resposta deixa claro que não houve fundamentação legal verificada. O arquivo não fica guardado: para novas perguntas sobre partes que não apareceram na resposta, anexe-o de novo.</p>
 <h2>Como ler a resposta</h2>
 <ol>
 <li><strong>Em resumo</strong>: a resposta direta.</li>
-<li><strong>O que as fontes dizem</strong>: os trechos relevantes explicados.</li>
+<li><strong>O que as fontes dizem</strong>: os trechos relevantes explicados, cada um ligado a uma fonte.</li>
 <li><strong>O que depende da situação</strong>: fatos ou documentos que podem mudar a resposta.</li>
-<li><strong>Fontes consultadas</strong>: norma ou página, artigo e link, com a situação de cada texto.</li>
+<li><strong>Fontes consultadas</strong>: norma, artigo, link e data da captura. Clique no título para abrir a lista.</li>
 <li><strong>Próximos passos</strong>: opções informativas e neutras.</li>
 </ol>
 <h2>Os selos</h2>
 <ul>
-<li><strong>Vigente</strong>: texto em vigor na data da verificação.</li>
-<li><strong>Texto histórico</strong>: redação anterior, que pode valer para fatos antigos.</li>
-<li><strong>Projeto de lei</strong>: proposta sem efeito até ser aprovada.</li>
-<li><strong>Não confirmada</strong>: informação sem fonte oficial conferida.</li>
-<li><strong>Fontes oficiais</strong>: trechos do texto oficial do Planalto, com link para conferir.</li>
-<li><strong>Demonstração</strong>: resposta com fontes fictícias.</li>
+<li><strong>Fontes oficiais</strong>: explicação baseada em trechos do Planalto ou da Câmara dos Deputados, com link para conferir.</li>
+<li><strong>Vigente / Revogado / Vetado</strong>: situação do artigo no texto capturado.</li>
+<li><strong>Acervo importado</strong>: texto de repositório comunitário, com vigência não verificada.</li>
 <li><strong>Modo IA</strong>: resposta gerada por IA sem fontes verificadas.</li>
+<li><strong>Demonstração</strong>: resposta com fontes fictícias, usada só quando escolhida.</li>
+</ul>
+<h2>Outras telas</h2>
+<ul>
+<li><strong>Pesquisar legislação</strong>: busca direta na base, por assunto, número, estado ou município.</li>
+<li><strong>Acompanhar processo</strong>: consulta gratuita de publicações do DJEN pelo número do processo.</li>
+<li><strong>Base de fontes</strong>: lista das normas, datas de captura e versões.</li>
 </ul>
 <h2>Limites</h2>
 <p>O ROSS AI informa e ajuda a entender. Ele não avalia chances, não define estratégia e não substitui um profissional. Quando um pedido passa desse limite, a resposta explica o motivo e indica onde procurar ajuda.</p>
-<h2>Cenários de demonstração</h2>
-<p>Veja como o ROSS AI se comporta em cada situação. Cada botão abre uma nova conversa.</p>
+<h2>Exemplos fictícios</h2>
+<p>Estes botões abrem conversas no modo de demonstração, com fontes fictícias, para mostrar como o ROSS AI reage a cada situação.</p>
 <div class="scenario-grid">
 <button type="button" class="btn btn-secondary" data-scenario="doc_ok">Documento legível</button>
 <button type="button" class="btn btn-secondary" data-scenario="doc_illegible">Documento ilegível</button>
@@ -412,9 +448,9 @@ window.ROSS_I18N = {
 <button type="button" class="btn btn-secondary" data-scenario="error">Erro ao responder</button>
 </div>
 <h2>Perguntas frequentes</h2>
-<p><strong>As respostas são confiáveis?</strong> Nesta demonstração, não: as fontes são fictícias e servem para mostrar a experiência. Na versão conectada a fontes reais, cada resposta mostra links e referências para você conferir.</p>
-<p><strong>Meus documentos ficam guardados?</strong> Não. Apenas o nome do arquivo fica no histórico local do navegador. Veja a página de Privacidade.</p>
-<p><strong>Posso usar em outro idioma?</strong> Sim. Mude o idioma em Configurações.</p>`
+<p><strong>As respostas são confiáveis?</strong> Elas se baseiam em trechos de fontes oficiais e mostram de onde vieram, mas a explicação é escrita por IA e pode errar. Confira os artigos citados antes de decidir.</p>
+<p><strong>Meus documentos ficam guardados?</strong> Não. Eles são enviados para gerar a resposta e não ficam no servidor. No navegador fica apenas o nome do arquivo. Veja a página de Privacidade.</p>
+<p><strong>Posso usar em outro idioma?</strong> Sim, a interface e as respostas podem ser em inglês. Mude o idioma em Configurações. A legislação continua sendo a brasileira.</p>`
       }
     }
   },
@@ -431,6 +467,15 @@ window.ROSS_I18N = {
       cancelledPublication: 'The source marks this publication as cancelled. Check the source for updates.', excerptNotice: 'Shortened excerpt. Open the source to read the complete publication.',
       newPublications: '{n} new or changed publication(s) since the previous lookup.',
       number: 'Proceeding number', hint: 'Enter 20 digits or paste the full number, including punctuation.',
+      cpfTitle: 'Search by CPF on the official portal',
+      cpfIntro: 'Find the proceeding number for free on Jus.br, the Brazilian Judiciary portal. CPF searches take place there; return to ROSS to track publications afterwards.',
+      cpfStepLogin: 'Open Jus.br and sign in with your gold-level gov.br account.',
+      cpfStepSearch: 'Choose “Consultar processos”, select “CPF da Parte”, enter the CPF and click “Buscar”.',
+      cpfStepReturn: 'Copy the 20-digit proceeding number and paste it in the field above. Look it up and choose “Track in this browser”.',
+      cpfOpen: 'Open Jus.br (new tab)', cpfReturn: 'I have the number',
+      cpfPrivacy: 'Enter your CPF, password and access codes only on the official portal. This shortcut does not send them to ROSS or import results automatically.',
+      cpfCoverage: 'Results depend on connected systems and your access permissions. An empty result does not establish that no proceedings exist.',
+      cpfRedirect: 'To search by CPF, use “Search by CPF on the official portal”. Paste the proceeding number found on Jus.br in this field.',
       search: 'Look up proceeding', loading: 'Looking up…', invalid: 'Check the proceeding number. It must contain 20 digits with valid check digits.',
       notConfigured: 'Proceeding lookup has not been activated in ROSS yet. No result was obtained. Try again after the service is activated.',
       unavailable: 'The proceeding could not be retrieved right now. Please try again shortly.',
@@ -473,6 +518,7 @@ window.ROSS_I18N = {
     tagline: 'Legal information, made clear.',
     taglineAlt: 'Informação jurídica, em linguagem simples.',
     home: {
+      catalogLoading: 'Loading the law base…',
       headline: 'Understand legal information with more clarity.',
       placeholder: 'What would you like to understand?',
       examples: [
@@ -608,13 +654,14 @@ window.ROSS_I18N = {
       invalid_json: 'The model replied in an unexpected format. Try again.',
       images_unavailable: 'This environment cannot send images to the model. Paste the text of the excerpt instead.',
       image_rejected: 'One of the images was not accepted by the model. Try another format or size.',
-      unavailable: 'AI mode is not available in this environment. The answer was generated in demonstration mode.',
+      unavailable: 'AI mode is not available in this environment. No answer was generated. Try again or choose another mode in Settings.',
+      quota_unavailable: 'The usage limit could not be checked right now, so for safety the question was not sent to the AI. Try again shortly.',
       law_fetch: 'The law text could not be loaded. Check the connection and try again.',
       api_not_configured: 'The AI server does not have its API key configured yet. No answer was generated.',
       api_error: 'The AI server did not respond. Try again in a moment.',
       refusal: 'The model could not answer this request. Rephrase the question or seek a professional.',
       truncated: 'The answer became too long and was cut off. Try a more specific question.',
-      catalog_unavailable: 'The law base is not loaded in this environment.'
+      catalog_unavailable: 'The law base could not be loaded. Check your connection and try again.'
     },
     attachModal: {
       title: 'Before attaching',
@@ -650,7 +697,7 @@ window.ROSS_I18N = {
       deleteAllConfirm: 'Delete all conversations and attachment records from this browser? This cannot be undone.',
       deleted: 'All conversations were deleted.',
       about: 'About',
-      aboutText: 'ROSS AI, demonstration version 0.1. Fictional sources, no connection to real legal databases.',
+      aboutText: 'ROSS AI, initial version. Explains Brazilian federal legislation with excerpts from official sources (Planalto and the Chamber of Deputies) and an imported corpus marked as unverified. An information tool that does not replace a professional.',
       count: '{n} conversation(s) stored.',
       mode: 'Answer mode',
       modeHelp: 'Official sources uses the law text captured from Planalto and explains it with AI. Demonstration uses fictional sources. AI without sources gives general answers, marked as unverified.',
@@ -718,108 +765,133 @@ window.ROSS_I18N = {
       emptyQuestions: ['What is the question about: consumer, work, housing, family, personal data or other?', 'Is there a specific law, contract or document involved?'],
       emptyStep: 'Rephrase with more detail or name the law, if you know which one.',
       noAI: 'I found these excerpts in the official sources. The AI explanation is currently unavailable; here is the official text for you to check.',
-      noAIWarn: 'Excerpts selected by word search in the official text. Read the full article at the link before concluding.'
+      noAIWarn: 'Excerpts selected by word search in the official text. Read the full article at the link before concluding.',
+      droppedClaims: 'I removed {n} statement(s) from the explanation because they cited excerpts that were not consulted.',
+      unlinked: 'The explanation did not indicate which excerpts it relies on. Treat it as unconfirmed and check the law text before concluding.',
+      documentNoLaw: 'I read the document, but found no law excerpts in the base to support a legal conclusion. The explanation below covers what the document says; no law it mentions was verified.',
+      documentUnread: 'The document could not be analysed now because the AI explanation is unavailable. Try again later or paste the excerpt you want to understand.',
+      documentDefaultQuestion: 'Explain what this document says and what is important to note.',
+      historyFiles: 'attached files',
+      historyDocument: 'Document analysed in this answer',
+      historyReattach: 'The original file was not sent again. If the question depends on parts of the document not shown above, ask the person to attach the file again.'
     },
     pages: {
       privacy: {
         title: 'Privacy',
-        updated: 'Updated 12 November 2026. Demonstration version.',
+        updated: 'Updated 15 November 2026.',
         html: `
 <h2>In short</h2>
-<p>ROSS AI asks only for what it needs to answer. In this demonstration version, everything you write is stored only in this browser. Nothing is sent to ROSS AI servers.</p>
-<h2>What is stored</h2>
+<p>ROSS AI asks only for what it needs to answer. Your conversation history stays in this browser. To generate explanations, your question, recent parts of the conversation, the selected law excerpts and attachments pass through the ROSS AI server and are sent to Google Gemini. The server does not keep questions or attachments.</p>
+<h2>What stays in this browser</h2>
 <ul>
 <li>The text of your questions and the answers.</li>
-<li>The name, size and type of attached files. File contents are not stored.</li>
-<li>Your preferences: language, appearance, jurisdiction and AI mode.</li>
-<li>Your ratings of answers (helpful or not helpful).</li>
+<li>The name, size and type of attached files. File contents are not kept; to ask again about a file you may need to attach it again.</li>
+<li>Your preferences: language, appearance, state and answer mode.</li>
+<li>Your ratings of answers (helpful or not helpful), which are not sent to anyone.</li>
 </ul>
-<p>Your history lives in the browser’s local storage (localStorage). In AI modes, your question, selected history and attachments are sent to the model to generate the answer.</p>
-<h2>Proceeding tracking</h2>
-<p>Under “Track a proceeding”, selected numbers, court abbreviations, query dates, source and publication identifiers stay in this browser. Remove tracking there to delete its record. Queried numbers pass through the ROSS server to CNJ/DJEN for the default free lookup. Escavador is an optional integration used only when configured by the operator. Lookup does not use the AI model. DJEN results may be cached for up to five minutes to reduce requests; texts and parties are not saved in a customer database. The source maintains its own data and processing terms.</p>
+<p>This data lives in the browser’s local storage (localStorage) and is not read by other people using ROSS AI on other devices.</p>
+<h2>What passes through the server</h2>
+<ul>
+<li><strong>AI explanations</strong>: the question, up to six earlier messages in summary form, the chosen law excerpts and attachments (images and PDFs) are sent to Google Gemini only to generate the answer.</li>
+<li><strong>Law search</strong>: search terms are used to query the ROSS AI law base. This search does not use the AI model.</li>
+<li><strong>Usage control</strong>: to limit abuse, the server counts daily requests using a code derived from the network address (a hash), without storing the address itself.</li>
+<li><strong>Track a proceeding</strong>: looked-up numbers go to the server and then to CNJ/DJEN. Tracked numbers, lookup dates and publication identifiers stay in this browser. Lookups do not use the AI model, and results may be cached on the server for up to five minutes.</li>
+</ul>
+<p>Inside claude.ai, the AI explanation uses the account of the person opening the app instead of the ROSS AI server.</p>
 <h2>Attached documents</h2>
-<p>Before attaching, we warn that documents may contain personal data and you can cancel. In demonstration mode the file is neither read nor sent. With AI active on the website, your question, selected history, law excerpts and attachments (images and PDFs) pass through the ROSS AI server and are sent to Google Gemini to generate the answer. The server does not store or publish questions or attachments. Inside claude.ai, the explanation uses the account of the person opening the artifact.</p>
+<p>Before attaching, the app warns that documents may contain personal data, and you can cancel. Attach only what the question needs and avoid unnecessary third-party data.</p>
 <h2>How to delete</h2>
 <ul>
 <li>Each conversation can be deleted from the menu, in the list of previous conversations.</li>
 <li>In Settings you can delete all conversations at once.</li>
+<li>In “Track a proceeding”, remove a number to delete its record.</li>
 <li>Clearing your browser’s site data also removes everything.</li>
 </ul>
 <h2>What we do not do</h2>
 <ul>
-<li>We do not sell or share data.</li>
+<li>We do not sell data.</li>
 <li>We do not show private documents on public pages.</li>
-<li>We do not use your documents to train models.</li>
 <li>We do not ask for data beyond what the answer needs.</li>
 </ul>
-<h2>Future version</h2>
-<p>When ROSS AI starts keeping conversations on servers, this page will be updated before the change, explaining where data lives, for how long, and how to request deletion.</p>
+<p>Google processes data sent to Gemini under the terms of the service contracted by the person responsible for ROSS AI.</p>
 <h2>Contact</h2>
-<p>Privacy questions: <span class="mono">privacy@example.invalid</span> (fictional demonstration address).</p>`
+<p>For questions about the service, open an issue at <a href="https://github.com/matheusbauto-blip/ross-ai/issues" target="_blank" rel="noopener">https://github.com/matheusbauto-blip/ross-ai/issues</a>. Issues are public: do not include personal data, proceeding numbers or documents.</p>`
       },
       terms: {
         title: 'Terms of use',
-        updated: 'Updated 12 November 2026. Demonstration version.',
+        updated: 'Updated 15 November 2026.',
         html: `
 <h2>What ROSS AI is</h2>
-<p>ROSS AI is a tool for legal information and understanding. It explains laws, contracts and documents in plain words, points to the sources consulted and says when an answer depends on professional review.</p>
+<p>ROSS AI is a tool for legal information and understanding about Brazilian law. It explains laws, contracts and documents in plain words, shows the law excerpts consulted and says when an answer depends on professional review.</p>
 <p>ROSS AI is not a law firm, does not provide legal advice and does not create a lawyer-client relationship.</p>
+<h2>Where answers come from</h2>
+<ul>
+<li><strong>Official sources</strong>: federal law excerpts captured from the Planalto legislation portal and the Chamber of Deputies’ legislation database, with capture date and a link to check.</li>
+<li><strong>Imported corpus</strong>: texts from a community repository, marked “current validity not verified”.</li>
+<li><strong>AI explanation</strong>: Google Gemini (or Claude, inside claude.ai) writes the explanation from those excerpts. AI can make mistakes; statements citing excerpts that were not consulted are removed, but that does not guarantee every answer is correct.</li>
+<li><strong>AI without sources</strong> and <strong>Demonstration</strong>: optional modes in Settings. The first gives general unverified answers; the second uses fictional examples.</li>
+</ul>
+<p>Coverage is still partial: selected federal legislation, part of state legislation and no municipal legislation. A capture date alone does not confirm that a law is still in force.</p>
 <h2>What the service does not do</h2>
 <ul>
 <li>It does not guarantee outcomes. Nobody can promise a case will be won or lost.</li>
 <li>It does not state that a clause is definitely valid or invalid, or that a lawsuit certainly applies.</li>
 <li>It does not replace lawyers, public defenders, unions or public bodies.</li>
-<li>It does not prevent lawsuits or meet deadlines for you.</li>
+<li>It does not prevent lawsuits or meet deadlines for you. Proceeding lookup shows DJEN publications, which are not the complete proceeding history.</li>
 </ul>
-<h2>Sources and demonstration version</h2>
-<p>Each legal answer should indicate the sources consulted, with jurisdiction, date and status (in force, historical, bill or unconfirmed). In this demonstration version the sources are fictional and answers are labelled as demonstrations. AI mode answers are generated without consulting official sources and are marked as unverified.</p>
 <h2>Proper use</h2>
 <ul>
 <li>Check the sources before making decisions.</li>
 <li>In urgent situations, seek professional help or the competent authority without delay.</li>
 <li>Attach only documents you have the right to use and avoid unnecessary third-party data.</li>
+<li>There is a daily limit of questions per device to keep the service available.</li>
 </ul>
 <h2>Responsibility</h2>
 <p>Answers may contain errors or be out of date. Decisions made on their basis are the responsibility of whoever makes them. We recommend professional guidance for personalised assessments.</p>
 <h2>Changes</h2>
 <p>These terms may change. The date at the top indicates the version in effect.</p>
 <h2>Contact</h2>
-<p><span class="mono">contact@example.invalid</span> (fictional demonstration address).</p>`
+<p>Open an issue at <a href="https://github.com/matheusbauto-blip/ross-ai/issues" target="_blank" rel="noopener">https://github.com/matheusbauto-blip/ross-ai/issues</a>. Issues are public: do not include personal data or documents.</p>`
       },
       help: {
         title: 'Help',
-        updated: 'Quick guide to the demonstration version.',
+        updated: 'Quick guide to ROSS AI.',
         html: `
 <h2>How to ask</h2>
 <ul>
 <li>Write in your own words. No technical terms needed.</li>
-<li>Say the country and, if you know it, the state. Rules change with place and date.</li>
+<li>ROSS AI covers Brazilian law. If the situation depends on a state, choose it below the message box.</li>
 <li>If the question is about an excerpt, paste the text or attach the document.</li>
+<li>For a simpler version of the previous answer, ask “explain it more simply”.</li>
 </ul>
 <h2>How to attach documents</h2>
-<p>Use the paper clip in the message box to attach PDFs or images. Before sending, you see a notice about personal data and can cancel. The file name appears above the message and can be removed.</p>
+<p>Use the paper clip in the message box to attach PDFs or images (up to 4 files and 20 MB per message). Before sending, you see a notice about personal data and can cancel. Even when the search finds no applicable law, the document is read and the answer makes clear that no legal basis was verified. The file is not kept: for new questions about parts that did not appear in the answer, attach it again.</p>
 <h2>How to read the answer</h2>
 <ol>
 <li><strong>In short</strong>: the direct answer.</li>
-<li><strong>What the sources say</strong>: the relevant excerpts explained.</li>
+<li><strong>What the sources say</strong>: the relevant excerpts explained, each linked to a source.</li>
 <li><strong>What depends on the situation</strong>: facts or documents that may change the answer.</li>
-<li><strong>Sources consulted</strong>: law or page, article and link, with each text’s status.</li>
+<li><strong>Sources consulted</strong>: law, article, link and capture date. Click the title to open the list.</li>
 <li><strong>Next steps</strong>: informative, neutral options.</li>
 </ol>
 <h2>The labels</h2>
 <ul>
-<li><strong>In force</strong>: text in effect on the verification date.</li>
-<li><strong>Historical text</strong>: earlier wording, which may apply to older facts.</li>
-<li><strong>Bill</strong>: a proposal with no effect until approved.</li>
-<li><strong>Unconfirmed</strong>: information without a checked official source.</li>
-<li><strong>Official sources</strong>: excerpts of the official Planalto text, with a link to check.</li>
-<li><strong>Demonstration</strong>: answer with fictional sources.</li>
+<li><strong>Official sources</strong>: explanation based on excerpts from Planalto or the Chamber of Deputies, with a link to check.</li>
+<li><strong>In force / Repealed / Vetoed</strong>: status of the article in the captured text.</li>
+<li><strong>Imported corpus</strong>: community repository text, current validity not verified.</li>
 <li><strong>AI mode</strong>: answer generated by AI without verified sources.</li>
+<li><strong>Demonstration</strong>: answer with fictional sources, used only when chosen.</li>
+</ul>
+<h2>Other screens</h2>
+<ul>
+<li><strong>Search legislation</strong>: direct search in the base by topic, number, state or municipality.</li>
+<li><strong>Track a proceeding</strong>: free lookup of DJEN publications by proceeding number.</li>
+<li><strong>Source registry</strong>: list of laws, capture dates and versions.</li>
 </ul>
 <h2>Limits</h2>
 <p>ROSS AI informs and helps you understand. It does not assess chances, define strategy or replace a professional. When a request crosses that line, the answer explains why and points to where to find help.</p>
-<h2>Demonstration scenarios</h2>
-<p>See how ROSS AI behaves in each situation. Each button opens a new conversation.</p>
+<h2>Fictional examples</h2>
+<p>These buttons open conversations in demonstration mode, with fictional sources, to show how ROSS AI reacts to each situation.</p>
 <div class="scenario-grid">
 <button type="button" class="btn btn-secondary" data-scenario="doc_ok">Readable document</button>
 <button type="button" class="btn btn-secondary" data-scenario="doc_illegible">Illegible document</button>
@@ -830,9 +902,9 @@ window.ROSS_I18N = {
 <button type="button" class="btn btn-secondary" data-scenario="error">Error while answering</button>
 </div>
 <h2>Frequently asked questions</h2>
-<p><strong>Are the answers reliable?</strong> Not in this demonstration: the sources are fictional and exist to show the experience. In the version connected to real sources, every answer shows links and references for you to check.</p>
-<p><strong>Are my documents kept?</strong> No. Only the file name stays in the browser’s local history. See the Privacy page.</p>
-<p><strong>Can I use another language?</strong> Yes. Change the language in Settings.</p>`
+<p><strong>Are the answers reliable?</strong> They are based on excerpts from official sources and show where they came from, but the explanation is written by AI and can be wrong. Check the cited articles before deciding.</p>
+<p><strong>Are my documents kept?</strong> No. They are sent to generate the answer and are not kept on the server. Only the file name stays in the browser. See the Privacy page.</p>
+<p><strong>Can I use another language?</strong> Yes, the interface and answers can be in English. Change the language in Settings. The law covered remains Brazilian.</p>`
       }
     }
   }

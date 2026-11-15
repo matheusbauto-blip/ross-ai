@@ -4,7 +4,7 @@
   const STORAGE_KEY = 'rossai.processes.v1';
   const MAX_SAVED = 20;
   let saved = [], loaded = false, active = false, deps, root, timer = null, controller = null, requestId = 0;
-  const state = { query: '', busy: false, error: '', result: null, notice: '', storageError: false };
+  const state = { query: '', busy: false, error: '', result: null, notice: '', storageError: false, cpfGuide: false };
   function processNumber(value) {
     if (typeof value !== 'string' || value.length > 40 || /[^\d.\s-]/.test(value)) throw new Error('process_invalid_number');
     const n = value.replace(/\D/g, '');
@@ -55,6 +55,7 @@
     const followed = p && saved.some(item => item.number === p.number);
     let content = '<p class="prose">' + esc(tr('intro')) + '</p>' +
       '<form id="process-form" class="process-form"><label for="process-number">' + esc(tr('number')) + '</label><div class="process-query"><input id="process-number" type="text" inputmode="numeric" maxlength="40" autocomplete="off" required placeholder="NNNNNNN-DD.AAAA.J.TR.OOOO" value="' + esc(state.query) + '" aria-describedby="process-hint process-error"><button type="submit" class="btn"' + (state.busy ? ' disabled' : '') + '>' + esc(tr(state.busy ? 'loading' : 'search')) + '</button></div><p id="process-hint" class="muted">' + esc(tr('hint')) + '</p></form>' +
+      '<details id="process-cpf" class="process-cpf"' + (state.cpfGuide ? ' open' : '') + '><summary>' + esc(tr('cpfTitle')) + '</summary><div class="process-cpf-content"><p>' + esc(tr('cpfIntro')) + '</p><ol>' + ['cpfStepLogin', 'cpfStepSearch', 'cpfStepReturn'].map(key => '<li>' + esc(tr(key)) + '</li>').join('') + '</ol><div class="row"><a id="process-cpf-link" class="btn btn-secondary" href="https://www.jus.br/" target="_blank" rel="noopener noreferrer">' + esc(tr('cpfOpen')) + '</a><button id="process-cpf-return" class="btn btn-secondary" type="button">' + esc(tr('cpfReturn')) + '</button></div><p class="muted">' + esc(tr('cpfPrivacy')) + '</p><p class="muted">' + esc(tr('cpfCoverage')) + '</p></div></details>' +
       '<div id="process-error" role="alert">' + (state.error ? '<p class="callout callout-warn">' + esc(state.error) + '</p>' : '') + '</div>' +
       (state.storageError ? '<p class="callout callout-warn">' + esc(tr('storageError')) + '</p>' : '') +
       '<div id="process-result" aria-live="polite" aria-busy="' + state.busy + '">' + (state.notice ? '<p class="callout callout-info">' + esc(state.notice) + '</p>' : '');
@@ -74,6 +75,12 @@
     root.innerHTML = deps.pageShell(tr('title'), '', content); deps.bindBack(root);
     root.querySelector('#process-number').addEventListener('input', e => { state.query = e.target.value; });
     root.querySelector('#process-form').addEventListener('submit', e => { e.preventDefault(); lookup(state.query); });
+    const cpfGuide = root.querySelector('#process-cpf');
+    cpfGuide.addEventListener('toggle', () => { if (active && root.querySelector('#process-cpf') === cpfGuide) state.cpfGuide = cpfGuide.open; });
+    root.querySelector('#process-cpf-return').addEventListener('click', () => {
+      state.cpfGuide = false; state.error = ''; paint();
+      const input = root.querySelector('#process-number'); input.focus(); input.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    });
     root.querySelector('#process-refresh')?.addEventListener('click', () => lookup(p.number));
     root.querySelector('#process-more')?.addEventListener('click', () => lookup(p.number, result.nextPage));
     root.querySelector('#process-follow')?.addEventListener('click', () => {
@@ -88,6 +95,13 @@
     root.querySelectorAll('[data-process-remove]').forEach(button => button.addEventListener('click', () => { saved = saved.filter(item => item.number !== button.dataset.processRemove); persist(); paint(); schedule(); }));
   }
   async function lookup(value, page = null, automatic = false) {
+    // CPF discovery requires the user's own authenticated session on Jus.br.
+    // Do not send a CPF to the number-only API or retain it in the input state.
+    if (typeof value === 'string' && /^[\d.\s-]+$/.test(value) && value.replace(/\D/g, '').length === 11) {
+      controller?.abort(); ++requestId; clearTimeout(timer);
+      state.query = ''; state.busy = false; state.result = null; state.notice = ''; state.cpfGuide = true; state.error = tr('cpfRedirect'); paint();
+      root.querySelector('#process-cpf summary').focus(); return;
+    }
     let number;
     try { number = processNumber(value); } catch { state.error = tr('invalid'); paint(); return; }
     if (automatic && state.busy) { schedule(); return; }

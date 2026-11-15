@@ -667,6 +667,7 @@
     let data = null; try { data = await res.json(); } catch (e) { data = null; }
     if (res.status === 429) throw { code: 'rate_limited' };
     if (res.status === 503 && data && data.error === 'api_not_configured') throw { code: 'api_not_configured' };
+    if (res.status === 503 && data && data.error === 'quota_unavailable') throw { code: 'quota_unavailable' };
     if (!res.ok && op === 'process_lookup' && data && data.error === 'unknown_op') throw { code: 'process_not_configured' };
     if (!res.ok && data && typeof data.error === 'string' && /^process_(?:not_configured|credentials|credits|not_found|restricted|invalid_number|invalid_page|unavailable)$/.test(data.error)) throw { code: data.error };
     if (!res.ok) throw { code: 'api_error', message: data && data.error ? data.error : 'HTTP ' + res.status };
@@ -712,7 +713,7 @@
       if (!sampleFn) throw { code: 'unavailable' };
       onStep(0);
       const history = priorTurns(conv, text || '');
-      const transcript = history.map((m) => (m.role === 'user' ? 'PERSON: ' + (m.text || '') + (m.attachments && m.attachments.length ? ' [attached: ' + m.attachments.map((f) => f.name).join(', ') + ']' : '') : 'ROSS AI: ' + (m.answer && m.answer.summary ? m.answer.summary : ''))).join('\n');
+      const transcript = history.map((m) => (m.role === 'user' ? 'PERSON: ' : 'ROSS AI: ') + turnText(m)).join('\n');
       const limits = state.aiLimits;
       const imgTypes = limits && limits.images && limits.images.mediaTypes ? limits.images.mediaTypes : [];
       const images = [], unread = [];
@@ -764,12 +765,27 @@
     if (!res.ok) throw { code: 'law_fetch', message: 'HTTP ' + res.status };
     return res.json();
   }
-  async function loadCatalog() {
-    try {
-      state.catalog = await sourceJSON('data/catalog.json');
-      try { state.lawPending = await sourceJSON('data/pending.json'); } catch (e) { state.lawPending = null; }
+  let catalogLoading = null;
+  function loadCatalog() {
+    if (catalogLoading) return catalogLoading;
+    catalogLoading = (async () => {
+      try {
+        state.catalog = await sourceJSON('data/catalog.json');
+        try { state.lawPending = await sourceJSON('data/pending.json'); } catch (e) { state.lawPending = null; }
+      } catch (e) { state.catalog = null; }
+      finally { catalogLoading = null; }
       if (['home', 'settings', 'sources'].includes(state.view)) render({ keep: true });
-    } catch (e) { state.catalog = null; }
+    })();
+    return catalogLoading;
+  }
+  /* O modo escolhido é mantido: se a base ainda não carregou, espera; se falhou, tenta de novo
+     e, persistindo a falha, devolve um erro com nova tentativa em vez de usar a demonstração. */
+  async function ensureCatalog() {
+    if (state.catalog) return state.catalog;
+    await loadCatalog();
+    if (!state.catalog) await loadCatalog();
+    if (!state.catalog) throw { code: 'catalog_unavailable' };
+    return state.catalog;
   }
   async function loadLaw(entry) {
     if (lawCache[entry.id]) return lawCache[entry.id];
@@ -977,11 +993,25 @@
     if (last && last.role === 'user' && String(last.text || '').trim() === String(currentQuestion || '').trim()) turns.pop();
     return turns.slice(-8);
   }
+  /* Cada turno anterior leva ao modelo o essencial: o texto da pessoa com os nomes dos arquivos e,
+     nas respostas, o resumo mais o que foi lido de documentos (trechos citados e observações). */
+  function turnText(message) {
+    if (message.role === 'user') {
+      const files = (message.attachments || []).map((f) => f.name).filter(Boolean);
+      return (message.text || '') + (files.length ? ' [' + t('oficial.historyFiles') + ': ' + files.join(', ') + ']' : '');
+    }
+    const a = message.answer || {};
+    let out = a.summary || '';
+    const doc = a.document;
+    if (doc && ((doc.excerpts && doc.excerpts.length) || (doc.notes && doc.notes.length))) {
+      const parts = (doc.excerpts || []).slice(0, 4).map((x) => (x.ref ? x.ref + ': ' : '') + '"' + String(x.quote || '').slice(0, 220) + '"' + (x.inDocument ? ' — ' + String(x.inDocument).slice(0, 160) : ''));
+      const notes = (doc.notes || []).slice(0, 2).map((n) => String(n).slice(0, 160));
+      out += '\n[' + t('oficial.historyDocument') + (doc.name ? ' ' + doc.name : '') + '] ' + parts.concat(notes).join(' | ') + '\n' + t('oficial.historyReattach');
+    }
+    return out.slice(0, 1200);
+  }
   function historyForModel(conv, currentQuestion) {
-    return priorTurns(conv, currentQuestion).slice(-6).map((message) => ({
-      role: message.role,
-      text: message.role === 'user' ? (message.text || '') : (message.answer && message.answer.summary ? message.answer.summary : ''),
-    }));
+    return priorTurns(conv, currentQuestion).slice(-6).map((message) => ({ role: message.role, text: turnText(message) }));
   }
   function plainAnswerQuestion(question) {
     return question + '\n\nESCOPO DESTA VERSÃO: O ROSS AI atende apenas ao Direito brasileiro. Não apresente leis brasileiras como se fossem de outro país. Se o pedido depender de legislação estrangeira, explique brevemente a limitação; se houver dúvida sobre a aplicação no Brasil, peça o esclarecimento necessário.' +
@@ -1014,7 +1044,7 @@
   providers.oficial = {
     id: 'oficial',
     async respond({ text, attachments, conv, onStep, signal }) {
-      if (!state.catalog) throw { code: 'catalog_unavailable' };
+      await ensureCatalog();
       const cap = state.catalog.generatedAt;
       if (conv.country !== 'BR') return { mode: 'oficial', kind: 'nosources', summary: t('oficial.jurisdiction', { country: countryName(conv.country) }), nextSteps: [t('oficial.jurisdictionStep')], capturedAt: cap };
       onStep(0);
@@ -1068,7 +1098,7 @@
         const key = s.url.replace(/#.*$/, '') + '|' + s.article;
         if (seen.has(key)) return false; seen.add(key); return true;
       })).slice(0, 200).map((s, i) => Object.assign({}, s, { n: i + 1 }));
-      if (!sources.length) return emptyOfficial();
+      if (!sources.length) return attachments && attachments.length ? documentWithoutLaw(text, attachments, conv, signal) : emptyOfficial();
       if (modelUnavailable || (!sampleFn && !API_URL)) return retrievalOnly(sources);
       if (!sampleFn && API_URL) {
         try { sources = await selectRelevantSources(context.searchQuestion, searchText, sources, signal); }
@@ -1077,7 +1107,7 @@
           if (e && e.code === 'rate_limited') throw e;
           return retrievalOnly(sources, 'oficial.relevanceUnavailable');
         }
-        if (!sources.length) return emptyOfficial();
+        if (!sources.length) return attachments && attachments.length ? documentWithoutLaw(text, attachments, conv, signal) : emptyOfficial();
       } else sources = sources.slice(0, 8);
       onStep(2);
       try {
@@ -1086,7 +1116,15 @@
       } catch (e) { if (e && e.code === 'api_not_configured') return retrievalOnly(sources); throw e; }
     }
   };
-  function emptyOfficial() { return { mode: 'oficial', kind: 'nosources', summary: t('oficial.empty'), questions: t('oficial.emptyQuestions'), nextSteps: [t('oficial.emptyStep')], capturedAt: state.catalog.generatedAt }; }
+  function emptyOfficial() { return { mode: 'oficial', kind: 'nosources', summary: t('oficial.empty'), questions: t('oficial.emptyQuestions'), nextSteps: [t('oficial.emptyStep')], capturedAt: state.catalog ? state.catalog.generatedAt : '' }; }
+  /* Sem trecho de lei, um arquivo anexado ainda é lido: a resposta explica o que está escrito no
+     documento e diz que não houve fundamentação legal verificada. */
+  async function documentWithoutLaw(text, attachments, conv, signal) {
+    if (!sampleFn && !API_URL) return Object.assign(emptyOfficial(), { warnings: [t('oficial.documentUnread')] });
+    const answer = await providers.ai.respond({ text: text || t('oficial.documentDefaultQuestion'), attachments: attachments, conv: conv, onStep: () => {}, signal: signal });
+    answer.warnings = [t('oficial.documentNoLaw')].concat(answer.warnings || []);
+    return answer;
+  }
   function retrievalOnly(sources, reason) {
     const top = sources.slice(0, 5);
     return { mode: 'oficial', kind: 'answer', corpus: top.some((s) => s.imported), summary: t(reason || 'oficial.noAI'), sourcesSay: top.map((s) => ({ title: s.shortName + ' · ' + s.article, text: s.excerpt.length > 700 ? s.excerpt.slice(0, 700) + '…' : s.excerpt, ref: s.n })), sources: top, warnings: [t('oficial.noAIWarn')], capturedAt: state.catalog.generatedAt };
@@ -1125,18 +1163,32 @@
     }, signal);
     return res.answer || {};
   }
+  /* Só aparecem afirmações e fontes ligadas a trechos que realmente foram enviados ao modelo.
+     Uma afirmação com referência inexistente ou ausente é descartada; nenhuma fonte é acrescentada
+     automaticamente para dar aparência de fundamentação. */
   function normalizeOfficial(d, sources, attachments) {
-    if (d && d.kind === 'nosources') return emptyOfficial();
     const a = normalizeAI(d, attachments);
-    a.mode = 'oficial'; a.capturedAt = state.catalog.generatedAt; a.corpus = sources.some((s) => s.imported);
+    a.mode = 'oficial'; a.capturedAt = state.catalog ? state.catalog.generatedAt : ''; a.corpus = sources.some((s) => s.imported);
     const byN = Object.fromEntries(sources.map((s) => [s.n, s]));
+    const validRef = (value) => { const n = Number(value); return Number.isInteger(n) && byN[n] ? n : null; };
+    const say = (Array.isArray(d && d.sourcesSay) ? d.sourcesSay : []).filter((s) => s && String(s.text || '').trim());
+    const keptSay = say.filter((s) => validRef(s.ref) !== null);
+    const droppedClaims = say.length - keptSay.length;
     const refs = [];
-    const say = Array.isArray(d && d.sourcesSay) ? d.sourcesSay : [];
-    (Array.isArray(d && d.sources) ? d.sources : []).concat(say).forEach((s) => { const n = Number(s && s.ref); if (byN[n] && !refs.includes(n)) refs.push(n); });
-    if (!refs.length && (a.kind === 'answer' || a.kind === 'document')) sources.slice(0, 3).forEach((s) => refs.push(s.n));
+    (Array.isArray(d && d.sources) ? d.sources : []).concat(keptSay).forEach((s) => { const n = validRef(s && s.ref); if (n !== null && !refs.includes(n)) refs.push(n); });
     const renum = {}; refs.forEach((n, i) => { renum[n] = i + 1; });
     a.sources = refs.map((n, i) => Object.assign({}, byN[n], { n: i + 1 }));
-    a.sourcesSay = say.map((s) => ({ title: String((s && s.title) || ''), text: String((s && s.text) || ''), ref: renum[Number(s && s.ref)] || null })).filter((s) => s.text);
+    a.sourcesSay = keptSay.map((s) => ({ title: String(s.title || ''), text: String(s.text), ref: renum[validRef(s.ref)] }));
+    if (a.kind === 'nosources') {
+      /* Preserva a explicação e as perguntas específicas do modelo; completa só o que faltar. */
+      a.sources = []; a.sourcesSay = [];
+      if (!a.summary) a.summary = t('oficial.empty');
+      if (!a.questions.length) a.questions = t('oficial.emptyQuestions');
+      if (!a.nextSteps.length) a.nextSteps = [t('oficial.emptyStep')];
+      return a;
+    }
+    if (droppedClaims) a.warnings = a.warnings.concat(t('oficial.droppedClaims', { n: droppedClaims }));
+    if (!a.sources.length && sources.length && (a.kind === 'answer' || a.kind === 'document')) a.warnings = a.warnings.concat(t('oficial.unlinked'));
     return a;
   }
   function lawCardHTML(s, n, m) {
@@ -1170,6 +1222,7 @@
   }
   function homeNotice() {
     const em = effectiveMode();
+    if (em === 'oficial' && !state.catalog) return t('home.catalogLoading');
     if (em === 'oficial') return t('home.oficialNotice', { n: state.catalog.laws.length, date: fmtDate(state.catalog.generatedAt) }) + (state.aiAvailable ? '' : ' ' + t('home.oficialNoAI'));
     if (em === 'ai') return t('home.aiNotice');
     return t('home.demoNotice');
@@ -1203,9 +1256,10 @@
   }
 
   /* ---------- Envio ---------- */
+  /* A demonstração só é usada quando escolhida; indisponibilidades aparecem como erro recuperável. */
   function activeProvider() {
-    if (state.mode === 'oficial' && state.catalog) return providers.oficial;
-    if (state.mode === 'ai' && state.aiAvailable) return providers.ai;
+    if (state.mode === 'oficial') return providers.oficial;
+    if (state.mode === 'ai') return providers.ai;
     return providers.demo;
   }
   function effectiveMode() { return activeProvider().id; }
@@ -1242,7 +1296,7 @@
     try {
       const answer = await provider.respond({ text: input.text, attachments: input.attachments, conv: requestConv, lang: state.lang, onStep: onStep, signal: ctl.signal });
       retryInputs.delete(botMsg);
-      botMsg.status = 'done'; botMsg.answer = answer; botMsg.provider = provider.id; delete botMsg.error;
+      botMsg.status = 'done'; botMsg.answer = answer; botMsg.provider = answer && answer.mode === 'ai' ? 'ai' : provider.id; delete botMsg.error;
     } catch (e) {
       retryInputs.set(botMsg, input);
       const code = e && e.code;

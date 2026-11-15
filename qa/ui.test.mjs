@@ -28,7 +28,7 @@ function setup(t, fetcher = async () => Response.json({ documents: 235, results:
   });
   for (const file of ['config.js', 'i18n.js', 'demo-data.js', 'process-tracker.js']) vm.runInContext(read(file), context);
   const script = read('app.js').replace("if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();",
-    'window.__test = {state, providers, render, go, load, onFilesChosen, newConversation, submitMessage, retryMessage, openConversation, deleteConversation, answerToText, isRephraseRequest, conversationContext, historyForModel};');
+    'window.__test = {state, providers, render, go, load, onFilesChosen, newConversation, submitMessage, retryMessage, openConversation, deleteConversation, answerToText, isRephraseRequest, conversationContext, historyForModel, normalizeOfficial, activeProvider, turnText};');
   vm.runInContext(script, context);
   const api = window.__test;
   api.state.catalog = structuredClone(catalog);
@@ -74,6 +74,64 @@ test('the drawer opens proceeding tracking and invalid numbers do not make reque
   await tick();
   assert.match(document.querySelector('#process-error').textContent, /Confira o número/);
   assert.equal(calls.length, 0);
+});
+
+test('CPF discovery opens the official portal without collecting credentials and returns to the number field', t => {
+  const { api, document, window, change } = setup(t);
+  for (const language of ['pt-BR', 'en']) {
+    api.state.lang = language; api.go('processes');
+    const guide = document.querySelector('#process-cpf');
+    assert.equal(guide.hasAttribute('open'), false);
+    guide.open = true; guide.dispatchEvent(new window.Event('toggle'));
+    const link = document.querySelector('#process-cpf-link');
+    assert.equal(link.getAttribute('href'), 'https://www.jus.br/');
+    assert.equal(link.getAttribute('target'), '_blank');
+    assert.match(link.getAttribute('rel'), /noopener/); assert.match(link.getAttribute('rel'), /noreferrer/);
+    assert.match(guide.textContent, /CPF da Parte/);
+    assert.match(guide.textContent, /ouro|gold-level/);
+    assert.equal(guide.querySelector('input, iframe'), null);
+    change('#process-number', processNumber);
+    let focused = false;
+    window.HTMLElement.prototype.focus = function () { focused = this.id === 'process-number'; };
+    document.querySelector('#process-cpf-return').click();
+    assert.equal(document.querySelector('#process-cpf').hasAttribute('open'), false);
+    assert.equal(document.querySelector('#process-number').value, processNumber);
+    assert.equal(focused, true);
+  }
+});
+
+test('a CPF entered as a proceeding number stays off the API and opens the official search guide', async t => {
+  const calls = [];
+  const { api, document, window, storage, change } = setup(t, async (...args) => { calls.push(args); return Response.json(processResponse()); });
+  api.go('processes');
+  // Deliberately fictitious input: discovery does not require validating a CPF.
+  for (const input of ['000.000.000-00', '00000000000']) {
+    change('#process-number', input);
+    document.querySelector('#process-form').dispatchEvent(new window.Event('submit', { bubbles: true, cancelable: true }));
+    await tick();
+    assert.equal(document.querySelector('#process-cpf').hasAttribute('open'), true);
+    assert.equal(document.querySelector('#process-number').value, '');
+    assert.match(document.querySelector('#process-error').textContent, /CPF/);
+    assert.equal(document.querySelector('.process-card'), null);
+    assert.equal(calls.length, 0); assert.equal(storage.size, 0);
+    document.querySelector('#process-cpf-return').click();
+  }
+  change('#process-number', processNumber);
+  document.querySelector('#process-form').dispatchEvent(new window.Event('submit', { bubbles: true, cancelable: true }));
+  await tick(); await tick();
+  assert.equal(calls.length, 1); assert.ok(document.querySelector('.process-card'));
+});
+
+test('opening CPF discovery during an outstanding lookup ignores that lookup response', async t => {
+  let resolveRequest;
+  const { api, document, window, change } = setup(t, async () => new Promise(resolve => { resolveRequest = resolve; }));
+  api.go('processes'); change('#process-number', processNumber);
+  const submit = () => document.querySelector('#process-form').dispatchEvent(new window.Event('submit', { bubbles: true, cancelable: true }));
+  submit(); change('#process-number', '000.000.000-00'); submit();
+  resolveRequest(Response.json(processResponse())); await tick(); await tick();
+  assert.equal(document.querySelector('.process-card'), null);
+  assert.equal(document.querySelector('#process-number').value, '');
+  assert.match(document.querySelector('#process-error').textContent, /CPF/);
 });
 
 test('an unconfigured process service displays an honest error without a fabricated process card', async t => {
@@ -437,4 +495,52 @@ test('rephrasing a previous source-search failure searches the original TV issue
   assert.match(context.query, /TV/);
   assert.match(context.answerQuestion, /Dúvida original/);
   assert.equal(context.sources.length, 0);
+});
+
+const officialSources = [{ n: 1, lawId: 'l8078', name: 'Lei nº 8.078/1990', shortName: 'CDC', article: 'Art. 49', heading: '', status: 'vigente', url: 'https://www.planalto.gov.br/ccivil_03/leis/l8078compilado.htm#art49', retrievedAt: '2026-11-13', version: 'v1', excerpt: 'Art. 49. O consumidor pode desistir do contrato...' }];
+
+test('claims citing excerpts that were never consulted are dropped and no source is added to dress them up', t => {
+  const { api } = setup(t);
+  const answer = api.normalizeOfficial({ kind: 'answer', summary: 'Resumo.', sourcesSay: [{ title: 'Afirmação', text: 'Diz algo', ref: 999999 }, { title: 'Sem referência', text: 'Outra coisa', ref: null }], sources: [{ ref: 999999, why: 'x' }], depends: [], nextSteps: [], questions: [], mentions: [], document: null, limitNotice: null, warnings: [] }, officialSources, []);
+  assert.equal(answer.sourcesSay.length, 0);
+  assert.equal(answer.sources.length, 0);
+  assert.ok(answer.warnings.some(w => /2 afirmaç/.test(w)));
+  assert.ok(answer.warnings.some(w => /não indicou em quais trechos/.test(w)));
+  const valid = api.normalizeOfficial({ kind: 'answer', summary: 'Resumo.', sourcesSay: [{ title: 'Afirmação', text: 'Diz algo', ref: 1 }], sources: [{ ref: 1, why: 'x' }], warnings: [] }, officialSources, []);
+  assert.equal(valid.sources.length, 1); assert.equal(valid.sourcesSay[0].ref, 1); assert.equal(valid.warnings.length, 0);
+});
+
+test('a nosources answer keeps the specific explanation and questions the model returned', t => {
+  const { api } = setup(t);
+  const answer = api.normalizeOfficial({ kind: 'nosources', summary: 'Os trechos tratam de compras, não de aluguel.', questions: ['O contrato é residencial ou comercial?'], sourcesSay: [], sources: [], warnings: [] }, officialSources, []);
+  assert.equal(answer.kind, 'nosources');
+  assert.equal(answer.summary, 'Os trechos tratam de compras, não de aluguel.');
+  assert.deepEqual(answer.questions, ['O contrato é residencial ou comercial?']);
+  assert.equal(answer.sources.length, 0);
+});
+
+test('official mode never falls back to the demonstration when the law base is unavailable', async t => {
+  const { api, document } = setup(t, async url => String(url).includes('catalog.json') ? new Response('', { status: 404 }) : Response.json({ results: [] }));
+  api.state.catalog = null; api.state.mode = 'oficial';
+  assert.equal(api.activeProvider().id, 'oficial');
+  api.submitMessage('Posso cancelar uma compra pela internet?');
+  for (let i = 0; i < 40 && !document.querySelector('.error-card'); i++) await tick();
+  const error = document.querySelector('.error-card');
+  assert.ok(error, 'error card expected');
+  assert.match(error.textContent, /base de leis/);
+  assert.ok(error.querySelector('[data-retry]'));
+  assert.ok(!document.querySelector('.badge-demo'));
+});
+
+test('document excerpts from a previous answer travel with the history sent to the model', t => {
+  const { api } = setup(t);
+  const conv = { messages: [
+    { role: 'user', text: 'O que diz este contrato?', attachments: [{ name: 'contrato.pdf' }], status: 'done' },
+    { role: 'assistant', status: 'done', answer: { summary: 'A cláusula 9 fixa multa.', document: { name: 'contrato.pdf', notes: ['Contrato de 6 páginas.'], excerpts: [{ ref: 'Cláusula 9ª', quote: 'multa de três mensalidades', inDocument: 'multa fixa', inLaw: '' }], warnings: [] } } },
+  ] };
+  const history = api.historyForModel(conv, 'E a renovação automática?');
+  assert.match(history[0].text, /contrato\.pdf/);
+  assert.match(history[1].text, /Cláusula 9ª: "multa de três mensalidades"/);
+  assert.match(history[1].text, /Documento analisado/);
+  assert.match(history[1].text, /anexe o arquivo novamente/);
 });

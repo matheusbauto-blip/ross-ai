@@ -284,8 +284,9 @@ Deno.serve(async (req: Request) => {
   }
   if (op !== "prepare" && op !== "answer") return json(400, { error: "unknown_op" }, origin);
 
-  const quota = await checkQuota(req);
-  if (!quota.allowed) return json(429, { error: "rate_limited" }, origin);
+  // Chamadas pagas ao modelo exigem o controle de uso: se ele não puder ser verificado, nada é enviado.
+  const quota = await checkQuota(req, false, true);
+  if (!quota.allowed) return json(quota.unavailable ? 503 : 429, { error: quota.unavailable ? "quota_unavailable" : "rate_limited" }, origin);
 
   try {
     const apiKey = await googleApiKey();

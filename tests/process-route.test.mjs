@@ -20,7 +20,7 @@ function server({ token = 'test-provider-value', quotaError = false, processSour
     crypto, TextEncoder, Response, Request, URL, AbortSignal, console: { error() {} },
   };
   vm.runInNewContext(stripTypeScriptTypes(source), context);
-  return { request: number => handler(new Request('https://test.invalid', { method: 'POST', headers: { Origin: 'https://matheusbauto-blip.github.io', 'Content-Type': 'application/json' }, body: JSON.stringify({ op: 'process_lookup', number }) })), counts: () => ({ lookups, djenLookups, modelCalls, quotaCalls }) };
+  return { raw: body => handler(new Request('https://test.invalid', { method: 'POST', headers: { Origin: 'https://matheusbauto-blip.github.io', 'Content-Type': 'application/json' }, body: JSON.stringify(body) })), request: number => handler(new Request('https://test.invalid', { method: 'POST', headers: { Origin: 'https://matheusbauto-blip.github.io', 'Content-Type': 'application/json' }, body: JSON.stringify({ op: 'process_lookup', number }) })), counts: () => ({ lookups, djenLookups, modelCalls, quotaCalls }) };
 }
 
 test('the actual process route works independently of Google credentials and never calls the model', async () => {
@@ -48,4 +48,13 @@ test('without a configured source, the route uses the public DJEN API and needs 
   const s = server({ token: '', processSource: '' }); const response = await s.request('00008323520184013202');
   assert.equal(response.status, 200); assert.equal((await response.json()).coverage, 'publications');
   assert.deepEqual(s.counts(), { lookups: 0, djenLookups: 1, modelCalls: 0, quotaCalls: 1 });
+});
+
+test('a quota outage blocks paid model calls instead of letting them through', async () => {
+  const s = server({ quotaError: true });
+  for (const op of ['prepare', 'answer']) {
+    const response = await s.raw({ op, question: 'teste', catalog: [], excerpts: [] });
+    assert.equal(response.status, 503); assert.deepEqual(await response.json(), { error: 'quota_unavailable' });
+  }
+  assert.equal(s.counts().modelCalls, 0);
 });

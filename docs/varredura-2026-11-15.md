@@ -19,7 +19,18 @@ Os demais achados abaixo continuam pendentes. Esta revisão não implementou “
 
 Essas mudanças estão em `app.js`, `styles.css` e `qa/ui.test.mjs`. A documentação de uso e o planejamento da função de caso foram atualizados.
 
-## Pendências prioritárias
+## Pendências prioritárias — corrigidas em 15/11/2026 (sessão posterior)
+
+| Achado | Correção aplicada | Validação |
+| --- | --- | --- |
+| Citação inválida continuava visível. | `normalizeOfficial` descarta afirmações cuja referência não corresponde a um trecho consultado e não acrescenta fontes automaticamente; a resposta avisa quantas afirmações foram removidas ou que a explicação não indicou seus trechos. Respostas `nosources` preservam a explicação e as perguntas específicas do modelo. | `qa/ui.test.mjs`: “claims citing excerpts that were never consulted…” e “a nosources answer keeps…”. |
+| Arquivo podia ficar sem análise. | Sem trecho de lei, um anexo é lido pelo modelo (`documentWithoutLaw`) e a resposta avisa que não houve fundamentação legal verificada; sem IA, informa que o documento não pôde ser analisado. | Caminho coberto pelos testes de anexos existentes; sem simulação do modelo real. |
+| Falha na base ativava demonstração. | `activeProvider` respeita o modo escolhido; `ensureCatalog` espera o carregamento, tenta de novo e devolve erro recuperável. A demonstração só é usada quando escolhida. | `qa/ui.test.mjs`: “official mode never falls back to the demonstration…”. |
+| Limite de uso liberava chamadas em caso de falha. | Na função, `prepare` e `answer` exigem o controle de uso (`strict`); falha devolve 503 `quota_unavailable` sem chamar o modelo. Busca e estatísticas do acervo continuam sem bloqueio. | `tests/process-route.test.mjs`: “a quota outage blocks paid model calls…”. |
+| Continuidade incompleta dos documentos. | `historyForModel` inclui nomes de arquivos, trechos citados e observações do documento analisado, com aviso de que o original não foi reenviado. | `qa/ui.test.mjs`: “document excerpts from a previous answer travel…”. |
+| Textos de produção contraditórios. | Ajuda, Termos, Privacidade e Sobre reescritos para o comportamento real (fontes oficiais, Gemini no site, acervo importado, DJEN, limites de uso); contatos fictícios substituídos pelos chamados públicos do repositório. | Páginas renderizam nos dois idiomas (teste existente); revisão jurídica dos textos ainda recomendada. |
+
+## Pendências prioritárias (registro original)
 
 | Prioridade | Achado e evidência | Correção indicada |
 | --- | --- | --- |
