@@ -14,12 +14,12 @@ for (const law of catalog.laws) {
 const script = source => '<script>' + source.replace(/<\/script/gi, '<\\/script') + '</script>';
 let html = await read('index.html');
 const css = await read('styles.css');
-html = html.replace('<link rel="stylesheet" href="styles.css">', () => '<style>' + css + '</style>');
+html = html.replace(/<link rel="stylesheet" href="styles\.css(?:\?[^"]*)?">/, () => '<style>' + css + '</style>');
 const config = script(await read('config.js')) + '\n' + script('window.ROSS_EMBEDDED_DATA=' + JSON.stringify(data).replace(/</g, '\\u003c') + ';');
-html = html.replace('<script src="config.js"></script>', () => config);
+html = html.replace(/<script src="config\.js(?:\?[^"]*)?"><\/script>/, () => config);
 for (const file of ['i18n.js', 'demo-data.js', 'app.js']) {
   const content = script(await read(file));
-  html = html.replace('<script src="' + file + '"></script>', () => content);
+  html = html.replace(new RegExp('<script src="' + file.replace('.', '\\.') + '(?:\\?[^"]*)?"></script>'), () => content);
 }
 await mkdir(dirname(output), { recursive: true });
 await writeFile(output, html);

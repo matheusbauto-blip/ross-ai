@@ -6,7 +6,7 @@ Aplicativo web estático: interface de conversa, base de legislação federal br
 
 ## Como rodar
 
-Site publicado: https://matheusbauto-blip.github.io/ross-ai/ (GitHub Pages, a partir da branch `main`).
+Site publicado: https://matheusbauto-blip.github.io/ross-ai/ (GitHub Pages). O fluxo `.github/workflows/pages.yml` publica a cada push na `main`: copia só os arquivos do site e carimba o commit nos endereços dos arquivos (`app.js?v=abc1234`, também nas buscas de dados), para que cada atualização chegue sem cache antigo. Localmente o carimbo fica como `__ROSS_VERSION__`, sem efeito.
 
 Localmente, sirva a pasta com um servidor estático e abra `index.html`:
 

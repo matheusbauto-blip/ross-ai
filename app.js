@@ -735,10 +735,13 @@
      Fluxo: escolher normas no catálogo → carregar o JSON da norma → pontuar artigos vigentes → montar trechos →
      (com IA) pedir explicação restrita aos trechos; (sem IA) mostrar os próprios trechos com link oficial. */
   const lawCache = {};
+  /* Versão dos arquivos publicados (carimbada pelo fluxo de publicação); evita cache antigo após cada atualização. */
+  const ASSET_VERSION = (() => { const m = document.querySelector('meta[name="ross-version"]'); const v = m ? m.getAttribute('content') || '' : ''; return /^__/.test(v) ? '' : v; })();
+  function versioned(path) { return ASSET_VERSION ? path + (path.includes('?') ? '&' : '?') + 'v=' + encodeURIComponent(ASSET_VERSION) : path; }
   async function sourceJSON(path) {
     const embedded = window.ROSS_EMBEDDED_DATA;
     if (embedded && Object.prototype.hasOwnProperty.call(embedded, path)) return embedded[path];
-    const res = await fetch(path);
+    const res = await fetch(versioned(path));
     if (!res.ok) throw { code: 'law_fetch', message: 'HTTP ' + res.status };
     return res.json();
   }
