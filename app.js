@@ -900,7 +900,7 @@
     ['loja', 'fornecedor'], ['golpe', 'estelionato fraude'], ['roubo', 'furto roubo'], ['roubaram', 'furto roubo'], ['pensao', 'alimentos'], ['heranca', 'sucessao'], ['aposentar', 'aposentadoria'], ['inss', 'previdencia beneficio segurado'],
     ['plano de saude', 'operadora cobertura'], ['cancelar', 'rescisao cancelamento'], ['devolver', 'devolucao restituicao arrependimento'], ['comprei', 'compra consumidor fornecedor'], ['internet', 'distancia eletronico'],
     ['escola', 'ensino educacao'], ['preso', 'prisao flagrante'], ['barulho', 'sossego perturbacao'], ['vizinho', 'vizinhanca'], ['cachorro', 'animal'], ['gato', 'animal'], ['defeito', 'vicio'], ['troca', 'substituicao'], ['juros', 'mora'],
-    ['filho', 'filhos menor crianca'], ['marido', 'conjuge'], ['esposa', 'conjuge'], ['divorcio', 'divorcio dissolucao'], ['uniao estavel', 'entidade familiar convivencia duradoura publica continua familia'], ['visita', 'convivencia'], ['guarda', 'guarda'], ['celular', 'telefone'], ['foto', 'imagem'], ['video', 'imagem']
+    ['filho', 'filhos menor crianca'], ['marido', 'conjuge'], ['esposa', 'conjuge'], ['divorcio', 'divorcio dissolucao'], ['uniao estavel', 'entidade familiar convivencia duradoura publica continua familia'], ['visita', 'convivencia'], ['guarda', 'guarda'], ['celular', 'produto aparelho'], ['notebook', 'produto aparelho'], ['computador', 'produto aparelho'], ['geladeira', 'produto'], ['televisao', 'produto'], ['foto', 'imagem'], ['video', 'imagem']
   ];
   function expandQuery(q) {
     const n = norm(q); const extra = [];
@@ -921,8 +921,8 @@
     const collision = /\b(?:batida|batidas|bateram|bateu|bati|bater|colisao|colisoes|abalroamento|engavetamento)\b/.test(q);
     const vehicle = /\b(?:carro|carros|veiculo|veiculos|moto|motocicleta|caminhao|traseira|para-choque)\b/.test(q);
     if (!(collision && vehicle) && !/\bengavetamento\b|\bacidente de transito\b/.test(q)) {
-      const purchase = /\b(?:comprei|compramos|adquiri|compra|loja|produto|fabricante|garantia)\b/.test(q);
-      const defect = /\b(?:defeito|defeitos|vicio|vicios|quebrou|manchas?)\b|\bparou de funcionar\b|\bnao (?:liga|funciona)\b|\bpontos? (?:pretos|mortos)\b/.test(q);
+      const purchase = /\b(?:comprei|compramos|adquiri|compra|loja|produto|fabricante|garantia|celular|smartphone|telefone|notebook|computador|tablet|aparelho|eletrodomestico|geladeira|fogao|televisao|tv|maquina de lavar)\b/.test(q);
+      const defect = /\b(?:defeito|defeitos|defeituos[oa]|vicio|vicios|quebrou|quebrado|estragou|estragado|pifou|falha|falhou|falhando|manchas?)\b|\b(?:deu|dando|com|apresent(?:ou|a|ando)|tem|teve) (?:um |uns |algum |varios )?probl\w{0,3}mas?\b|\bprobl\w{0,3}mas? (?:n[ao]s?|com)\b|\bparou de (?:funcionar|carregar|ligar)\b|\bnao (?:liga|funciona|carrega|pega)\b|\bpontos? (?:pretos|mortos)\b/.test(q);
       if (purchase && defect) return {
         laws: ['l8078'],
         terms: 'vício qualidade produto durável fornecedor conserto reparação garantia sanar vício reclamar decadência',
@@ -1029,13 +1029,16 @@
     const terms = new Set(tokensOf(query));
     return sources.slice(0, 200).map((source, index) => {
       const text = repairEncoding(source.excerpt).replace(/\s+/g, ' ');
-      let best = text.slice(0, 155), score = -1;
-      for (let offset = 0; offset < text.length; offset += 90) {
-        const snippet = text.slice(offset, offset + 155);
+      const head = text.slice(0, 150);
+      let best = '', bestOffset = 0, score = 0;
+      for (let offset = 90; offset < text.length; offset += 90) {
+        const snippet = text.slice(offset, offset + 150);
         const matched = tokensOf(snippet).filter((token) => terms.has(token)).length;
-        if (matched > score) { score = matched; best = snippet; }
+        if (matched > score) { score = matched; best = snippet; bestOffset = offset; }
       }
-      return { id: 'passage-' + (index + 1), name: (source.shortName.slice(0, 30) + ' ' + source.article + ': ' + best).slice(0, 200) };
+      const headMatched = tokensOf(head).filter((token) => terms.has(token)).length;
+      const tail = best && score > headMatched && bestOffset >= 150 ? ' … ' + best : best && score > headMatched ? text.slice(150, bestOffset + 150) : '';
+      return { id: 'passage-' + (index + 1), name: (source.shortName.slice(0, 30) + ' ' + source.article + ': ' + head + tail).slice(0, 380) };
     });
   }
   function validatedSelection(sources, ids) {
@@ -1043,13 +1046,28 @@
       .map((id) => sources[Number(id.slice(8)) - 1]).filter(Boolean).slice(0, 3)
       .map((source, index) => Object.assign({}, source, { n: index + 1 }));
   }
+  function focusSources(question, sources) {
+    const intent = searchIntent(question);
+    if (!intent || !intent.focus) return [];
+    return sources.filter((source) => {
+      const patterns = intent.focus[source.lawId];
+      if (!patterns || !source.excerpt) return false;
+      const text = norm(source.excerpt).replace(/\s+/g, ' ');
+      return patterns.some((pattern) => pattern.test(text));
+    });
+  }
   async function selectRelevantSources(question, query, sources, signal) {
-    const catalog = relevanceCatalog(sources, query);
+    const candidates = sources.slice(0, 200);
+    const catalog = relevanceCatalog(candidates, query);
     const result = await apiCall('prepare', {
-      question: 'RELEVÂNCIA DE TRECHOS JURÍDICOS. A pergunta é: ' + question + '\nCada item do catálogo representa um artigo ou trecho real. Em laws, selecione até 3 IDs passage-N cujos textos ajudam diretamente a responder à pergunta. Compare o conteúdo, não só o nome da lei ou palavras coincidentes. Ignore assuntos apenas parecidos. Se nenhum trecho servir, retorne laws vazio. Não acrescente IDs.',
+      question: 'RELEVÂNCIA DE TRECHOS JURÍDICOS. A pergunta é: ' + question + '\nCada item do catálogo representa um artigo ou trecho real (início do artigo e, após “…”, o trecho mais próximo da pergunta). Em laws, selecione até 3 IDs passage-N cujos textos ajudam diretamente a responder à pergunta. Compare o conteúdo, não só o nome da lei ou palavras coincidentes. Ignore assuntos apenas parecidos. Se nenhum trecho servir, retorne laws vazio. Não acrescente IDs.',
       catalog,
     }, signal);
-    return validatedSelection(sources.slice(0, 200), result.laws);
+    const selected = validatedSelection(candidates, result.laws);
+    // Quando a pergunta tem uma intenção reconhecida (ex.: produto com defeito), os artigos que a regulam
+    // acompanham a seleção automática em vez de depender dela. A resposta só cita o que usar de fato.
+    const focus = focusSources(question, candidates).filter((source) => !selected.some((s) => s.lawId === source.lawId && s.article === source.article)).slice(0, 2);
+    return selected.concat(focus).map((source, index) => Object.assign({}, source, { n: index + 1 }));
   }
   function priorTurns(conv, currentQuestion) {
     const turns = (Array.isArray(conv.messages) ? conv.messages : []).filter((message) =>
@@ -1255,8 +1273,9 @@
     if (a.kind === 'nosources') {
       /* Preserva a explicação e as perguntas específicas do modelo; completa só o que faltar. */
       a.sources = []; a.sourcesSay = [];
-      if (!a.summary) a.summary = t('oficial.empty');
-      if (!a.questions.length) a.questions = t('oficial.emptyQuestions');
+      const generic = !a.summary;
+      if (generic) a.summary = t('oficial.empty');
+      if (generic && !a.questions.length) a.questions = t('oficial.emptyQuestions');
       if (!a.nextSteps.length) a.nextSteps = [t('oficial.emptyStep')];
       return a;
     }
