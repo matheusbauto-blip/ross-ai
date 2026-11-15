@@ -30,6 +30,16 @@ Essas mudanças estão em `app.js`, `styles.css` e `qa/ui.test.mjs`. A documenta
 | Continuidade incompleta dos documentos. | `historyForModel` inclui nomes de arquivos, trechos citados e observações do documento analisado, com aviso de que o original não foi reenviado. | `qa/ui.test.mjs`: “document excerpts from a previous answer travel…”. |
 | Textos de produção contraditórios. | Ajuda, Termos, Privacidade e Sobre reescritos para o comportamento real (fontes oficiais, Gemini no site, acervo importado, DJEN, limites de uso); contatos fictícios substituídos pelos chamados públicos do repositório. | Páginas renderizam nos dois idiomas (teste existente); revisão jurídica dos textos ainda recomendada. |
 
+## Outras falhas — corrigidas em 15/11/2026 (sessão posterior)
+
+| Achado | Correção aplicada | Validação |
+| --- | --- | --- |
+| Uma lei indisponível derrubava toda a recuperação. | O carregamento usa `Promise.allSettled`: as normas que carregaram seguem para a busca de artigos e a resposta recebe o aviso `oficial.partialCoverage` com o nome das que faltaram. Se nenhuma carregar, o erro `law_fetch` é recuperável, com nova tentativa. | `qa/ui.test.mjs`: “one law that fails to load does not sink the retrieval…” e “when every selected law fails to load…”. |
+| Cópia perdia o aviso sobre repositório. | `answerToText` usa o mesmo aviso do acervo importado exibido na tela (`corpus.answerNotice`) e, para cada fonte importada, registra edição, vigência não verificada, fonte oficial quando houver e o endereço da edição importada. | `qa/ui.test.mjs`: “the copied text carries the imported-corpus provenance…”. |
+| Falha de salvamento não era informada. | `save` registra a falha (distinguindo armazenamento cheio), avisa uma vez e mostra um aviso persistente na conversa e na tela inicial, com “Exportar histórico” (arquivo de texto ou área de transferência) e “Tentar salvar de novo”. A conversa continua em memória. | `qa/ui.test.mjs`: “a storage failure is reported…” e “exporting the history…”. |
+| Resposta em processamento não podia ser interrompida. | Botão “Parar” no compositor (no lugar de “Enviar” enquanto há resposta em andamento) e no cartão de carregamento; prazo de espera de 3 minutos no cliente com mensagem própria (`errors.timeout`). O texto de cancelamento avisa que um pedido já enviado pode ter sido processado e contado. | `qa/ui.test.mjs`: “a running answer can be stopped…” e “a client-side deadline ends an endless wait…”. |
+| Proteção do corpo dependia de `Content-Length`. | A função lê o corpo com limite de bytes (`readBounded`) antes de interpretar o JSON; ultrapassar o limite devolve 413 `too_large` sem consultar cota nem modelo. O limite pode ser ajustado por `ROSS_MAX_BODY_BYTES`. | `tests/process-route.test.mjs`: “an oversized body without Content-Length is refused…”. |
+
 ## Pendências prioritárias (registro original)
 
 | Prioridade | Achado e evidência | Correção indicada |
@@ -41,7 +51,7 @@ Essas mudanças estão em `app.js`, `styles.css` e `qa/ui.test.mjs`. A documenta
 | Alta | **Continuidade incompleta dos documentos.** Após uma resposta bem-sucedida, o histórico conserva metadados do arquivo, e `historyForModel` envia apenas o texto do cliente e o resumo do assistente. Trechos, notas e conteúdo original não acompanham a pergunta seguinte. | Manter contexto documental estruturado por conversa, com origem e trecho, antes de oferecer organização completa de casos. Informar quando o original precisar ser reenviado. |
 | Alta | **Textos de produção contraditórios.** Ajuda, termos, privacidade e “Sobre” ainda contêm descrições da demonstração e contatos `exemplo.invalid`, apesar do uso de fontes oficiais e do envio ao Google. | Atualizar a descrição ao comportamento real e obter os contatos reais do responsável. Conferir as afirmações sobre tratamento dos dados com a configuração efetivamente utilizada. |
 
-## Outras falhas confirmadas
+## Outras falhas confirmadas (registro original)
 
 | Prioridade | Achado e evidência | Correção indicada |
 | --- | --- | --- |
@@ -80,6 +90,8 @@ Comando da suíte completa:
 ```sh
 ROSS_DOM_MODULE=/tmp/ross-qa-dom/linkedom-worker.mjs node --test --test-concurrency=1 tests/*.test.mjs qa/ui.test.mjs
 ```
+
+Após as correções de 15/11/2026, a suíte completa passou com **158 testes** (115 unitários e 43 de interface).
 
 Foram verificadas também a sintaxe dos arquivos JavaScript e a consistência das alterações. As reproduções adicionais usaram um DOM simulado; as duas falhas do handler usaram banco e provedor substituídos por simuladores. Não foram enviados documentos privados ou pedidos de teste ao modelo real durante a varredura.
 

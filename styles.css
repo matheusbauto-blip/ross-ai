@@ -499,3 +499,11 @@ img { max-width: 100%; }
 
 /* Acervo importado (repositório comunitário): selo distinto do texto oficial */
 .badge-imported { background: var(--surface-2); color: var(--fg-2); border-color: var(--border); }
+
+/* Parar e aviso de armazenamento */
+.stop-btn { background: var(--danger); }
+.stop-btn:hover { background: color-mix(in srgb, var(--danger) 85%, black); }
+.loading-actions { margin-top: 10px; }
+.storage-notice { margin: 12px 0; }
+.storage-notice .row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+#storage-slot:empty { display: none; }

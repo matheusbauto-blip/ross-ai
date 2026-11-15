@@ -28,7 +28,7 @@ const IP_LIMIT = Number(Deno.env.get("ROSS_IP_DAILY_LIMIT") ?? "40");
 const GLOBAL_LIMIT = Number(Deno.env.get("ROSS_GLOBAL_DAILY_LIMIT") ?? "1000");
 const ALLOWED_ORIGINS = (Deno.env.get("ROSS_ALLOWED_ORIGINS") ?? "https://matheusbauto-blip.github.io,https://ross-ai-leis.swirlingcurl2.chatgpt.site,http://localhost:8766,http://localhost:8765")
   .split(",").map((s) => s.trim()).filter(Boolean);
-const MAX_BODY_BYTES = 28 * 1024 * 1024;
+const MAX_BODY_BYTES = Number(Deno.env.get("ROSS_MAX_BODY_BYTES") ?? "") || 28 * 1024 * 1024;
 const MAX_ATTACHMENTS = 4;
 const ALLOWED_MEDIA = new Set(["image/jpeg", "image/png", "image/webp", "image/gif", "application/pdf"]);
 
@@ -75,6 +75,24 @@ async function sha256(s: string) {
 }
 const str = (v: unknown, max = 4000) => (typeof v === "string" ? v.slice(0, max) : "");
 const arr = (v: unknown) => (Array.isArray(v) ? v : []);
+
+/* O corpo é lido com limite de bytes antes de ser interpretado: um pedido sem Content-Length
+   (ou com o cabeçalho errado) não pode passar de MAX_BODY_BYTES. */
+class BodyTooLarge extends Error {}
+async function readBounded(req: Request, max: number) {
+  if (!req.body) return "";
+  const reader = req.body.getReader(); const parts: Uint8Array[] = []; let bytes = 0;
+  try {
+    while (true) {
+      const { done, value } = await reader.read(); if (done) break;
+      bytes += value.byteLength;
+      if (bytes > max) { await reader.cancel(); throw new BodyTooLarge("too_large"); }
+      parts.push(value);
+    }
+  } finally { reader.releaseLock(); }
+  const raw = new Uint8Array(bytes); let offset = 0; for (const part of parts) { raw.set(part, offset); offset += part.byteLength; }
+  return new TextDecoder().decode(raw);
+}
 
 async function googleApiKey() {
   const envKey = Deno.env.get("GEMINI_API_KEY") || Deno.env.get("GOOGLE_API_KEY");
@@ -260,7 +278,13 @@ Deno.serve(async (req: Request) => {
   if (length > MAX_BODY_BYTES) return json(413, { error: "too_large" }, origin);
 
   let body: Record<string, unknown>;
-  try { body = await req.json(); if (!body || Array.isArray(body) || typeof body !== "object") throw new Error(); } catch { return json(400, { error: "invalid_json" }, origin); }
+  try {
+    body = JSON.parse(await readBounded(req, MAX_BODY_BYTES));
+    if (!body || Array.isArray(body) || typeof body !== "object") throw new Error();
+  } catch (e) {
+    if (e instanceof BodyTooLarge) return json(413, { error: "too_large" }, origin);
+    return json(400, { error: "invalid_json" }, origin);
+  }
   const op = str(body.op, 20);
   if (op === "process_lookup") {
     try {

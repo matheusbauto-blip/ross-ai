@@ -6,10 +6,10 @@ import { stripTypeScriptTypes } from 'node:module';
 import { processNumber, ProcessError } from '../supabase/functions/ross-ai/process-provider.mjs';
 
 const source = readFileSync(new URL('../supabase/functions/ross-ai/index.ts', import.meta.url), 'utf8').replace(/^import .*;\s*$/gm, '');
-function server({ token = 'test-provider-value', quotaError = false, processSource = 'escavador' } = {}) {
+function server({ token = 'test-provider-value', quotaError = false, processSource = 'escavador', maxBody = '' } = {}) {
   let handler, lookups = 0, djenLookups = 0, modelCalls = 0, quotaCalls = 0;
   const schema = new Proxy(function () {}, { get: () => schema, apply: () => schema });
-  const env = { SUPABASE_URL: 'https://test.invalid', SUPABASE_SERVICE_ROLE_KEY: 'mock-service-role', ESCAVADOR_API_TOKEN: token, ROSS_PROCESS_SOURCE: processSource };
+  const env = { SUPABASE_URL: 'https://test.invalid', SUPABASE_SERVICE_ROLE_KEY: 'mock-service-role', ESCAVADOR_API_TOKEN: token, ROSS_PROCESS_SOURCE: processSource, ROSS_MAX_BODY_BYTES: maxBody };
   const context = {
     Deno: { env: { get: key => env[key] }, serve: fn => { handler = fn; } }, z: schema,
     createClient: () => ({ rpc: async () => { quotaCalls++; return quotaError ? { error: { message: 'simulated quota outage' } } : { data: { allowed: true } }; } }),
@@ -17,10 +17,10 @@ function server({ token = 'test-provider-value', quotaError = false, processSour
     lookupProcess: async input => { lookups++; assert.equal(input.number, '00008323520184013202'); assert.equal(input.apiKey, token); return { process: { number: input.number }, movements: [] }; },
     lookupDjen: async input => { djenLookups++; assert.equal(input.number, '00008323520184013202'); return { coverage: 'publications', process: { number: input.number }, movements: [] }; },
     processNumber, ProcessError, GeminiError: class extends Error {}, eligibleForAnswer() {}, repositoryExcerpts() {},
-    crypto, TextEncoder, Response, Request, URL, AbortSignal, console: { error() {} },
+    crypto, TextEncoder, TextDecoder, Response, Request, URL, AbortSignal, console: { error() {} },
   };
   vm.runInNewContext(stripTypeScriptTypes(source), context);
-  return { raw: body => handler(new Request('https://test.invalid', { method: 'POST', headers: { Origin: 'https://matheusbauto-blip.github.io', 'Content-Type': 'application/json' }, body: JSON.stringify(body) })), request: number => handler(new Request('https://test.invalid', { method: 'POST', headers: { Origin: 'https://matheusbauto-blip.github.io', 'Content-Type': 'application/json' }, body: JSON.stringify({ op: 'process_lookup', number }) })), counts: () => ({ lookups, djenLookups, modelCalls, quotaCalls }) };
+  return { rawRequest: request => handler(request), raw: body => handler(new Request('https://test.invalid', { method: 'POST', headers: { Origin: 'https://matheusbauto-blip.github.io', 'Content-Type': 'application/json' }, body: JSON.stringify(body) })), request: number => handler(new Request('https://test.invalid', { method: 'POST', headers: { Origin: 'https://matheusbauto-blip.github.io', 'Content-Type': 'application/json' }, body: JSON.stringify({ op: 'process_lookup', number }) })), counts: () => ({ lookups, djenLookups, modelCalls, quotaCalls }) };
 }
 
 test('the actual process route works independently of Google credentials and never calls the model', async () => {
@@ -57,4 +57,16 @@ test('a quota outage blocks paid model calls instead of letting them through', a
     assert.equal(response.status, 503); assert.deepEqual(await response.json(), { error: 'quota_unavailable' });
   }
   assert.equal(s.counts().modelCalls, 0);
+});
+
+test('an oversized body without Content-Length is refused by the bytes actually read, before parsing or quota', async () => {
+  const s = server({ maxBody: '2048' });
+  const stream = new ReadableStream({ start(controller) { for (let i = 0; i < 8; i++) controller.enqueue(new TextEncoder().encode('{"op":"answer","question":"' + 'x'.repeat(500) + '"')); controller.close(); } });
+  const request = new Request('https://test.invalid', { method: 'POST', headers: { Origin: 'https://matheusbauto-blip.github.io', 'Content-Type': 'application/json' }, body: stream, duplex: 'half' });
+  assert.equal(request.headers.get('content-length'), null, 'the test must exercise the path without Content-Length');
+  const big = await s.rawRequest(request);
+  assert.equal(big.status, 413); assert.deepEqual(await big.json(), { error: 'too_large' });
+  assert.deepEqual(s.counts(), { lookups: 0, djenLookups: 0, modelCalls: 0, quotaCalls: 0 });
+  const small = await s.raw({ op: 'process_lookup', number: '00008323520184013202' });
+  assert.equal(small.status, 200, 'bodies within the limit still work');
 });

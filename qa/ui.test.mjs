@@ -14,21 +14,23 @@ const tick = () => new Promise(resolve => setImmediate(resolve));
 function setup(t, fetcher = async () => Response.json({ documents: 235, results: [] })) {
   const { window, document } = parseHTML(read('index.html'));
   const storage = new Map();
+  const clipboard = [];
   const timers = new Set();
   window.scrollTo = () => {};
   window.innerHeight = 800;
   window.HTMLElement.prototype.focus = function () {};
   window.HTMLElement.prototype.scrollIntoView = function () {};
   const context = vm.createContext({
-    window, document, navigator: { language: 'pt-BR', clipboard: { writeText: async () => {} } },
+    window, document, navigator: { language: 'pt-BR', clipboard: { writeText: async text => { clipboard.push(text); } } },
     location: { hash: '' }, history: { replaceState() {} },
-    localStorage: { getItem: key => storage.get(key) || null, setItem: (key, value) => storage.set(key, value) },
+    localStorage: { getItem: key => storage.get(key) || null, setItem: (key, value) => { if (storage.fail) throw storage.fail; storage.set(key, value); } },
     console, setTimeout: (fn, delay) => { const timer = setTimeout(fn, delay); timers.add(timer); return timer; }, clearTimeout,
     AbortController, URL, requestAnimationFrame: fn => fn(), fetch: fetcher,
   });
   for (const file of ['config.js', 'i18n.js', 'demo-data.js', 'process-tracker.js']) vm.runInContext(read(file), context);
   const script = read('app.js').replace("if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();",
-    'window.__test = {state, providers, render, go, load, onFilesChosen, newConversation, submitMessage, retryMessage, openConversation, deleteConversation, answerToText, isRephraseRequest, conversationContext, historyForModel, normalizeOfficial, activeProvider, turnText};');
+    'window.__test = {state, providers, render, go, load, onFilesChosen, newConversation, submitMessage, retryMessage, openConversation, deleteConversation, answerToText, isRephraseRequest, conversationContext, historyForModel, normalizeOfficial, activeProvider, turnText, stopAnswer, exportHistory};')
+    .replace('}, CLIENT_TIMEOUT_MS);', '}, window.__clientTimeout || CLIENT_TIMEOUT_MS);');
   vm.runInContext(script, context);
   const api = window.__test;
   api.state.catalog = structuredClone(catalog);
@@ -41,7 +43,7 @@ function setup(t, fetcher = async () => Response.json({ documents: 235, results:
     else node.value = value;
     node.dispatchEvent(new window.Event(node.localName === 'select' ? 'change' : 'input', { bubbles: true }));
   };
-  return { api, document, window, storage, change };
+  return { api, document, window, storage, change, clipboard };
 }
 
 test('every main view renders in both languages', async t => {
@@ -543,4 +545,131 @@ test('document excerpts from a previous answer travel with the history sent to t
   assert.match(history[1].text, /Cláusula 9ª: "multa de três mensalidades"/);
   assert.match(history[1].text, /Documento analisado/);
   assert.match(history[1].text, /anexe o arquivo novamente/);
+});
+
+test('one law that fails to load does not sink the retrieval; the answer flags the partial coverage', async t => {
+  const ops = []; const files = [];
+  const { api } = setup(t, async (url, options) => {
+    const address = String(url);
+    if (address.includes('data/laws/')) {
+      files.push(address);
+      if (files.length > 1) return new Response('', { status: 502 });
+      return Response.json({ id: 'l8078', name: 'Lei nº 8.078, de 11 de setembro de 1990 (Código de Defesa do Consumidor)', shortName: 'Código de Defesa do Consumidor', number: 'Lei nº 8.078/1990', type: 'lei', jurisdiction: 'Brasil · Federal', url: 'https://www.planalto.gov.br/ccivil_03/leis/l8078compilado.htm', retrievedAt: '2026-11-13T00:00:00.000Z', version: 'v1', source: 'Planalto — Portal da Legislação', articles: [{ id: '49', label: 'Art. 49', heading: 'CAPÍTULO VI · Da Proteção Contratual', status: 'vigente', hasHistory: false, text: 'Art. 49. O consumidor pode desistir do contrato, no prazo de 7 dias a contar de sua assinatura ou do ato de recebimento do produto, sempre que a contratação ocorrer fora do estabelecimento comercial, especialmente por telefone ou a domicílio.' }] });
+    }
+    const body = JSON.parse(options.body); ops.push(body.op);
+    if (body.op === 'search') return Response.json({ results: [] });
+    if (body.op === 'prepare') return Response.json(body.catalog.some(law => /^passage-/.test(law.id)) ? { terms: [], laws: ['passage-1'] } : { terms: ['desistir', 'arrependimento'], laws: ['l8078', 'l10406', 'cf88'] });
+    return Response.json({ answer: { kind: 'answer', summary: 'Você pode desistir em 7 dias.', sourcesSay: [{ title: 'CDC', text: 'Prazo de 7 dias.', ref: 1 }], sources: [{ ref: 1, why: 'Direito de arrependimento' }], warnings: [] } });
+  });
+  api.state.mode = 'oficial';
+  await api.submitMessage('Comprei pela internet e quero desistir. Posso?');
+  const message = api.state.conversations[0].messages.at(-1);
+  assert.equal(message.status, 'done', message.error);
+  assert.ok(files.length >= 2, 'more than one law should have been requested');
+  assert.ok(ops.includes('answer'), 'the answer step must still run with the laws that loaded');
+  assert.equal(message.answer.sources[0].lawId, 'l8078');
+  assert.ok(message.answer.warnings.some(w => /Não consegui carregar o texto de: /.test(w) && /Código Civil|Constituição/.test(w)), JSON.stringify(message.answer.warnings));
+});
+
+test('when every selected law fails to load the answer is a recoverable error, not a silent empty result', async t => {
+  const { api, document } = setup(t, async (url, options) => {
+    if (String(url).includes('data/laws/')) return new Response('', { status: 502 });
+    const body = JSON.parse(options.body);
+    if (body.op === 'search') return Response.json({ results: [] });
+    return Response.json({ terms: ['desistir'], laws: ['l8078'] });
+  });
+  api.state.mode = 'oficial';
+  await api.submitMessage('Comprei pela internet e quero desistir. Posso?');
+  const message = api.state.conversations[0].messages.at(-1);
+  assert.equal(message.status, 'error');
+  assert.match(message.error, /texto da norma/);
+  assert.ok(document.querySelector('.error-card [data-retry]'));
+});
+
+test('the copied text carries the imported-corpus provenance shown on screen', t => {
+  const { api } = setup(t);
+  const imported = { n: 1, lawId: 'corpus-abc', imported: true, name: 'Lei Estadual nº 1/2020', shortName: 'Lei 1/2020', article: 'Art. 3º', status: 'nao_confirmada', url: 'https://www.al.sp.gov.br/norma/1', retrievedAt: '2026-11-01', version: 'abcdef123456', corpusVersion: 'edição 2024-05-01', repositoryPath: 'estadual/SP/lei-1-2020.md', repositoryRef: 'a'.repeat(40), excerpt: 'Art. 3º Texto.' };
+  const answer = { mode: 'oficial', kind: 'answer', corpus: true, summary: 'Resumo.', sourcesSay: [{ title: 'Lei 1/2020 · Art. 3º', text: 'Diz algo', ref: 1 }], sources: [imported], warnings: [], capturedAt: '2026-11-13' };
+  const text = api.answerToText(answer, { id: 'm1' });
+  assert.match(text, /trechos importados do ctresb\/leis/);
+  assert.doesNotMatch(text, /Planalto ou Câmara/);
+  assert.match(text, /Acervo importado · ctresb\/leis/);
+  assert.match(text, /edição 2024-05-01/);
+  assert.match(text, /Vigência não verificada/);
+  assert.match(text, /https:\/\/github\.com\/ctresb\/leis\/blob\/a{40}\/estadual\/SP\/lei-1-2020\.md/);
+  assert.doesNotMatch(text, /undefined/);
+});
+
+test('a storage failure is reported, keeps the conversation on screen and offers an export', async t => {
+  const { api, document, storage } = setup(t);
+  api.state.conversations.length = 0;
+  storage.fail = Object.assign(new Error('The quota has been exceeded.'), { name: 'QuotaExceededError' });
+  api.providers.oficial.respond = async () => ({ mode: 'oficial', kind: 'answer', summary: 'Resposta guardada só em memória.', sources: [] });
+  await api.submitMessage('Minha pergunta');
+  await new Promise(resolve => setTimeout(resolve, 200));
+  assert.ok(api.state.storageError && api.state.storageError.quota, 'quota failure expected to be recorded');
+  assert.equal(api.state.conversations.length, 1, 'the conversation stays in memory');
+  assert.match(document.querySelector('#messages').textContent, /Resposta guardada só em memória/);
+  const notice = document.querySelector('#storage-notice');
+  assert.ok(notice, 'storage notice expected');
+  assert.match(notice.textContent, /armazenamento local deste navegador está cheio/);
+  assert.ok(notice.querySelector('[data-export-history]'));
+  assert.ok(document.querySelector('#toast-root').textContent.includes('Armazenamento cheio'));
+  storage.fail = null;
+  document.querySelector('[data-retry-save]').click();
+  await new Promise(resolve => setTimeout(resolve, 200));
+  assert.equal(api.state.storageError, null);
+  assert.ok(!document.querySelector('#storage-notice'), 'notice disappears once saving works again');
+  assert.ok(storage.get('rossai.state.v1'), 'state persisted after retry');
+});
+
+test('exporting the history produces a readable text of every conversation', async t => {
+  const { api, document, clipboard } = setup(t);
+  api.state.conversations.length = 0;
+  api.providers.oficial.respond = async () => ({ mode: 'oficial', kind: 'answer', summary: 'Resposta exportável.', sources: [] });
+  await api.submitMessage('Pergunta para exportar');
+  api.exportHistory();
+  await tick();
+  assert.equal(clipboard.length, 1, 'without file downloads the export falls back to the clipboard');
+  assert.match(clipboard[0], /Histórico de conversas/);
+  assert.match(clipboard[0], /Você: Pergunta para exportar/);
+  assert.match(clipboard[0], /Resposta exportável/);
+  assert.doesNotMatch(clipboard[0], /undefined/);
+  assert.match(document.querySelector('#toast-root').textContent, /copiado/);
+});
+
+test('a running answer can be stopped from the interface and the stop is explained honestly', async t => {
+  const { api, document } = setup(t);
+  api.state.mode = 'demo';
+  const pending = api.submitMessage('Posso cancelar uma compra pela internet?');
+  await tick();
+  assert.ok(api.state.busy, 'answer should be in flight');
+  const stop = document.querySelector('#btn-stop'); const send = document.querySelector('#btn-send');
+  assert.ok(stop && !stop.hasAttribute('hidden'), 'Stop button visible while busy');
+  assert.ok(send.hasAttribute('hidden'), 'Send button hidden while busy');
+  assert.ok(document.querySelector('.msg [data-stop]'), 'the loading card offers Stop too');
+  stop.click();
+  await pending;
+  const message = api.state.conversations[0].messages.at(-1);
+  assert.equal(message.status, 'error');
+  assert.match(message.error, /interrompida a seu pedido/);
+  assert.match(message.error, /pode ter sido processado/);
+  assert.ok(document.querySelector('.error-card [data-retry]'));
+  assert.ok(document.querySelector('#btn-stop').hasAttribute('hidden'));
+  assert.ok(!document.querySelector('#btn-send').hasAttribute('hidden'));
+  assert.equal(api.state.busy, null);
+});
+
+test('a client-side deadline ends an endless wait with a distinct, retryable message', async t => {
+  const { api, document, window } = setup(t, (url, options) => new Promise((resolve, reject) => {
+    options.signal.addEventListener('abort', () => reject(new DOMException('aborted', 'AbortError')));
+  }));
+  window.__clientTimeout = 60;
+  api.state.mode = 'oficial';
+  await api.submitMessage('Posso cancelar uma compra pela internet?');
+  const message = api.state.conversations[0].messages.at(-1);
+  assert.equal(message.status, 'error');
+  assert.match(message.error, /demorou mais do que o esperado/);
+  assert.ok(document.querySelector('.error-card [data-retry]'));
+  assert.equal(api.state.busy, null);
 });
