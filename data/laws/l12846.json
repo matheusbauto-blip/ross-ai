@@ -1,0 +1,270 @@
+{
+ "id": "l12846",
+ "name": "Lei nº 12.846, de 1º de agosto de 2013 (Lei Anticorrupção)",
+ "shortName": "Lei Anticorrupção",
+ "number": "Lei nº 12.846/2013",
+ "type": "lei",
+ "date": "2013-08-01",
+ "url": "https://www.planalto.gov.br/ccivil_03/_ato2011-2014/2013/lei/l12846.htm",
+ "lexml": "urn:lex:br:federal:lei:2013-08-01;12846",
+ "jurisdiction": "Brasil · Federal",
+ "source": "Câmara dos Deputados — Legislação Informatizada (texto atualizado)",
+ "textUrl": "https://www2.camara.leg.br/legin/fed/lei/2013/lei-12846-1-agosto-2013-776664-normaatualizada-pl.html",
+ "index": "LexML Brasil (https://www.lexml.gov.br)",
+ "retrievedAt": "2026-11-13T14:08:21.297Z",
+ "sha256": "9afe6e1ce1afec52ebbd6ef579f3e8b24f2eaadb238e3d1e6aa9477ec4837301",
+ "bytes": 54362,
+ "articleCount": 31,
+ "vigentes": 31,
+ "revogados": 0,
+ "articles": [
+  {
+   "id": "1",
+   "label": "Art. 1",
+   "heading": "",
+   "text": "Art. 1Âº Esta Lei dispÃµe sobre a responsabilizaÃ§Ã£o objetiva administrativa e civil de pessoas jurÃ­dicas pela prÃ¡tica de atos contra a administraÃ§Ã£o pÃºblica, nacional ou estrangeira.\nParÃ¡grafo Ãºnico. Aplica-se o disposto nesta Lei Ã s sociedades empresÃ¡rias e Ã s sociedades simples, personificadas ou nÃ£o, independentemente da forma de organizaÃ§Ã£o ou modelo societÃ¡rio adotado, bem como a quaisquer fundaÃ§Ãµes, associaÃ§Ãµes de entidades ou pessoas, ou sociedades estrangeiras, que tenham sede, filial ou representaÃ§Ã£o no territÃ³rio brasileiro, constituÃ­das de fato ou de direito, ainda que temporariamente.",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "2",
+   "label": "Art. 2",
+   "heading": "",
+   "text": "Art. 2Âº As pessoas jurÃ­dicas serÃ£o responsabilizadas objetivamente, nos Ã¢mbitos administrativo e civil, pelos atos lesivos previstos nesta Lei praticados em seu interesse ou benefÃ­cio, exclusivo ou nÃ£o.",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "3",
+   "label": "Art. 3",
+   "heading": "",
+   "text": "Art. 3Âº A responsabilizaÃ§Ã£o da pessoa jurÃ­dica nÃ£o exclui a responsabilidade individual de seus dirigentes ou administradores ou de qualquer pessoa natural, autora, coautora ou partÃ­cipe do ato ilÃ­cito.\nÂ§ 1Âº A pessoa jurÃ­dica serÃ¡ responsabilizada independentemente da responsabilizaÃ§Ã£o individual das pessoas naturais referidas no caput.\nÂ§ 2Âº Os dirigentes ou administradores somente serÃ£o responsabilizados por atos ilÃ­citos na medida da sua culpabilidade.",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "4",
+   "label": "Art. 4",
+   "heading": "",
+   "text": "Art. 4Âº Subsiste a responsabilidade da pessoa jurÃ­dica na hipÃ³tese de alteraÃ§Ã£o contratual, transformaÃ§Ã£o, incorporaÃ§Ã£o, fusÃ£o ou cisÃ£o societÃ¡ria.\nÂ§ 1Âº Nas hipÃ³teses de fusÃ£o e incorporaÃ§Ã£o, a responsabilidade da sucessora serÃ¡ restrita Ã obrigaÃ§Ã£o de pagamento de multa e reparaÃ§Ã£o integral do dano causado, atÃ© o limite do patrimÃ´nio transferido, nÃ£o lhe sendo aplicÃ¡veis as demais sanÃ§Ãµes previstas nesta Lei decorrentes de atos e fatos ocorridos antes da data da fusÃ£o ou incorporaÃ§Ã£o, exceto no caso de simulaÃ§Ã£o ou evidente intuito de fraude, devidamente comprovados.\nÂ§ 2Âº As sociedades controladoras, controladas, coligadas ou, no Ã¢mbito do respectivo contrato, as consorciadas serÃ£o solidariamente responsÃ¡veis pela prÃ¡tica dos atos previstos nesta Lei, restringindo- se tal responsabilidade Ã obrigaÃ§Ã£o de pagamento de multa e reparaÃ§Ã£o integral do dano causado.\nCAPÃTULO II\nDOS ATOS LESIVOS Ã€ ADMINISTRAÃ‡ÃƒO PÃšBLICA\nNACIONAL OU ESTRANGEIRA",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "5",
+   "label": "Art. 5",
+   "heading": "",
+   "text": "Art. 5Âº Constituem atos lesivos Ã administraÃ§Ã£o pÃºblica, nacional ou estrangeira, para os fins desta Lei, todos aqueles praticados pelas pessoas jurÃ­dicas mencionadas no parÃ¡grafo Ãºnico do art. 1Âº, que atentem contra o patrimÃ´nio pÃºblico nacional ou estrangeiro, contra princÃ­pios da administraÃ§Ã£o pÃºblica ou contra os compromissos internacionais assumidos pelo Brasil, assim definidos:\nI - prometer, oferecer ou dar, direta ou indiretamente, vantagem indevida a agente pÃºblico, ou a terceira pessoa a ele relacionada;\nII - comprovadamente, financiar, custear, patrocinar ou de qualquer modo subvencionar a prÃ¡tica dos atos ilÃ­citos previstos nesta Lei;\nIII - comprovadamente, utilizar-se de interposta pessoa fÃ­sica ou jurÃ­dica para ocultar ou dissimular seus reais interesses ou a identidade dos beneficiÃ¡rios dos atos praticados;\nIV - no tocante a licitaÃ§Ãµes e contratos:\na) frustrar ou fraudar, mediante ajuste, combinaÃ§Ã£o ou qualquer outro expediente, o carÃ¡ter competitivo de procedimento licitatÃ³rio pÃºblico;\nb) impedir, perturbar ou fraudar a realizaÃ§Ã£o de qualquer ato de procedimento licitatÃ³rio pÃºblico;\nc) afastar ou procurar afastar licitante, por meio de fraude ou oferecimento de vantagem de qualquer tipo;\nd) fraudar licitaÃ§Ã£o pÃºblica ou contrato dela decorrente;\ne) criar, de modo fraudulento ou irregular, pessoa jurÃ­dica para participar de licitaÃ§Ã£o pÃºblica ou celebrar contrato administrativo;\nf) obter vantagem ou benefÃ­cio indevido, de modo fraudulento, de modificaÃ§Ãµes ou prorrogaÃ§Ãµes de contratos celebrados com a administraÃ§Ã£o pÃºblica, sem autorizaÃ§Ã£o em lei, no ato convocatÃ³rio da licitaÃ§Ã£o pÃºblica ou nos respectivos instrumentos contratuais; ou\ng) manipular ou fraudar o equilÃ­brio econÃ´mico-financeiro dos contratos celebrados com a administraÃ§Ã£o pÃºblica;\nV - dificultar atividade de investigaÃ§Ã£o ou fiscalizaÃ§Ã£o de Ã³rgÃ£os, entidades ou agentes pÃºblicos, ou intervir em sua atuaÃ§Ã£o, inclusive no Ã¢mbito das agÃªncias reguladoras e dos Ã³rgÃ£os de fiscalizaÃ§Ã£o do sistema financeiro nacional.\nÂ§ 1Âº Considera-se administraÃ§Ã£o pÃºblica estrangeira os Ã³rgÃ£os e entidades estatais ou representaÃ§Ãµes diplomÃ¡ticas de paÃ­s estrangeiro, de qualquer nÃ­vel ou esfera de governo, bem como as pessoas jurÃ­dicas controladas, direta ou indiretamente, pelo poder pÃºblico de paÃ­s estrangeiro.\nÂ§ 2Âº Para os efeitos desta Lei, equiparam-se Ã administraÃ§Ã£o pÃºblica estrangeira as organizaÃ§Ãµes pÃºblicas internacionais.\nÂ§ 3Âº Considera-se agente pÃºblico estrangeiro, para os fins desta Lei, quem, ainda que transitoriamente ou sem remuneraÃ§Ã£o, exerÃ§a cargo, emprego ou funÃ§Ã£o pÃºblica em Ã³rgÃ£os, entidades estatais ou em representaÃ§Ãµes diplomÃ¡ticas de paÃ­s estrangeiro, assim como em pessoas jurÃ­dicas controladas, direta ou indiretamente, pelo poder pÃºblico de paÃ­s estrangeiro ou em organizaÃ§Ãµes pÃºblicas internacionais.\nCAPÃTULO III\nDA RESPONSABILIZAÃ‡ÃƒO ADMINISTRATIVA",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "6",
+   "label": "Art. 6",
+   "heading": "",
+   "text": "Art. 6Âº Na esfera administrativa, serÃ£o aplicadas Ã s pessoas jurÃ­dicas consideradas responsÃ¡veis pelos atos lesivos previstos nesta Lei as seguintes sanÃ§Ãµes:\nI - multa, no valor de 0,1% (um dÃ©cimo por cento) a 20% (vinte por cento) do faturamento bruto do Ãºltimo exercÃ­cio anterior ao da instauraÃ§Ã£o do processo administrativo, excluÃ­dos os tributos, a qual nunca serÃ¡ inferior Ã vantagem auferida, quando for possÃ­vel sua estimaÃ§Ã£o; e\nII - publicaÃ§Ã£o extraordinÃ¡ria da decisÃ£o condenatÃ³ria.\nÂ§ 1Âº As sanÃ§Ãµes serÃ£o aplicadas fundamentadamente, isolada ou cumulativamente, de acordo com as peculiaridades do caso concreto e com a gravidade e natureza das infraÃ§Ãµes.\nÂ§ 2Âº A aplicaÃ§Ã£o das sanÃ§Ãµes previstas neste artigo serÃ¡ precedida da manifestaÃ§Ã£o jurÃ­dica elaborada pela Advocacia PÃºblica ou pelo Ã³rgÃ£o de assistÃªncia jurÃ­dica, ou equivalente, do ente pÃºblico.\nÂ§ 3Âº A aplicaÃ§Ã£o das sanÃ§Ãµes previstas neste artigo nÃ£o exclui, em qualquer hipÃ³tese, a obrigaÃ§Ã£o da reparaÃ§Ã£o integral do dano causado.\nÂ§ 4Âº Na hipÃ³tese do inciso I do caput, caso nÃ£o seja possÃ­vel utilizar o critÃ©rio do valor do faturamento bruto da pessoa jurÃ­dica, a multa serÃ¡ de R$ 6.000,00 (seis mil reais) a R$ 60.000.000,00 (sessenta milhÃµes de reais).\nÂ§ 5Âº A publicaÃ§Ã£o extraordinÃ¡ria da decisÃ£o condenatÃ³ria ocorrerÃ¡ na forma de extrato de sentenÃ§a, a expensas da pessoa jurÃ­dica, em meios de comunicaÃ§Ã£o de grande circulaÃ§Ã£o na Ã¡rea da prÃ¡tica da infraÃ§Ã£o e de atuaÃ§Ã£o da pessoa jurÃ­dica ou, na sua falta, em publicaÃ§Ã£o de circulaÃ§Ã£o nacional, bem como por meio de afixaÃ§Ã£o de edital, pelo prazo mÃ­nimo de 30 (trinta) dias, no prÃ³prio estabelecimento ou no local de exercÃ­cio da atividade, de modo visÃ­vel ao pÃºblico, e no sÃ­tio eletrÃ´nico na rede mundial de computadores.\nÂ§ 6Âº (VETADO).",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "7",
+   "label": "Art. 7",
+   "heading": "",
+   "text": "Art. 7Âº SerÃ£o levados em consideraÃ§Ã£o na aplicaÃ§Ã£o das sanÃ§Ãµes:\nI - a gravidade da infraÃ§Ã£o;\nII - a vantagem auferida ou pretendida pelo infrator;\nIII - a consumaÃ§Ã£o ou nÃ£o da infraÃ§Ã£o;\nIV - o grau de lesÃ£o ou perigo de lesÃ£o;\nV - o efeito negativo produzido pela infraÃ§Ã£o;\nVI - a situaÃ§Ã£o econÃ´mica do infrator;\nVII - a cooperaÃ§Ã£o da pessoa jurÃ­dica para a apuraÃ§Ã£o das infraÃ§Ãµes;\nVIII - a existÃªncia de mecanismos e procedimentos internos de integridade, auditoria e incentivo Ã denÃºncia de irregularidades e a aplicaÃ§Ã£o efetiva de cÃ³digos de Ã©tica e de conduta no Ã¢mbito da pessoa jurÃ­dica;\nIX - o valor dos contratos mantidos pela pessoa jurÃ­dica com o Ã³rgÃ£o ou entidade pÃºblica lesados; e\nX - (VETADO).\nParÃ¡grafo Ãºnico. Os parÃ¢metros de avaliaÃ§Ã£o de mecanismos e procedimentos previstos no inciso VIII do caput serÃ£o estabelecidos em regulamento do Poder Executivo federal.\nCAPÃTULO IV\nDO PROCESSO ADMINISTRATIVO DE RESPONSABILIZAÃ‡ÃƒO",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "8",
+   "label": "Art. 8",
+   "heading": "",
+   "text": "Art. 8Âº A instauraÃ§Ã£o e o julgamento de processo administrativo para apuraÃ§Ã£o da responsabilidade de pessoa jurÃ­dica cabem Ã autoridade mÃ¡xima de cada Ã³rgÃ£o ou entidade dos Poderes Executivo, Legislativo e JudiciÃ¡rio, que agirÃ¡ de ofÃ­cio ou mediante provocaÃ§Ã£o, observados o contraditÃ³rio e a ampla defesa.\nÂ§ 1Âº A competÃªncia para a instauraÃ§Ã£o e o julgamento do processo administrativo de apuraÃ§Ã£o de responsabilidade da pessoa jurÃ­dica poderÃ¡ ser delegada, vedada a subdelegaÃ§Ã£o.\nÂ§ 2Âº No Ã¢mbito do Poder Executivo federal, a Controladoria- Geral da UniÃ£o - CGU terÃ¡ competÃªncia concorrente para instaurar processos administrativos de responsabilizaÃ§Ã£o de pessoas jurÃ­dicas ou para avocar os processos instaurados com fundamento nesta Lei, para exame de sua regularidade ou para corrigir-lhes o andamento.",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "9",
+   "label": "Art. 9",
+   "heading": "",
+   "text": "Art. 9Âº Competem Ã Controladoria-Geral da UniÃ£o - CGU a apuraÃ§Ã£o, o processo e o julgamento dos atos ilÃ­citos previstos nesta Lei, praticados contra a administraÃ§Ã£o pÃºblica estrangeira, observado o disposto no Artigo 4 da ConvenÃ§Ã£o sobre o Combate da CorrupÃ§Ã£o de FuncionÃ¡rios PÃºblicos Estrangeiros em TransaÃ§Ãµes Comerciais Internacionais, promulgada pelo Decreto nÂº 3.678, de 30 de novembro de 2000.",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "10",
+   "label": "Art. 10",
+   "heading": "",
+   "text": "Art. 10. O processo administrativo para apuraÃ§Ã£o da responsabilidade de pessoa jurÃ­dica serÃ¡ conduzido por comissÃ£o designada pela autoridade instauradora e composta por 2 (dois) ou mais servidores estÃ¡veis.\nÂ§ 1Âº O ente pÃºblico, por meio do seu Ã³rgÃ£o de representaÃ§Ã£o judicial, ou equivalente, a pedido da comissÃ£o a que se refere o caput, poderÃ¡ requerer as medidas judiciais necessÃ¡rias para a investigaÃ§Ã£o e o processamento das infraÃ§Ãµes, inclusive de busca e apreensÃ£o.\nÂ§ 2Âº A comissÃ£o poderÃ¡, cautelarmente, propor Ã autoridade instauradora que suspenda os efeitos do ato ou processo objeto da investigaÃ§Ã£o.\nÂ§ 3Âº A comissÃ£o deverÃ¡ concluir o processo no prazo de 180 (cento e oitenta) dias contados da data da publicaÃ§Ã£o do ato que a instituir e, ao final, apresentar relatÃ³rios sobre os fatos apurados e eventual responsabilidade da pessoa jurÃ­dica, sugerindo de forma motivada as sanÃ§Ãµes a serem aplicadas.\nÂ§ 4Âº O prazo previsto no Â§ 3Âº poderÃ¡ ser prorrogado, mediante ato fundamentado da autoridade instauradora.",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "11",
+   "label": "Art. 11",
+   "heading": "",
+   "text": "Art. 11. No processo administrativo para apuraÃ§Ã£o de responsabilidade, serÃ¡ concedido Ã pessoa jurÃ­dica prazo de 30 (trinta) dias para defesa, contados a partir da intimaÃ§Ã£o.",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "12",
+   "label": "Art. 12",
+   "heading": "",
+   "text": "Art. 12. O processo administrativo, com o relatÃ³rio da comissÃ£o, serÃ¡ remetido Ã autoridade instauradora, na forma do art. 10, para julgamento.",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "13",
+   "label": "Art. 13",
+   "heading": "",
+   "text": "Art. 13. A instauraÃ§Ã£o de processo administrativo especÃ­fico de reparaÃ§Ã£o integral do dano nÃ£o prejudica a aplicaÃ§Ã£o imediata das sanÃ§Ãµes estabelecidas nesta Lei.\nParÃ¡grafo Ãºnico. ConcluÃ­do o processo e nÃ£o havendo pagamento, o crÃ©dito apurado serÃ¡ inscrito em dÃ­vida ativa da fazenda pÃºblica.",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "14",
+   "label": "Art. 14",
+   "heading": "",
+   "text": "Art. 14. A personalidade jurÃ­dica poderÃ¡ ser desconsiderada sempre que utilizada com abuso do direito para facilitar, encobrir ou dissimular a prÃ¡tica dos atos ilÃ­citos previstos nesta Lei ou para provocar confusÃ£o patrimonial, sendo estendidos todos os efeitos das sanÃ§Ãµes aplicadas Ã pessoa jurÃ­dica aos seus administradores e sÃ³cios com poderes de administraÃ§Ã£o, observados o contraditÃ³rio e a ampla defesa.",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "15",
+   "label": "Art. 15",
+   "heading": "",
+   "text": "Art. 15. A comissÃ£o designada para apuraÃ§Ã£o da responsabilidade de pessoa jurÃ­dica, apÃ³s a conclusÃ£o do procedimento administrativo, darÃ¡ conhecimento ao MinistÃ©rio PÃºblico de sua existÃªncia, para apuraÃ§Ã£o de eventuais delitos.\nCAPÃTULO V\nDO ACORDO DE LENIÃŠNCIA",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "16",
+   "label": "Art. 16",
+   "heading": "",
+   "text": "Art. 16. A autoridade mÃ¡xima de cada Ã³rgÃ£o ou entidade pÃºblica poderÃ¡ celebrar acordo de leniÃªncia com as pessoas jurÃ­dicas responsÃ¡veis pela prÃ¡tica dos atos previstos nesta Lei que colaborem efetivamente com as investigaÃ§Ãµes e o processo administrativo, sendo que dessa colaboraÃ§Ã£o resulte:\nI - a identificaÃ§Ã£o dos demais envolvidos na infraÃ§Ã£o, quando couber; e\nII - a obtenÃ§Ã£o cÃ©lere de informaÃ§Ãµes e documentos que comprovem o ilÃ­cito sob apuraÃ§Ã£o.\nÂ§ 1Âº O acordo de que trata o caput somente poderÃ¡ ser celebrado se preenchidos, cumulativamente, os seguintes requisitos:\nI - a pessoa jurÃ­dica seja a primeira a se manifestar sobre seu interesse em cooperar para a apuraÃ§Ã£o do ato ilÃ­cito;\nII - a pessoa jurÃ­dica cesse completamente seu envolvimento na infraÃ§Ã£o investigada a partir da data de propositura do acordo;\nIII - a pessoa jurÃ­dica admita sua participaÃ§Ã£o no ilÃ­cito e coopere plena e permanentemente com as investigaÃ§Ãµes e o processo administrativo, comparecendo, sob suas expensas, sempre que solicitada, a todos os atos processuais, atÃ© seu encerramento.\nÂ§ 2Âº A celebraÃ§Ã£o do acordo de leniÃªncia isentarÃ¡ a pessoa jurÃ­dica das sanÃ§Ãµes previstas no inciso II do art. 6Âº e no inciso IV do art. 19 e reduzirÃ¡ em atÃ© 2/3 (dois terÃ§os) o valor da multa aplicÃ¡vel.\nÂ§ 3Âº O acordo de leniÃªncia nÃ£o exime a pessoa jurÃ­dica da obrigaÃ§Ã£o de reparar integralmente o dano causado.\nÂ§ 4Âº O acordo de leniÃªncia estipularÃ¡ as condiÃ§Ãµes necessÃ¡rias para assegurar a efetividade da colaboraÃ§Ã£o e o resultado Ãºtil do processo.\nÂ§ 5Âº Os efeitos do acordo de leniÃªncia serÃ£o estendidos Ã s pessoas jurÃ­dicas que integram o mesmo grupo econÃ´mico, de fato e de direito, desde que firmem o acordo em conjunto, respeitadas as condiÃ§Ãµes nele estabelecidas.\nÂ§ 6Âº A proposta de acordo de leniÃªncia somente se tornarÃ¡ pÃºblica apÃ³s a efetivaÃ§Ã£o do respectivo acordo, salvo no interesse das investigaÃ§Ãµes e do processo administrativo.\nÂ§ 7Âº NÃ£o importarÃ¡ em reconhecimento da prÃ¡tica do ato ilÃ­cito investigado a proposta de acordo de leniÃªncia rejeitada.\nÂ§ 8Âº Em caso de descumprimento do acordo de leniÃªncia, a pessoa jurÃ­dica ficarÃ¡ impedida de celebrar novo acordo pelo prazo de 3 (trÃªs) anos contados do conhecimento pela administraÃ§Ã£o pÃºblica do referido descumprimento.\nÂ§ 9Âº A celebraÃ§Ã£o do acordo de leniÃªncia interrompe o prazo prescricional dos atos ilÃ­citos previstos nesta Lei.\nÂ§ 10. A Controladoria-Geral da UniÃ£o - CGU Ã© o Ã³rgÃ£o competente para celebrar os acordos de leniÃªncia no Ã¢mbito do Poder Executivo federal, bem como no caso de atos lesivos praticados contra a administraÃ§Ã£o pÃºblica estrangeira.",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "17",
+   "label": "Art. 17",
+   "heading": "",
+   "text": "Art. 17. A administraÃ§Ã£o pÃºblica poderÃ¡ tambÃ©m celebrar acordo de leniÃªncia com a pessoa jurÃ­dica responsÃ¡vel pela prÃ¡tica de ilÃ­citos previstos na Lei nÂº 8.666, de 21 de junho de 1993, com vistas Ã isenÃ§Ã£o ou atenuaÃ§Ã£o das sanÃ§Ãµes administrativas estabelecidas em seus arts. 86 a 88.\nCAPÃTULO VI\nDA RESPONSABILIZAÃ‡ÃƒO JUDICIAL",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "18",
+   "label": "Art. 18",
+   "heading": "",
+   "text": "Art. 18. Na esfera administrativa, a responsabilidade da pessoa jurÃ­dica nÃ£o afasta a possibilidade de sua responsabilizaÃ§Ã£o na esfera judicial.",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "19",
+   "label": "Art. 19",
+   "heading": "",
+   "text": "Art. 19. Em razÃ£o da prÃ¡tica de atos previstos no art. 5Âº desta Lei, a UniÃ£o, os Estados, o Distrito Federal e os MunicÃ­pios, por meio das respectivas Advocacias PÃºblicas ou Ã³rgÃ£os de representaÃ§Ã£o judicial, ou equivalentes, e o MinistÃ©rio PÃºblico, poderÃ£o ajuizar aÃ§Ã£o com vistas Ã aplicaÃ§Ã£o das seguintes sanÃ§Ãµes Ã s pessoas jurÃ­dicas infratoras:\nI - perdimento dos bens, direitos ou valores que representem vantagem ou proveito direta ou indiretamente obtidos da infraÃ§Ã£o, ressalvado o direito do lesado ou de terceiro de boa-fÃ©;\nII - suspensÃ£o ou interdiÃ§Ã£o parcial de suas atividades;\nIII - dissoluÃ§Ã£o compulsÃ³ria da pessoa jurÃ­dica;\nIV - proibiÃ§Ã£o de receber incentivos, subsÃ­dios, subvenÃ§Ãµes, doaÃ§Ãµes ou emprÃ©stimos de Ã³rgÃ£os ou entidades pÃºblicas e de instituiÃ§Ãµes financeiras pÃºblicas ou controladas pelo poder pÃºblico, pelo prazo mÃ­nimo de 1 (um) e mÃ¡ximo de 5 (cinco) anos.\nÂ§ 1Âº A dissoluÃ§Ã£o compulsÃ³ria da pessoa jurÃ­dica serÃ¡ determinada quando comprovado:\nI - ter sido a personalidade jurÃ­dica utilizada de forma habitual para facilitar ou promover a prÃ¡tica de atos ilÃ­citos; ou\nII - ter sido constituÃ­da para ocultar ou dissimular interesses ilÃ­citos ou a identidade dos beneficiÃ¡rios dos atos praticados.\nÂ§ 2Âº (VETADO).\nÂ§ 3Âº As sanÃ§Ãµes poderÃ£o ser aplicadas de forma isolada ou cumulativa.\nÂ§ 4Âº O MinistÃ©rio PÃºblico ou a Advocacia PÃºblica ou Ã³rgÃ£o de representaÃ§Ã£o judicial, ou equivalente, do ente pÃºblico poderÃ¡ requerer a indisponibilidade de bens, direitos ou valores necessÃ¡rios Ã garantia do pagamento da multa ou da reparaÃ§Ã£o integral do dano causado, conforme previsto no art. 7Âº, ressalvado o direito do terceiro de boa-fÃ©.",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "20",
+   "label": "Art. 20",
+   "heading": "",
+   "text": "Art. 20. Nas aÃ§Ãµes ajuizadas pelo MinistÃ©rio PÃºblico, poderÃ£o ser aplicadas as sanÃ§Ãµes previstas no art. 6o, sem prejuÃ­zo daquelas previstas neste CapÃ­tulo, desde que constatada a omissÃ£o das autoridades competentes para promover a responsabilizaÃ§Ã£o administrativa.",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "21",
+   "label": "Art. 21",
+   "heading": "",
+   "text": "Art. 21. Nas aÃ§Ãµes de responsabilizaÃ§Ã£o judicial, serÃ¡ adotado o rito previsto na Lei nÂº 7.347, de 24 de julho de 1985.\nParÃ¡grafo Ãºnico. A condenaÃ§Ã£o torna certa a obrigaÃ§Ã£o de reparar, integralmente, o dano causado pelo ilÃ­cito, cujo valor serÃ¡ apurado em posterior liquidaÃ§Ã£o, se nÃ£o constar expressamente da sentenÃ§a.\nCAPÃTULO VII\nDISPOSIÃ‡Ã•ES FINAIS",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "22",
+   "label": "Art. 22",
+   "heading": "",
+   "text": "Art. 22. Fica criado no Ã¢mbito do Poder Executivo federal o Cadastro Nacional de Empresas Punidas - CNEP, que reunirÃ¡ e darÃ¡ publicidade Ã s sanÃ§Ãµes aplicadas pelos Ã³rgÃ£os ou entidades dos Poderes Executivo, Legislativo e JudiciÃ¡rio de todas as esferas de governo com base nesta Lei.\nÂ§ 1Âº Os Ã³rgÃ£os e entidades referidos no caput deverÃ£o informar e manter atualizados, no Cnep, os dados relativos Ã s sanÃ§Ãµes por eles aplicadas.\nÂ§ 2Âº O Cnep conterÃ¡, entre outras, as seguintes informaÃ§Ãµes acerca das sanÃ§Ãµes aplicadas:\nI - razÃ£o social e nÃºmero de inscriÃ§Ã£o da pessoa jurÃ­dica ou entidade no Cadastro Nacional da Pessoa JurÃ­dica - CNPJ;\nII - tipo de sanÃ§Ã£o; e\nIII - data de aplicaÃ§Ã£o e data final da vigÃªncia do efeito limitador ou impeditivo da sanÃ§Ã£o, quando for o caso.\nÂ§ 3Âº As autoridades competentes, para celebrarem acordos de leniÃªncia previstos nesta Lei, tambÃ©m deverÃ£o prestar e manter atualizadas no Cnep, apÃ³s a efetivaÃ§Ã£o do respectivo acordo, as informaÃ§Ãµes acerca do acordo de leniÃªncia celebrado, salvo se esse procedimento vier a causar prejuÃ­zo Ã s investigaÃ§Ãµes e ao processo administrativo.\nÂ§ 4Âº Caso a pessoa jurÃ­dica nÃ£o cumpra os termos do acordo de leniÃªncia, alÃ©m das informaÃ§Ãµes previstas no Â§ 3Âº, deverÃ¡ ser incluÃ­da no Cnep referÃªncia ao respectivo descumprimento.\nÂ§ 5Âº Os registros das sanÃ§Ãµes e acordos de leniÃªncia serÃ£o excluÃ­dos depois de decorrido o prazo previamente estabelecido no ato sancionador ou do cumprimento integral do acordo de leniÃªncia e da reparaÃ§Ã£o do eventual dano causado, mediante solicitaÃ§Ã£o do Ã³rgÃ£o ou entidade sancionadora.",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "23",
+   "label": "Art. 23",
+   "heading": "",
+   "text": "Art. 23. Os Ã³rgÃ£os ou entidades dos Poderes Executivo, Legislativo e JudiciÃ¡rio de todas as esferas de governo deverÃ£o informar e manter atualizados, para fins de publicidade, no Cadastro Nacional de Empresas InidÃ´neas e Suspensas - CEIS, de carÃ¡ter pÃºblico, instituÃ­do no Ã¢mbito do Poder Executivo federal, os dados relativos Ã s sanÃ§Ãµes por eles aplicadas, nos termos do disposto nos arts. 87 e 88 da Lei nÂº 8.666, de 21 de junho de 1993.",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "24",
+   "label": "Art. 24",
+   "heading": "",
+   "text": "Art. 24. A multa e o perdimento de bens, direitos ou valores aplicados com fundamento nesta Lei serÃ£o destinados preferencialmente aos Ã³rgÃ£os ou entidades pÃºblicas lesadas.",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "25",
+   "label": "Art. 25",
+   "heading": "",
+   "text": "Art. 25. Prescrevem em 5 (cinco) anos as infraÃ§Ãµes previstas nesta Lei, contados da data da ciÃªncia da infraÃ§Ã£o ou, no caso de infraÃ§Ã£o permanente ou continuada, do dia em que tiver cessado.\nParÃ¡grafo Ãºnico. Na esfera administrativa ou judicial, a prescriÃ§Ã£o serÃ¡ interrompida com a instauraÃ§Ã£o de processo que tenha por objeto a apuraÃ§Ã£o da infraÃ§Ã£o.",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "26",
+   "label": "Art. 26",
+   "heading": "",
+   "text": "Art. 26. A pessoa jurÃ­dica serÃ¡ representada no processo administrativo na forma do seu estatuto ou contrato social.\nÂ§ 1Âº As sociedades sem personalidade jurÃ­dica serÃ£o representadas pela pessoa a quem couber a administraÃ§Ã£o de seus bens.\nÂ§ 2Âº A pessoa jurÃ­dica estrangeira serÃ¡ representada pelo gerente, representante ou administrador de sua filial, agÃªncia ou sucursal aberta ou instalada no Brasil.",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "27",
+   "label": "Art. 27",
+   "heading": "",
+   "text": "Art. 27. A autoridade competente que, tendo conhecimento das infraÃ§Ãµes previstas nesta Lei, nÃ£o adotar providÃªncias para a apuraÃ§Ã£o dos fatos serÃ¡ responsabilizada penal, civil e administrativamente nos termos da legislaÃ§Ã£o especÃ­fica aplicÃ¡vel.",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "28",
+   "label": "Art. 28",
+   "heading": "",
+   "text": "Art. 28. Esta Lei aplica-se aos atos lesivos praticados por pessoa jurÃ­dica brasileira contra a administraÃ§Ã£o pÃºblica estrangeira, ainda que cometidos no exterior.",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "29",
+   "label": "Art. 29",
+   "heading": "",
+   "text": "Art. 29. O disposto nesta Lei nÃ£o exclui as competÃªncias do Conselho Administrativo de Defesa EconÃ´mica, do MinistÃ©rio da JustiÃ§a e do MinistÃ©rio da Fazenda para processar e julgar fato que constitua infraÃ§Ã£o Ã ordem econÃ´mica.",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "30",
+   "label": "Art. 30",
+   "heading": "",
+   "text": "Art. 30. A aplicaÃ§Ã£o das sanÃ§Ãµes previstas nesta Lei nÃ£o afeta os processos de responsabilizaÃ§Ã£o e aplicaÃ§Ã£o de penalidades decorrentes de:\nI - ato de improbidade administrativa nos termos da Lei nÂº 8.429, de 2 de junho de 1992; e\nII - atos ilÃ­citos alcanÃ§ados pela Lei nÂº 8.666, de 21 de junho de 1993, ou outras normas de licitaÃ§Ãµes e contratos da administraÃ§Ã£o pÃºblica, inclusive no tocante ao Regime Diferenciado de ContrataÃ§Ãµes PÃºblicas - RDC instituÃ­do pela Lei nÂº 12.462, de 4 de agosto de 2011.",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "31",
+   "label": "Art. 31",
+   "heading": "",
+   "text": "Art. 31. Esta Lei entra em vigor 180 (cento e oitenta) dias apÃ³s a data de sua publicaÃ§Ã£o.\nBrasÃ­lia, 1Âº de agosto de 2013; 192Âº da IndependÃªncia e 125Âº da RepÃºblica.\nDILMA ROUSSEFF\nJosÃ© Eduardo Cardozo\nLuÃ­s InÃ¡cio Lucena Adams\nJorge Hage Sobrinho",
+   "status": "vigente",
+   "hasHistory": false
+  }
+ ]
+}

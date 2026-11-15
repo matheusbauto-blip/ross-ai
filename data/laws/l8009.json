@@ -1,0 +1,87 @@
+{
+ "id": "l8009",
+ "name": "Lei nº 8.009, de 29 de março de 1990 (impenhorabilidade do bem de família)",
+ "shortName": "Lei do Bem de Família",
+ "number": "Lei nº 8.009/1990",
+ "type": "lei",
+ "date": "1990-03-29",
+ "url": "https://www.planalto.gov.br/ccivil_03/leis/l8009.htm",
+ "lexml": "urn:lex:br:federal:lei:1990-03-29;8009",
+ "jurisdiction": "Brasil · Federal",
+ "source": "Câmara dos Deputados — Legislação Informatizada (texto atualizado)",
+ "textUrl": "https://www2.camara.leg.br/legin/fed/lei/1990/lei-8009-29-marco-1990-366074-normaatualizada-pl.html",
+ "index": "LexML Brasil (https://www.lexml.gov.br)",
+ "retrievedAt": "2026-11-13T14:08:33.759Z",
+ "sha256": "5fdaa0f6a80bd1c0cbc15dc7d76288a0bd2e791d14e273c05103eecf49bac34b",
+ "bytes": 39201,
+ "articleCount": 8,
+ "vigentes": 8,
+ "revogados": 0,
+ "articles": [
+  {
+   "id": "1",
+   "label": "Art. 1",
+   "heading": "",
+   "text": "Art. 1º O imóvel residencial próprio do casal, ou da entidade familiar, é impenhorável e não responderá por qualquer tipo de dívida civil, comercial, fiscal, previdenciária ou de outra natureza, contraída pelos cônjuges ou pelos pais ou filhos que sejam seus proprietários e nele residam, salvo nas hipóteses previstas nesta lei.\nParágrafo único. A impenhorabilidade compreende o imóvel sobre o qual se assentam a construção, as plantações, as benfeitorias de qualquer natureza e todos os equipamentos, inclusive os de uso profissional, ou móveis que guarnecem a casa, desde que quitados.\n/",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "2",
+   "label": "Art. 2",
+   "heading": "",
+   "text": "Art. 2º Excluem-se da impenhorabilidade os veículos de transporte, obras de arte e adornos suntuosos.\nParágrafo único. No caso de imóvel locado, a impenhorabilidade aplica-se aos bens móveis quitados que guarneçam a residência e que sejam de propriedade do locatário, observado o disposto neste artigo.\n/",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "3",
+   "label": "Art. 3",
+   "heading": "",
+   "text": "Art. 3º A impenhorabilidade é oponível em qualquer processo de execução civil, fiscal, previdenciária, trabalhista ou de outra natureza, salvo se movido:\nI - (Revogado pela Lei Complementar nº 150, de 1/6/2015)\nII - pelo titular do crédito decorrente do financiamento destinado à construção ou à aquisição do imóvel, no limite dos créditos e acréscimos constituídos em função do respectivo contrato;\nIII - pelo credor da pensão alimentícia, resguardados os direitos, sobre o bem, do seu coproprietário que, com o devedor, integre união estável ou conjugal, observadas as hipóteses em que ambos responderão pela dívida; (Inciso com redação dada pela Lei nº 13.144, de 6/7/2015)\nIV - para cobrança de impostos, predial ou territorial, taxas e contribuições devidas em função do imóvel familiar;\nV - para execução de hipoteca sobre o imóvel oferecido como garantia real pelo casal ou pela entidade familiar;\nVI - por ter sido adquirido com produto de crime ou para execução de sentença penal condenatória a ressarcimento, indenização ou perdimento de bens;\nVII - por obrigação decorrente de fiança concedida em contrato de locação. (Inciso acrescido pela Lei nº 8.245 de 18/10/1991)\n/",
+   "status": "vigente",
+   "nota": "Inciso com redação dada pela Lei nº 13.144, de 6/7/2015",
+   "hasHistory": false
+  },
+  {
+   "id": "4",
+   "label": "Art. 4",
+   "heading": "",
+   "text": "Art. 4º Não se beneficiará do disposto nesta lei aquele que, sabendo-se insolvente, adquire de má-fé imóvel mais valioso para transferir a residência familiar, desfazendo-se ou não da moradia antiga.\n§ 1º Neste caso, poderá o juiz, na respectiva ação do credor, transferir a impenhorabilidade para a moradia familiar anterior, ou anular-lhe a venda, liberando a mais valiosa para execução ou concurso, conforme a hipótese.\n§ 2º Quando a residência familiar constituir-se em imóvel rural, a impenhorabilidade restringir-se-á à sede de moradia, com os respectivos bens móveis, e, nos casos do art. 5º, inciso XXVI, da Constituição, à área limitada como pequena propriedade rural.\n/",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "5",
+   "label": "Art. 5",
+   "heading": "",
+   "text": "Art. 5º Para os efeitos de impenhorabilidade, de que trata esta lei, considera-se residência um único imóvel utilizado pelo casal ou pela entidade familiar para moradia permanente.\nParágrafo único. Na hipótese de o casal, ou entidade familiar, ser possuidor de vários imóveis utilizados como residência, a impenhorabilidade recairá sobre o de menor valor, salvo se outro tiver sido registrado, para esse fim, no Registro de Imóveis e na forma do art. 70 do Código Civil.\n/",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "6",
+   "label": "Art. 6",
+   "heading": "",
+   "text": "Art. 6º São canceladas as execuções suspensas pela Medida Provisória nº 143, de 8 de março de 1990, que deu origem a esta lei.\n/",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "7",
+   "label": "Art. 7",
+   "heading": "",
+   "text": "Art. 7º Esta lei entra em vigor na data de sua publicação.\n/",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "8",
+   "label": "Art. 8",
+   "heading": "",
+   "text": "Art. 8º Revogam-se as disposições em contrário.\n/\nSenado Federal, 29 de março de 1990; 169º da Independência e 102º da República.\n/\nFERNANDO COLLOR",
+   "status": "vigente",
+   "hasHistory": false
+  }
+ ]
+}

@@ -1,0 +1,400 @@
+{
+ "id": "l9307",
+ "name": "Lei nº 9.307, de 23 de setembro de 1996 (Lei de Arbitragem)",
+ "shortName": "Lei de Arbitragem",
+ "number": "Lei nº 9.307/1996",
+ "type": "lei",
+ "date": "1996-09-23",
+ "url": "https://www.planalto.gov.br/ccivil_03/leis/l9307.htm",
+ "lexml": "urn:lex:br:federal:lei:1996-09-23;9307",
+ "jurisdiction": "Brasil · Federal",
+ "source": "Câmara dos Deputados — Legislação Informatizada (texto atualizado)",
+ "textUrl": "https://www2.camara.leg.br/legin/fed/lei/1996/lei-9307-23-setembro-1996-349058-normaatualizada-pl.html",
+ "index": "LexML Brasil (https://www.lexml.gov.br)",
+ "retrievedAt": "2026-11-13T14:08:09.215Z",
+ "sha256": "c938e178571271d8a145df42af655fc532d7478350f4d481137aa64b96abdc49",
+ "bytes": 68076,
+ "articleCount": 47,
+ "vigentes": 46,
+ "revogados": 1,
+ "articles": [
+  {
+   "id": "1",
+   "label": "Art. 1",
+   "heading": "",
+   "text": "Art. 1Âº As pessoas capazes de contratar poderÃ£o valer-se da arbitragem para dirimir litÃ­gios relativos a direitos patrimoniais disponÃ­veis.\nÂ§ 1Âº A administraÃ§Ã£o pÃºblica direta e indireta poderÃ¡ utilizar-se da arbitragem para dirimir conflitos relativos a direitos patrimoniais disponÃ­veis. (ParÃ¡grafo acrescido pela Lei nÂº 13.129, de 26/5/2015, publicado no DOU de 27/5/2015, em vigor apÃ³s 60 (sessenta) dias da publicaÃ§Ã£o)\nÂ§ 2Âº A autoridade ou o Ã³rgÃ£o competente da administraÃ§Ã£o pÃºblica direta para a celebraÃ§Ã£o de convenÃ§Ã£o de arbitragem Ã© a mesma para a realizaÃ§Ã£o de acordos ou transaÃ§Ãµes. (ParÃ¡grafo acrescido pela Lei nÂº 13.129, de 26/5/2015, publicado no DOU de 27/5/2015, em vigor apÃ³s 60 (sessenta) dias da publicaÃ§Ã£o)",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "2",
+   "label": "Art. 2",
+   "heading": "",
+   "text": "Art. 2Âº A arbitragem poderÃ¡ ser de direito ou de eqÃ¼idade, a critÃ©rio das partes.\nÂ§ 1Âº PoderÃ£o as partes escolher, livremente, as regras de direito que serÃ£o aplicadas na arbitragem, desde que nÃ£o haja violaÃ§Ã£o aos bons costumes e Ã ordem pÃºblica.\nÂ§ 2Âº PoderÃ£o, tambÃ©m, as partes convencionar que a arbitragem se realize com base nos princÃ­pios gerais de direito, nos usos e costumes e nas regras internacionais de comÃ©rcio.\nÂ§ 3Âº A arbitragem que envolva a administraÃ§Ã£o pÃºblica serÃ¡ sempre de direito e respeitarÃ¡ o princÃ­pio da publicidade. (ParÃ¡grafo acrescido pela Lei nÂº 13.129, de 26/5/2015, publicado no DOU de 27/5/2015, em vigor apÃ³s 60 (sessenta) dias da publicaÃ§Ã£o)\nCAPÃTULO II\nDA CONVENÃ‡ÃƒO DE ARBITRAGEM E SEUS EFEITOS",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "3",
+   "label": "Art. 3",
+   "heading": "",
+   "text": "Art. 3Âº As partes interessadas podem submeter a soluÃ§Ã£o de seus litÃ­gios ao juÃ­zo arbitral mediante convenÃ§Ã£o de arbitragem, assim entendida a clÃ¡usula compromissÃ³ria e o compromisso arbitral.",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "4",
+   "label": "Art. 4",
+   "heading": "",
+   "text": "Art. 4Âº A clÃ¡usula compromissÃ³ria Ã© a convenÃ§Ã£o atravÃ©s da qual as partes em um contrato comprometem-se a submeter Ã arbitragem os litÃ­gios que possam vir a surgir, relativamente a tal contrato.\nÂ§ 1Âº A clÃ¡usula compromissÃ³ria deve ser estipulada por escrito, podendo estar inserta no prÃ³prio contrato ou em documento apartado que a ele se refira.\nÂ§ 2Âº Nos contratos de adesÃ£o, a clÃ¡usula compromissÃ³ria sÃ³ terÃ¡ eficÃ¡cia se o aderente tomar a iniciativa de instituir a arbitragem ou concordar, expressamente, com a sua instituiÃ§Ã£o, desde que por escrito em documento anexo ou em negrito, com a assinatura ou visto especialmente para essa clÃ¡usula.\nÂ§ 3Âº (VETADO na Lei nÂº 13.129, de 26/5/2015)\nÂ§ 4Âº (VETADO na Lei nÂº 13.129, de 26/5/2015)",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "5",
+   "label": "Art. 5",
+   "heading": "",
+   "text": "Art. 5Âº Reportando-se as partes, na clÃ¡usula compromissÃ³ria, Ã s regras de algum Ã³rgÃ£o arbitral institucional ou entidade especializada, a arbitragem serÃ¡ instituÃ­da e processada de acordo com tais regras, podendo, igualmente, as partes estabelecer na prÃ³pria clÃ¡usula, ou em outro documento, a forma convencionada para a instituiÃ§Ã£o da arbitragem.",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "6",
+   "label": "Art. 6",
+   "heading": "",
+   "text": "Art. 6Âº NÃ£o havendo acordo prÃ©vio sobre a forma de instituir a arbitragem, a parte interessada manifestarÃ¡ Ã outra parte sua intenÃ§Ã£o de dar inÃ­cio Ã arbitragem, por via postal ou por outro meio qualquer de comunicaÃ§Ã£o, mediante comprovaÃ§Ã£o de recebimento, convocando-a para, em dia, hora e local certos, firmar o compromisso arbitral.\nParÃ¡grafo Ãºnico. NÃ£o comparecendo a parte convocada ou, comparecendo, recusar-se a firmar o compromisso arbitral, poderÃ¡ a outra parte propor a demanda de que trata o art. 7Â° desta Lei, perante o Ã³rgÃ£o do Poder JudiciÃ¡rio a que, originariamente, tocaria o julgamento da causa.",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "7",
+   "label": "Art. 7",
+   "heading": "",
+   "text": "Art. 7Âº Existindo clÃ¡usula compromissÃ³ria e havendo resistÃªncia quanto Ã instituiÃ§Ã£o da arbitragem, poderÃ¡ a parte interessada requerer a citaÃ§Ã£o da outra parte para comparecer em juÃ­zo a fim de lavrar-se o compromisso, designando o juiz audiÃªncia especial para tal fim.\nÂ§ 1Âº O autor indicarÃ¡, com precisÃ£o, o objeto da arbitragem, instruindo o pedido com o documento que contiver a clÃ¡usula compromissÃ³ria.\nÂ§ 2Âº Comparecendo as partes Ã audiÃªncia, o juiz tentarÃ¡, previamente, a conciliaÃ§Ã£o acerca do litÃ­gio. NÃ£o obtendo sucesso, tentarÃ¡ o juiz conduzir as partes Ã celebraÃ§Ã£o, de comum acordo, do compromisso arbitral.\nÂ§ 3Âº NÃ£o concordando as partes sobre os termos do compromisso, decidirÃ¡ o juiz, apÃ³s ouvir o rÃ©u, sobre seu conteÃºdo, na prÃ³pria audiÃªncia ou no prazo de dez dias, respeitadas as disposiÃ§Ãµes da clÃ¡usula compromissÃ³ria e atendendo ao disposto nos arts. 10 e 21, Â§ 2Â°, desta Lei.\nÂ§ 4Âº Se a clÃ¡usula compromissÃ³ria nada dispuser sobre a nomeaÃ§Ã£o de Ã¡rbitros, caberÃ¡ ao juiz, ouvidas as partes, estatuir a respeito, podendo nomear Ã¡rbitro Ãºnico para a soluÃ§Ã£o do litÃ­gio.\nÂ§ 5Âº A ausÃªncia do autor, sem justo motivo, Ã audiÃªncia designada para a lavratura do compromisso arbitral, importarÃ¡ a extinÃ§Ã£o do processo sem julgamento de mÃ©rito.\nÂ§ 6Âº NÃ£o comparecendo o rÃ©u Ã audiÃªncia, caberÃ¡ ao juiz, ouvido o autor, estatuir a respeito do conteÃºdo do compromisso, nomeando Ã¡rbitro Ãºnico.\nÂ§ 7Âº A sentenÃ§a que julgar procedente o pedido valerÃ¡ como compromisso arbitral.",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "8",
+   "label": "Art. 8",
+   "heading": "",
+   "text": "Art. 8Âº A clÃ¡usula compromissÃ³ria Ã© autÃ´noma em relaÃ§Ã£o ao contrato em que estiver inserta, de tal sorte que a nulidade deste nÃ£o implica, necessariamente, a nulidade da clÃ¡usula compromissÃ³ria.\nParÃ¡grafo Ãºnico. CaberÃ¡ ao Ã¡rbitro decidir de ofÃ­cio, ou por provocaÃ§Ã£o das partes, as questÃµes acerca da existÃªncia, validade e eficÃ¡cia da convenÃ§Ã£o de arbitragem e do contrato que contenha a clÃ¡usula compromissÃ³ria.",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "9",
+   "label": "Art. 9",
+   "heading": "",
+   "text": "Art. 9Âº O compromisso arbitral Ã© a convenÃ§Ã£o atravÃ©s da qual as partes submetem um litÃ­gio Ã arbitragem de uma ou mais pessoas, podendo ser judicial ou extrajudicial.\nÂ§ 1Âº O compromisso arbitral judicial celebrar-se-Ã¡ por termo nos autos, perante o juÃ­zo ou tribunal, onde tem curso a demanda.\nÂ§ 2Âº O compromisso arbitral extrajudicial serÃ¡ celebrado por escrito particular, assinado por duas testemunhas, ou por instrumento pÃºblico.",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "10",
+   "label": "Art. 10",
+   "heading": "",
+   "text": "Art. 10. ConstarÃ¡, obrigatoriamente, do compromisso arbitral:\nI - o nome, profissÃ£o, estado civil e domicÃ­lio das partes;\nII - o nome, profissÃ£o e domicÃ­lio do Ã¡rbitro, ou dos Ã¡rbitros, ou, se for o caso, a identificaÃ§Ã£o da entidade Ã qual as partes delegaram a indicaÃ§Ã£o de Ã¡rbitros;\nIII - a matÃ©ria que serÃ¡ objeto da arbitragem; e\nIV - o lugar em que serÃ¡ proferida a sentenÃ§a arbitral.",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "11",
+   "label": "Art. 11",
+   "heading": "",
+   "text": "Art. 11. PoderÃ¡, ainda, o compromisso arbitral conter:\nI - local, ou locais, onde se desenvolverÃ¡ a arbitragem;\nII - a autorizaÃ§Ã£o para que o Ã¡rbitro ou os Ã¡rbitros julguem por eqÃ¼idade, se assim for convencionado pelas partes;\nIII - o prazo para apresentaÃ§Ã£o da sentenÃ§a arbitral;\nIV - a indicaÃ§Ã£o da lei nacional ou das regras corporativas aplicÃ¡veis Ã arbitragem, quando assim convencionarem as partes;\nV - a declaraÃ§Ã£o da responsabilidade pelo pagamento dos honorÃ¡rios e das despesas com a arbitragem; e\nVI - a fixaÃ§Ã£o dos honorÃ¡rios do Ã¡rbitro, ou dos Ã¡rbitros.\nÂ ParÃ¡grafo Ãºnico. Fixando as partes os honorÃ¡rios do Ã¡rbitro, ou dos Ã¡rbitros, no compromisso arbitral, este constituirÃ¡ tÃ­tulo executivo extrajudicial; nÃ£o havendo tal estipulaÃ§Ã£o, o Ã¡rbitro requererÃ¡ ao Ã³rgÃ£o do Poder JudiciÃ¡rio que seria competente para julgar, originariamente, a causa que os fixe por sentenÃ§a.",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "12",
+   "label": "Art. 12",
+   "heading": "",
+   "text": "Art. 12. Extingue-se o compromisso arbitral:\nI - escusando-se qualquer dos Ã¡rbitros, antes de aceitar a nomeaÃ§Ã£o, desde que as partes tenham declarado, expressamente, nÃ£o aceitar substituto;\nII - falecendo ou ficando impossibilitado de dar seu voto algum dos Ã¡rbitros, desde que as partes declarem, expressamente, nÃ£o aceitar substituto; e\nIII - tendo expirado o prazo a que se refere o art. 11, inciso III, desde que a parte interessada tenha notificado o Ã¡rbitro, ou o presidente do tribunal arbitral, concedendo-lhe o prazo de dez dias para a prolaÃ§Ã£o e apresentaÃ§Ã£o da sentenÃ§a arbitral.\nCAPÃTULO III\nDOS ÃRBITROS",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "13",
+   "label": "Art. 13",
+   "heading": "",
+   "text": "Art. 13. Pode ser Ã¡rbitro qualquer pessoa capaz e que tenha a confianÃ§a das partes.\nÂ§ 1Âº As partes nomearÃ£o um ou mais Ã¡rbitros, sempre em nÃºmero Ã­mpar, podendo nomear, tambÃ©m, os respectivos suplentes.\nÂ§ 2Âº Quando as partes nomearem Ã¡rbitros em nÃºmero par, estes estÃ£o autorizados, desde logo, a nomear mais um Ã¡rbitro. NÃ£o havendo acordo, requererÃ£o as partes ao Ã³rgÃ£o do Poder JudiciÃ¡rio a que tocaria, originariamente, o julgamento da causa a nomeaÃ§Ã£o do Ã¡rbitro, aplicÃ¡vel, no que couber, o procedimento previsto no art. 7Âº desta Lei.\nÂ§ 3Âº As partes poderÃ£o, de comum acordo, estabelecer o processo de escolha dos Ã¡rbitros, ou adotar as regras de um Ã³rgÃ£o arbitral institucional ou entidade especializada.\nÂ§ 4Âº As partes, de comum acordo, poderÃ£o afastar a aplicaÃ§Ã£o de dispositivo do regulamento do Ã³rgÃ£o arbitral institucional ou entidade especializada que limite a escolha do Ã¡rbitro Ãºnico, coÃ¡rbitro ou presidente do tribunal Ã respectiva lista de Ã¡rbitros, autorizado o controle da escolha pelos Ã³rgÃ£os competentes da instituiÃ§Ã£o, sendo que, nos casos de impasse e arbitragem multiparte, deverÃ¡ ser observado o que dispuser o regulamento aplicÃ¡vel. (ParÃ¡grafo com redaÃ§Ã£o dada pela Lei nÂº 13.129, de 26/5/2015, publicada no DOU de 27/5/2015, em vigor apÃ³s 60 (sessenta) dias da publicaÃ§Ã£o)\nÂ§ 5Âº O Ã¡rbitro ou o presidente do tribunal designarÃ¡, se julgar conveniente, um secretÃ¡rio, que poderÃ¡ ser um dos Ã¡rbitros.\nÂ§ 6Âº No desempenho de sua funÃ§Ã£o, o Ã¡rbitro deverÃ¡ proceder com imparcialidade, independÃªncia, competÃªncia, diligÃªncia e discriÃ§Ã£o.\nÂ§ 7Âº PoderÃ¡ o Ã¡rbitro ou o tribunal arbitral determinar Ã s partes o adiantamento de verbas para despesas e diligÃªncias que julgar necessÃ¡rias.",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "14",
+   "label": "Art. 14",
+   "heading": "",
+   "text": "Art. 14. EstÃ£o impedidos de funcionar como Ã¡rbitros as pessoas que tenham, com as partes ou com o litÃ­gio que lhes for submetido, algumas das relaÃ§Ãµes que caracterizam os casos de impedimento ou suspeiÃ§Ã£o de juÃ­zes, aplicando-se-lhes, no que couber, os mesmos deveres e responsabilidades, conforme previsto no CÃ³digo de Processo Civil.\nÂ§ 1Âº As pessoas indicadas para funcionar como Ã¡rbitro tÃªm o dever de revelar, antes da aceitaÃ§Ã£o da funÃ§Ã£o, qualquer fato que denote dÃºvida justificada quanto Ã sua imparcialidade e independÃªncia.\nÂ§ 2Âº O Ã¡rbitro somente poderÃ¡ ser recusado por motivo ocorrido apÃ³s sua nomeaÃ§Ã£o. PoderÃ¡, entretanto, ser recusado por motivo anterior Ã sua nomeaÃ§Ã£o, quando:\na) nÃ£o for nomeado, diretamente, pela parte; ouÂ\nb) o motivo para a recusa do Ã¡rbitro for conhecido posteriormente Ã sua nomeaÃ§Ã£o.Â",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "15",
+   "label": "Art. 15",
+   "heading": "",
+   "text": "Art. 15. A parte interessada em argÃ¼ir a recusa do Ã¡rbitro apresentarÃ¡, nos termos do art. 20, a respectiva exceÃ§Ã£o, diretamente ao Ã¡rbitro ou ao presidente do tribunal arbitral, deduzindo suas razÃµes e apresentando as provas pertinentes.\nParÃ¡grafo Ãºnico. Acolhida a exceÃ§Ã£o, serÃ¡ afastado o Ã¡rbitro suspeito ou impedido, que serÃ¡ substituÃ­do, na forma do art. 16 desta Lei.",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "16",
+   "label": "Art. 16",
+   "heading": "",
+   "text": "Art. 16. Se o Ã¡rbitro escusar-se antes da aceitaÃ§Ã£o da nomeaÃ§Ã£o, ou, apÃ³s a aceitaÃ§Ã£o, vier a falecer, tornar-se impossibilitado para o exercÃ­cio da funÃ§Ã£o, ou for recusado, assumirÃ¡ seu lugar o substituto indicado no compromisso, se houver.\nÂ§ 1Âº NÃ£o havendo substituto indicado para o Ã¡rbitro, aplicar-se-Ã£o as regras do Ã³rgÃ£o arbitral institucional ou entidade especializada, se as partes as tiverem invocado na convenÃ§Ã£o de arbitragem.\nÂ§ 2Âº Nada dispondo a convenÃ§Ã£o de arbitragem e nÃ£o chegando as partes a um acordo sobre a nomeaÃ§Ã£o do Ã¡rbitro a ser substituÃ­do, procederÃ¡ a parte interessada da forma prevista no art. 7Âº desta Lei, a menos que as partes tenham declarado, expressamente, na convenÃ§Ã£o de arbitragem, nÃ£o aceitar substituto.",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "17",
+   "label": "Art. 17",
+   "heading": "",
+   "text": "Art. 17. Os Ã¡rbitros, quando no exercÃ­cio de suas funÃ§Ãµes ou em razÃ£o delas, ficam equiparados aos funcionÃ¡rios pÃºblicos, para os efeitos da legislaÃ§Ã£o penal.",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "18",
+   "label": "Art. 18",
+   "heading": "",
+   "text": "Art. 18. O Ã¡rbitro Ã© juiz de fato e de direito, e a sentenÃ§a que proferir nÃ£o fica sujeita a recurso ou a homologaÃ§Ã£o pelo Poder JudiciÃ¡rio.\nCAPÃTULO IV\nDO PROCEDIMENTO ARBITRAL",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "19",
+   "label": "Art. 19",
+   "heading": "",
+   "text": "Art. 19. Considera-se instituÃ­da a arbitragem quando aceita a nomeaÃ§Ã£o pelo Ã¡rbitro, se for Ãºnico, ou por todos, se forem vÃ¡rios.\nÂ§ 1Âº InstituÃ­da a arbitragem e entendendo o Ã¡rbitro ou o tribunal arbitral que hÃ¡ necessidade de explicitar questÃ£o disposta na convenÃ§Ã£o de arbitragem, serÃ¡ elaborado, juntamente com as partes, adendo firmado por todos, que passarÃ¡ a fazer parte integrante da convenÃ§Ã£o de arbitragem. (ParÃ¡grafo Ãºnico transformado em Â§1Âº e com redaÃ§Ã£o dada pela Lei nÂº 13.129, de 26/5/2015, publicada no DOU de 27/5/2015, em vigor apÃ³s 60 (sessenta) dias da publicaÃ§Ã£o)\nÂ§ 2Âº A instituiÃ§Ã£o da arbitragem interrompe a prescriÃ§Ã£o, retroagindo Ã data do requerimento de sua instauraÃ§Ã£o, ainda que extinta a arbitragem por ausÃªncia de jurisdiÃ§Ã£o. (ParÃ¡grafo acrescido pela Lei nÂº 13.129, de 26/5/2015, publicada no DOU de 27/5/2015, em vigor apÃ³s 60 (sessenta) dias da publicaÃ§Ã£o)",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "20",
+   "label": "Art. 20",
+   "heading": "",
+   "text": "Art. 20. A parte que pretender argÃ¼ir questÃµes relativas Ã competÃªncia, suspeiÃ§Ã£o ou impedimento do Ã¡rbitro ou dos Ã¡rbitros, bem como nulidade, invalidade ou ineficÃ¡cia da convenÃ§Ã£o de arbitragem, deverÃ¡ fazÃª-lo na primeira oportunidade que tiver de se manifestar, apÃ³s a instituiÃ§Ã£o da arbitragem.\nÂ§ 1Âº Acolhida a argÃ¼iÃ§Ã£o de suspeiÃ§Ã£o ou impedimento, serÃ¡ o Ã¡rbitro substituÃ­do nos termos do art. 16 desta Lei, reconhecida a incompetÃªncia do Ã¡rbitro ou do tribunal arbitral, bem como a nulidade, invalidade ou ineficÃ¡cia da convenÃ§Ã£o de arbitragem, serÃ£o as partes remetidas ao Ã³rgÃ£o do Poder JudiciÃ¡rio competente para julgar a causa.\nÂ§ 2Âº NÃ£o sendo acolhida a argÃ¼iÃ§Ã£o, terÃ¡ normal prosseguimento a arbitragem, sem prejuÃ­zo de vir a ser examinada a decisÃ£o pelo Ã³rgÃ£o do Poder JudiciÃ¡rio competente, quando da eventual propositura da demanda de que trata o art. 33 desta Lei.",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "21",
+   "label": "Art. 21",
+   "heading": "",
+   "text": "Art. 21. A arbitragem obedecerÃ¡ ao procedimento estabelecido pelas partes na convenÃ§Ã£o de arbitragem, que poderÃ¡ reportar-se Ã s regras de um Ã³rgÃ£o arbitral institucional ou entidade especializada, facultando-se, ainda, Ã s partes delegar ao prÃ³prio Ã¡rbitro, ou ao tribunal arbitral, regular o procedimento.\nÂ§ 1Âº NÃ£o havendo estipulaÃ§Ã£o acerca do procedimento, caberÃ¡ ao Ã¡rbitro ou ao tribunal arbitral disciplinÃ¡-lo.\nÂ§ 2Âº SerÃ£o, sempre, respeitados no procedimento arbitral os princÃ­pios do contraditÃ³rio, da igualdade das partes, da imparcialidade do Ã¡rbitro e de seu livre convencimento.\nÂ§ 3Âº As partes poderÃ£o postular por intermÃ©dio de advogado, respeitada, sempre, a faculdade de designar quem as represente ou assista no procedimento arbitral.\nÂ§ 4Âº CompetirÃ¡ ao Ã¡rbitro ou ao tribunal arbitral, no inicio do procedimento, tentar a conciliaÃ§Ã£o das partes, aplicando-se, no que couber, o art. 28 desta Lei.",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "22",
+   "label": "Art. 22",
+   "heading": "",
+   "text": "Art. 22. PoderÃ¡ o Ã¡rbitro ou o tribunal arbitral tomar o depoimento das partes, ouvir testemunhas e determinar a realizaÃ§Ã£o de perÃ­cias ou outras provas que julgar necessÃ¡rias, mediante requerimento das partes ou de ofÃ­cio.\nÂ§ 1Âº O depoimento das partes e das testemunhas serÃ¡ tomado em local, dia e hora previamente comunicados, por escrito, e reduzido a termo, assinado pelo depoente, ou a seu rogo, e pelos Ã¡rbitros.\nÂ§ 2Âº Em caso de desatendimento, sem justa causa, da convocaÃ§Ã£o para prestar depoimento pessoal, o Ã¡rbitro ou o tribunal arbitral levarÃ¡ em consideraÃ§Ã£o o comportamento da parte faltosa, ao proferir sua sentenÃ§a; se a ausÃªncia for de testemunha, nas mesmas circunstÃ¢ncias, poderÃ¡ o Ã¡rbitro ou o presidente do tribunal arbitral requerer Ã autoridade judiciÃ¡ria que conduza a testemunha renitente, comprovando a existÃªncia da convenÃ§Ã£o de arbitragem.\nÂ§ 3Âº A revelia da parte nÃ£o impedirÃ¡ que seja proferida a sentenÃ§a arbitral.\nÂ§ 4Âº (Revogado pela Lei nÂº 13.129, de 26/5/2015, publicada no DOU de 27/5/2015, em vigor apÃ³s 60 (sessenta) dias da publicaÃ§Ã£o)\nÂ§ 5Âº Se, durante o procedimento arbitral, um Ã¡rbitro vier a ser substituÃ­do fica a critÃ©rio do substituto repetir as provas jÃ¡ produzidas.\nCAPÃTULO IV-A\nDAS TUTELAS CAUTELARES E DE URGÃŠNCIA\n(CapÃ­tulo acrescido pela Lei nÂº 13.129, de 26/5/2015)",
+   "status": "vigente",
+   "nota": "CapÃ­tulo acrescido pela Lei nÂº 13.129, de 26/5/2015",
+   "hasHistory": false
+  },
+  {
+   "id": "22-A",
+   "label": "Art. 22-A",
+   "heading": "",
+   "text": "Art. 22-A. Antes de instituÃ­da a arbitragem, as partes poderÃ£o recorrer ao Poder JudiciÃ¡rio para a concessÃ£o de medida cautelar ou de urgÃªncia.\nParÃ¡grafo Ãºnico. Cessa a eficÃ¡cia da medida cautelar ou de urgÃªncia se a parte interessada nÃ£o requerer a instituiÃ§Ã£o da arbitragem no prazo de 30 (trinta) dias, contado da data de efetivaÃ§Ã£o da respectiva decisÃ£o. (Artigo acrescido pela Lei nÂº 13.129, de 26/5/2015, publicada no DOU de 27/5/2015, em vigor apÃ³s 60 (sessenta) dias da publicaÃ§Ã£o)",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "22-B",
+   "label": "Art. 22-B",
+   "heading": "",
+   "text": "Art. 22-B. InstituÃ­da a arbitragem, caberÃ¡ aos Ã¡rbitros manter, modificar ou revogar a medida cautelar ou de urgÃªncia concedida pelo Poder JudiciÃ¡rio.\nParÃ¡grafo Ãºnico. Estando jÃ¡ instituÃ­da a arbitragem, a medida cautelar ou de urgÃªncia serÃ¡ requerida diretamente aos Ã¡rbitros. (Artigo acrescido pela Lei nÂº 13.129, de 26/5/2015, publicada no DOU de 27/5/2015, em vigor apÃ³s 60 (sessenta) dias da publicaÃ§Ã£o)\nCAPÃTULO IV-B\nDA CARTA ARBITRAL\n(CapÃ­tulo acrescido pela Lei nÂº 13.129, de 26/5/2015)",
+   "status": "vigente",
+   "nota": "CapÃ­tulo acrescido pela Lei nÂº 13.129, de 26/5/2015",
+   "hasHistory": false
+  },
+  {
+   "id": "22-C",
+   "label": "Art. 22-C",
+   "heading": "",
+   "text": "Art. 22-C. O Ã¡rbitro ou o tribunal arbitral poderÃ¡ expedir carta arbitral para que o Ã³rgÃ£o jurisdicional nacional pratique ou determine o cumprimento, na Ã¡rea de sua competÃªncia territorial, de ato solicitado pelo Ã¡rbitro.\nParÃ¡grafo Ãºnico. No cumprimento da carta arbitral serÃ¡ observado o segredo de justiÃ§a, desde que comprovada a confidencialidade estipulada na arbitragem. (Artigo acrescido pela Lei nÂº 13.129, de 26/5/2015, publicada no DOU de 27/5/2015, em vigor apÃ³s 60 (sessenta) dias da publicaÃ§Ã£o)\nCAPÃTULO V\nDA SENTENÃ‡A ARBITRAL",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "23",
+   "label": "Art. 23",
+   "heading": "",
+   "text": "Art. 23. A sentenÃ§a arbitral serÃ¡ proferida no prazo estipulado pelas partes. Nada tendo sido convencionado, o prazo para a apresentaÃ§Ã£o da sentenÃ§a Ã© de seis meses, contado da instituiÃ§Ã£o da arbitragem ou da substituiÃ§Ã£o do Ã¡rbitro.\nÂ§1Âº Os Ã¡rbitros poderÃ£o proferir sentenÃ§as parciais. (ParÃ¡grafo Ãºnico transformado em Â§1Âº e com redaÃ§Ã£o dada pela Lei nÂº 13.129, de 26/5/2015, publicada no DOU de 27/5/2015, em vigor apÃ³s 60 (sessenta) dias da publicaÃ§Ã£o)\nÂ§ 2Âº As partes e os Ã¡rbitros, de comum acordo, poderÃ£o prorrogar o prazo para proferir a sentenÃ§a final.Â (ParÃ¡grafo acrescido pela Lei nÂº 13.129, de 26/5/2015, publicada no DOU de 27/5/2015, em vigor apÃ³s 60 (sessenta) dias da publicaÃ§Ã£o)",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "24",
+   "label": "Art. 24",
+   "heading": "",
+   "text": "Art. 24. A decisÃ£o do Ã¡rbitro ou dos Ã¡rbitros serÃ¡ expressa em documento escrito.\nÂ§ 1Âº Quando forem vÃ¡rios os Ã¡rbitros, a decisÃ£o serÃ¡ tomada por maioria. Se nÃ£o houver acordo majoritÃ¡rio, prevalecerÃ¡ o voto do presidente do tribunal arbitral.\nÂ§ 2Âº O Ã¡rbitro que divergir da maioria poderÃ¡, querendo, declarar seu voto em separado.",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "25",
+   "label": "Art. 25",
+   "heading": "",
+   "text": "Art. 25. (Revogado pela Lei nÂº 13.129, de 26/5/2015, publicada no DOU de 27/5/2015, em vigor apÃ³s 60 (sessenta) dias da publicaÃ§Ã£o)",
+   "status": "revogado",
+   "hasHistory": false
+  },
+  {
+   "id": "26",
+   "label": "Art. 26",
+   "heading": "",
+   "text": "Art. 26. SÃ£o requisitos obrigatÃ³rios da sentenÃ§a arbitral:\nI - o relatÃ³rio, que conterÃ¡ os nomes das partes e um resumo do litÃ­gio;\nII - os fundamentos da decisÃ£o, onde serÃ£o analisadas as questÃµes de fato e de direito, mencionando-se, expressamente, se os Ã¡rbitros julgaram por eqÃ¼idade;\nIII - o dispositivo, em que os Ã¡rbitros resolverÃ£o as questÃµes que lhes forem submetidas e estabelecerÃ£o o prazo para o cumprimento da decisÃ£o, se for o caso; e\nIV - a data e o lugar em que foi proferida.\nParÃ¡grafo Ãºnico. A sentenÃ§a arbitral serÃ¡ assinada pelo Ã¡rbitro ou por todos os Ã¡rbitros. CaberÃ¡ ao presidente do tribunal arbitral, na hipÃ³tese de um ou alguns dos Ã¡rbitros nÃ£o poder ou nÃ£o querer assinar a sentenÃ§a, certificar tal fato.",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "27",
+   "label": "Art. 27",
+   "heading": "",
+   "text": "Art. 27. A sentenÃ§a arbitral decidirÃ¡ sobre a responsabilidade das partes acerca das custas e despesas com a arbitragem, bem como sobre verba decorrente de litigÃ¢ncia de mÃ¡-fÃ©, se for o caso, respeitadas as disposiÃ§Ãµes da convenÃ§Ã£o de arbitragem, se houver.",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "28",
+   "label": "Art. 28",
+   "heading": "",
+   "text": "Art. 28. Se, no decurso da arbitragem, as partes chegarem a acordo quanto ao litÃ­gio, o Ã¡rbitro ou o tribunal arbitral poderÃ¡, a pedido das partes, declarar tal fato mediante sentenÃ§a arbitral, que conterÃ¡ os requisitos do art. 26 desta Lei.",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "29",
+   "label": "Art. 29",
+   "heading": "",
+   "text": "Art. 29. Proferida a sentenÃ§a arbitral, dÃ¡-se por finda a arbitragem, devendo o Ã¡rbitro, ou o presidente do tribunal arbitral, enviar cÃ³pia da decisÃ£o Ã s partes, por via postal ou por outro meio qualquer de comunicaÃ§Ã£o, mediante comprovaÃ§Ã£o de recebimento, ou, ainda, entregando-a diretamente Ã s partes, mediante recibo.",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "30",
+   "label": "Art. 30",
+   "heading": "",
+   "text": "Art. 30. No prazo de 5 (cinco) dias, a contar do recebimento da notificaÃ§Ã£o ou da ciÃªncia pessoal da sentenÃ§a arbitral, salvo se outro prazo for acordado entre as partes, a parte interessada, mediante comunicaÃ§Ã£o Ã outra parte, poderÃ¡ solicitar ao Ã¡rbitro ou ao tribunal arbitral que: (\"Caput\" do artigo com redaÃ§Ã£o dada pela Lei nÂº 13.129, de 26/5/2015, publicada no DOU de 27/5/2015, em vigor apÃ³s 60 (sessenta) dias da publicaÃ§Ã£o)\nI - corrija qualquer erro material da sentenÃ§a arbitral;\nII - esclareÃ§a alguma obscuridade, dÃºvida ou contradiÃ§Ã£o da sentenÃ§a arbitral, ou se pronuncie sobre ponto omitido a respeito do qual devia manifestar-se a decisÃ£o.\nParÃ¡grafo Ãºnico. O Ã¡rbitro ou o tribunal arbitral decidirÃ¡ no prazo de 10 (dez) dias ou em prazo acordado com as partes, aditarÃ¡ a sentenÃ§a arbitral e notificarÃ¡ as partes na forma do art. 29. (ParÃ¡grafo Ãºnico com redaÃ§Ã£o dada pela Lei nÂº 13.129, de 26/5/2015, publicada no DOU de 27/5/2015, em vigor apÃ³s 60 (sessenta) dias da publicaÃ§Ã£o)",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "31",
+   "label": "Art. 31",
+   "heading": "",
+   "text": "Art. 31. A sentenÃ§a arbitral produz, entre as partes e seus sucessores, os mesmos efeitos da sentenÃ§a proferida pelos Ã³rgÃ£os do Poder JudiciÃ¡rio e, sendo condenatÃ³ria, constitui tÃ­tulo executivo.",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "32",
+   "label": "Art. 32",
+   "heading": "",
+   "text": "Art. 32. Ã‰ nula a sentenÃ§a arbitral se:\nI - for nula a convenÃ§Ã£o de arbitragem; (Inciso com redaÃ§Ã£o dada pela Lei nÂº 13.129, de 26/5/2015, publicada no DOU de 27/5/2015, em vigor apÃ³s 60 (sessenta) dias da publicaÃ§Ã£o)\nII - emanou de quem nÃ£o podia ser Ã¡rbitro;\nIII - nÃ£o contiver os requisitos do art. 26 desta Lei;\nIV - for proferida fora dos limites da convenÃ§Ã£o de arbitragem;\nV - (Revogado pela Lei nÂº 13.129, de 26/5/2015, publicada no DOU de 27/5/2015, em vigor apÃ³s 60 (sessenta) dias da publicaÃ§Ã£o)\nVI - comprovado que foi proferida por prevaricaÃ§Ã£o, concussÃ£o ou corrupÃ§Ã£o passiva;\nVII - proferida fora do prazo, respeitado o disposto no art. 12, inciso III, desta Lei; e\nVIII - forem desrespeitados os princÃ­pios de que trata o art. 21, Â§ 2Â°, desta Lei.",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "33",
+   "label": "Art. 33",
+   "heading": "",
+   "text": "Art. 33. A parte interessada poderÃ¡ pleitear ao Ã³rgÃ£o do Poder JudiciÃ¡rio competente a declaraÃ§Ã£o de nulidade da sentenÃ§a arbitral, nos casos previstos nesta Lei. (\"Caput\" do artigo com redaÃ§Ã£o dada pela Lei nÂº 13.129, de 26/5/2015, publicada no DOU de 27/5/2015, em vigor apÃ³s 60 (sessenta) dias da publicaÃ§Ã£o)\nÂ Â§ 1Âº A demanda para a declaraÃ§Ã£o de nulidade da sentenÃ§a arbitral, parcial ou final, seguirÃ¡ as regras do procedimento comum, previstas na Lei no 5.869, de 11 de janeiro de 1973 (CÃ³digo de Processo Civil), e deverÃ¡ ser proposta no prazo de atÃ© 90 (noventa) dias apÃ³s o recebimento da notificaÃ§Ã£o da respectiva sentenÃ§a, parcial ou final, ou da decisÃ£o do pedido de esclarecimentos. (ParÃ¡grafo com redaÃ§Ã£o dada pela Lei nÂº 13.129, de 26/5/2015, publicada no DOU de 27/5/2015, em vigor apÃ³s 60 (sessenta) dias da publicaÃ§Ã£o)\nÂ§ 2Âº A sentenÃ§a que julgar procedente o pedido declararÃ¡ a nulidade da sentenÃ§a arbitral, nos casos do art. 32, e determinarÃ¡, se for o caso, que o Ã¡rbitro ou o tribunal profira nova sentenÃ§a arbitral. (ParÃ¡grafo com redaÃ§Ã£o dada pela Lei nÂº 13.129, de 26/5/2015, publicada no DOU de 27/5/2015, em vigor apÃ³s 60 (sessenta) dias da publicaÃ§Ã£o)\nÂ§ 3Âº A decretaÃ§Ã£o da nulidade da sentenÃ§a arbitral tambÃ©m poderÃ¡ ser requerida na impugnaÃ§Ã£o ao cumprimento da sentenÃ§a, nos termos dos arts. 525 e seguintes do CÃ³digo de Processo Civil, se houver execuÃ§Ã£o judicial. (ParÃ¡grafo com redaÃ§Ã£o dada pela Lei nÂº 13.105, de 16/3/2015, publicada no DOU de 17/3/2015, em vigor apÃ³s 1 ano da publicaÃ§Ã£o)\nÂ§4Âº A parte interessada poderÃ¡ ingressar em juÃ­zo para requerer a prolaÃ§Ã£o de sentenÃ§a arbitral complementar, se o Ã¡rbitro nÃ£o decidir todos os pedidos submetidos Ã arbitragem. (ParÃ¡grafo acrescido pela Lei nÂº 13.129, de 26/5/2015, publicada no DOU de 27/5/2015, em vigor apÃ³s 60 (sessenta) dias da publicaÃ§Ã£o)\nCAPÃTULO VI\nDO RECONHECIMENTO E EXECUÃ‡ÃƒO DE SENTENÃ‡AS ARBITRAIS ESTRANGEIRAS",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "34",
+   "label": "Art. 34",
+   "heading": "",
+   "text": "Art. 34. A sentenÃ§a arbitral estrangeira serÃ¡ reconhecida ou executada no Brasil de conformidade com os tratados internacionais com eficÃ¡cia no ordenamento interno e, na sua ausÃªncia, estritamente de acordo com os termos desta Lei.\nParÃ¡grafo Ãºnico. Considera-se sentenÃ§a arbitral estrangeira a que tenha sido proferida fora do territÃ³rio nacional.",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "35",
+   "label": "Art. 35",
+   "heading": "",
+   "text": "Art. 35. Para ser reconhecida ou executada no Brasil, a sentenÃ§a arbitral estrangeira estÃ¡ sujeita, unicamente, Ã homologaÃ§Ã£o do Superior Tribunal de JustiÃ§a. (Artigo com redaÃ§Ã£o dada pela Lei nÂº 13.129, de 26/5/2015, publicada no DOU de 27/5/2015, em vigor apÃ³s 60 (sessenta) dias da publicaÃ§Ã£o)",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "36",
+   "label": "Art. 36",
+   "heading": "",
+   "text": "Art. 36. Aplica-se Ã homologaÃ§Ã£o para reconhecimento ou execuÃ§Ã£o de sentenÃ§a arbitral estrangeira, no que couber, o disposto nos arts. 483 e 484 do CÃ³digo de Processo Civil.",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "37",
+   "label": "Art. 37",
+   "heading": "",
+   "text": "Art. 37. A homologaÃ§Ã£o de sentenÃ§a arbitral estrangeira serÃ¡ requerida pela parte interessada, devendo a petiÃ§Ã£o inicial conter as indicaÃ§Ãµes da lei processual, conforme o art. 282 do CÃ³digo de Processo Civil, e ser instruÃ­da, necessariamente, com:\nI - o original da sentenÃ§a arbitral ou uma cÃ³pia devidamente certificada, autenticada pelo consulado brasileiro e acompanhada de traduÃ§Ã£o oficial;\nII - o original da convenÃ§Ã£o de arbitragem ou cÃ³pia devidamente certificada, acompanhada de traduÃ§Ã£o oficial.",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "38",
+   "label": "Art. 38",
+   "heading": "",
+   "text": "Art. 38. Somente poderÃ¡ ser negada a homologaÃ§Ã£o para o reconhecimento ou execuÃ§Ã£o de sentenÃ§a arbitral estrangeira, quando o rÃ©u demonstrar que:\nI - as partes na convenÃ§Ã£o de arbitragem eram incapazes;\nII - a convenÃ§Ã£o de arbitragem nÃ£o era vÃ¡lida segundo a lei a qual as partes a submeteram, ou, na falta de indicaÃ§Ã£o, em virtude da lei do paÃ­s onde a sentenÃ§a arbitral foi proferida;\nIII - nÃ£o foi notificado da designaÃ§Ã£o do Ã¡rbitro ou do procedimento de arbitragem, ou tenha sido violado o princÃ­pio do contraditÃ³rio, impossibilitando a ampla defesa;\nIV - a sentenÃ§a arbitral foi proferida fora dos limites da convenÃ§Ã£o de arbitragem, e nÃ£o foi possÃ­vel separar a parte excedente daquela submetida Ã arbitragem;\nV - a instituiÃ§Ã£o da arbitragem nÃ£o estÃ¡ de acordo com o compromisso arbitral ou clÃ¡usula compromissÃ³ria;\nVI - a sentenÃ§a arbitral nÃ£o se tenha, ainda, tornado obrigatÃ³ria para as partes, tenha sido anulada, ou, ainda, tenha sido suspensa por Ã³rgÃ£o judicial do paÃ­s onde a sentenÃ§a arbitral for prolatada.",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "39",
+   "label": "Art. 39",
+   "heading": "",
+   "text": "Art. 39. A homologaÃ§Ã£o para o reconhecimento ou a execuÃ§Ã£o da sentenÃ§a arbitral estrangeira tambÃ©m serÃ¡ denegada se o Superior Tribunal de JustiÃ§a constatar que: (\"Caput\" do artigo com redaÃ§Ã£o dada pela Lei nÂº 13.129, de 26/5/2015, publicada no DOU de 27/5/2015, em vigor apÃ³s 60 (sessenta) dias da publicaÃ§Ã£o)\nI - segundo a lei brasileira, o objeto do litÃ­gio nÃ£o Ã© suscetÃ­vel de ser resolvido por arbitragem;\nII - a decisÃ£o ofende a ordem pÃºblica nacional.\nParÃ¡grafo Ãºnico. NÃ£o serÃ¡ considerada ofensa Ã ordem pÃºblica nacional a efetivaÃ§Ã£o da citaÃ§Ã£o da parte residente ou domiciliada no Brasil, nos moldes da convenÃ§Ã£o de arbitragem ou da lei processual do paÃ­s onde se realizou a arbitragem, admitindo-se, inclusive, a citaÃ§Ã£o postal com prova inequÃ­voca de recebimento, desde que assegure Ã parte brasileira tempo hÃ¡bil para o exercÃ­cio do direito de defesa.",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "40",
+   "label": "Art. 40",
+   "heading": "",
+   "text": "Art. 40. A denegaÃ§Ã£o da homologaÃ§Ã£o para reconhecimento ou execuÃ§Ã£o de sentenÃ§a arbitral estrangeira por vÃ­cios formais, nÃ£o obsta que a parte interessada renove o pedido, uma vez sanados os vÃ­cios apresentados.\nCAPÃTULO VII\nDISPOSIÃ‡Ã•ES FINAIS",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "41",
+   "label": "Art. 41",
+   "heading": "",
+   "text": "Art. 41. Os arts. 267, inciso VII; 301, inciso IX; e 584, inciso III, do CÃ³digo de Processo Civil passam a ter a seguinte redaÃ§Ã£o:\n\"Art. 267.....................................................................................\n....................................................................................................\nVII - pela convenÃ§Ã£o de arbitragem;\"\n\"Art. 301....................................................................................\n...................................................................................................\nIX - convenÃ§Ã£o de arbitragem;\"\n\"Art. 584...................................................................................\n....................................................................................................\nIII - a sentenÃ§a arbitral e a sentenÃ§a homologatÃ³ria de transaÃ§Ã£o ou de conciliaÃ§Ã£o;\"",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "42",
+   "label": "Art. 42",
+   "heading": "",
+   "text": "Art. 42. O art. 520 do CÃ³digo de Processo Civil passa a ter mais um inciso, com a seguinte redaÃ§Ã£o:\n\"Art. 520....................................................................................\n...................................................................................................\nVI - julgar procedente o pedido de instituiÃ§Ã£o de arbitragem.\"",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "43",
+   "label": "Art. 43",
+   "heading": "",
+   "text": "Art. 43. Esta Lei entrarÃ¡ em vigor sessenta dias apÃ³s a data de sua publicaÃ§Ã£o.",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "44",
+   "label": "Art. 44",
+   "heading": "",
+   "text": "Art. 44. Ficam revogados os arts. 1.037 a 1.048 da Lei nÂ° 3.071, de 1Â° de janeiro de 1916, CÃ³digo Civil Brasileiro; os arts. 101 e 1.072 a 1.102 da Lei nÂ° 5.869, de 11 de janeiro de 1973, CÃ³digo de Processo Civil; e demais disposiÃ§Ãµes em contrÃ¡rio.\nBrasÃ­lia, 23 de setembro de 1996; 175Â° da IndependÃªncia e 108Â° da RepÃºblica.\nFERNANDO HENRIQUE CARDOSO\nNelson A. Jobim",
+   "status": "vigente",
+   "hasHistory": false
+  }
+ ]
+}

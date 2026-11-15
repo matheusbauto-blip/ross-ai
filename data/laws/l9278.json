@@ -1,0 +1,110 @@
+{
+ "id": "l9278",
+ "name": "Lei nº 9.278, de 10 de maio de 1996 (união estável)",
+ "shortName": "Lei da União Estável",
+ "number": "Lei nº 9.278/1996",
+ "type": "lei",
+ "date": "1996-05-10",
+ "url": "https://www.planalto.gov.br/ccivil_03/leis/l9278.htm",
+ "lexml": "urn:lex:br:federal:lei:1996-05-10;9278",
+ "jurisdiction": "Brasil · Federal",
+ "source": "Câmara dos Deputados — Legislação Informatizada (texto atualizado)",
+ "textUrl": "https://www2.camara.leg.br/legin/fed/lei/1996/lei-9278-10-maio-1996-362582-normaatualizada-pl.html",
+ "index": "LexML Brasil (https://www.lexml.gov.br)",
+ "retrievedAt": "2026-11-13T14:08:32.086Z",
+ "sha256": "3227f8019e64b1133d566bb3c063b0153c7aeec48d5104eb5199c362fd7b2076",
+ "bytes": 9962,
+ "articleCount": 11,
+ "vigentes": 8,
+ "revogados": 3,
+ "articles": [
+  {
+   "id": "1",
+   "label": "Art. 1",
+   "heading": "",
+   "text": "Art. 1Âº Ã‰ reconhecida como entidade familiar a convivÃªncia duradoura, pÃºblica e contÃ­nua, de um homem e uma mulher, estabelecida com objetivo de constituiÃ§Ã£o de famÃ­lia.",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "2",
+   "label": "Art. 2",
+   "heading": "",
+   "text": "Art. 2Âº SÃ£o direitos e deveres iguais dos conviventes:\nI - respeito e consideraÃ§Ã£o mÃºtuos;\nII - assistÃªncia moral e material recÃ­proca;\nIII - guarda, sustento e educaÃ§Ã£o dos filhos comuns.",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "3",
+   "label": "Art. 3",
+   "heading": "",
+   "text": "Art. 3Âº (VETADO)",
+   "status": "vetado",
+   "hasHistory": false
+  },
+  {
+   "id": "4",
+   "label": "Art. 4",
+   "heading": "",
+   "text": "Art. 4Âº (VETADO)",
+   "status": "vetado",
+   "hasHistory": false
+  },
+  {
+   "id": "5",
+   "label": "Art. 5",
+   "heading": "",
+   "text": "Art. 5Âº Os bens mÃ³veis e imÃ³veis adquiridos por um ou por ambos os conviventes, na constÃ¢ncia da uniÃ£o estÃ¡vel e a tÃ­tulo oneroso, sÃ£o considerados fruto do trabalho e da colaboraÃ§Ã£o comum, passando a pertencer a ambos, em condomÃ­nio e em partes iguais, salvo estipulaÃ§Ã£o contrÃ¡ria em contrato escrito.\nÂ§ 1Âº Cessa a presunÃ§Ã£o do caput deste artigo se a aquisiÃ§Ã£o patrimonial ocorrer com o produto de bens adquiridos anteriormente ao inÃ­cio da uniÃ£o.\nÂ§ 2Âº A administraÃ§Ã£o do patrimÃ´nio comum dos conviventes compete a ambos, salvo estipulaÃ§Ã£o contrÃ¡ria em contrato escrito.",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "6",
+   "label": "Art. 6",
+   "heading": "",
+   "text": "Art. 6Âº (VETADO)",
+   "status": "vetado",
+   "hasHistory": false
+  },
+  {
+   "id": "7",
+   "label": "Art. 7",
+   "heading": "",
+   "text": "Art. 7Âº Dissolvida a uniÃ£o estÃ¡vel por rescisÃ£o, a assistÃªncia material prevista nesta Lei serÃ¡ prestada por um dos conviventes ao que dela necessitar, a tÃ­tulo de alimentos.\nParÃ¡grafo Ãºnico. Dissolvida a uniÃ£o estÃ¡vel por morte de um dos conviventes, o sobrevivente terÃ¡ direito real de habitaÃ§Ã£o, enquanto viver ou nÃ£o constituir nova uniÃ£o ou casamento, relativamente ao imÃ³vel destinado Ã residÃªncia da famÃ­lia.",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "8",
+   "label": "Art. 8",
+   "heading": "",
+   "text": "Art. 8Âº Os conviventes poderÃ£o, de comum acordo e a qualquer tempo, requerer a conversÃ£o da uniÃ£o estÃ¡vel em casamento, por requerimento ao Oficial do Registro Civil da CircunscriÃ§Ã£o de seu domicÃ­lio.",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "9",
+   "label": "Art. 9",
+   "heading": "",
+   "text": "Art. 9Âº Toda a matÃ©ria relativa Ã uniÃ£o estÃ¡vel Ã© de competÃªncia do juÃ­zo da Vara de FamÃ­lia, assegurado o segredo de justiÃ§a.",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "10",
+   "label": "Art. 10",
+   "heading": "",
+   "text": "Art. 10. Esta Lei entra em vigor na data de sua publicaÃ§Ã£o.",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "11",
+   "label": "Art. 11",
+   "heading": "",
+   "text": "Art. 11. Revogam-se as disposiÃ§Ãµes em contrÃ¡rio.\nBrasÃ­lia, 10 de maio de 1996; 175Âº da IndependÃªncia e 108Âº da RepÃºblica.\nFERNANDO HENRIQUE CARDOSO\nMilton Seligman",
+   "status": "vigente",
+   "hasHistory": false
+  }
+ ]
+}

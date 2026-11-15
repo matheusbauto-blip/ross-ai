@@ -1,0 +1,406 @@
+{
+ "id": "l13140",
+ "name": "Lei nº 13.140, de 26 de junho de 2015 (Lei de Mediação)",
+ "shortName": "Lei de Mediação",
+ "number": "Lei nº 13.140/2015",
+ "type": "lei",
+ "date": "2015-06-26",
+ "url": "https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2015/lei/l13140.htm",
+ "lexml": "urn:lex:br:federal:lei:2015-06-26;13140",
+ "jurisdiction": "Brasil · Federal",
+ "source": "Câmara dos Deputados — Legislação Informatizada (texto atualizado)",
+ "textUrl": "https://www2.camara.leg.br/legin/fed/lei/2015/lei-13140-26-junho-2015-781100-normaatualizada-pl.html",
+ "index": "LexML Brasil (https://www.lexml.gov.br)",
+ "retrievedAt": "2026-11-13T14:08:10.075Z",
+ "sha256": "fd76c437ae24eb158c998dfbf3374c9c3437b701b32e9a2bb06e1741dfb6e326",
+ "bytes": 63893,
+ "articleCount": 48,
+ "vigentes": 48,
+ "revogados": 0,
+ "articles": [
+  {
+   "id": "1",
+   "label": "Art. 1",
+   "heading": "",
+   "text": "Art. 1Âº Esta Lei dispÃµe sobre a mediaÃ§Ã£o como meio de soluÃ§Ã£o de controvÃ©rsias entre particulares e sobre a autocomposiÃ§Ã£o de conflitos no Ã¢mbito da administraÃ§Ã£o pÃºblica.\nParÃ¡grafo Ãºnico. Considera-se mediaÃ§Ã£o a atividade tÃ©cnica exercida por terceiro imparcial sem poder decisÃ³rio, que, escolhido ou aceito pelas partes, as auxilia e estimula a identificar ou desenvolver soluÃ§Ãµes consensuais para a controvÃ©rsia.\nCAPÃTULO I\nDA MEDIAÃ‡ÃƒO\nSeÃ§Ã£o I\nDisposiÃ§Ãµes Gerais",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "2",
+   "label": "Art. 2",
+   "heading": "",
+   "text": "Art. 2Âº A mediaÃ§Ã£o serÃ¡ orientada pelos seguintes princÃ­pios:\nI - imparcialidade do mediador;\nII - isonomia entre as partes;\nIII - oralidade;\nIV - informalidade;\nV - autonomia da vontade das partes;\nVI - busca do consenso;\nVII - confidencialidade;\nVIII - boa-fÃ©.\nÂ§ 1Âº Na hipÃ³tese de existir previsÃ£o contratual de clÃ¡usula de mediaÃ§Ã£o, as partes deverÃ£o comparecer Ã primeira reuniÃ£o de mediaÃ§Ã£o.\nÂ§ 2Âº NinguÃ©m serÃ¡ obrigado a permanecer em procedimento de mediaÃ§Ã£o.",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "3",
+   "label": "Art. 3",
+   "heading": "",
+   "text": "Art. 3Âº Pode ser objeto de mediaÃ§Ã£o o conflito que verse sobre direitos disponÃ­veis ou sobre direitos indisponÃ­veis que admitam transaÃ§Ã£o.\nÂ§ 1Âº A mediaÃ§Ã£o pode versar sobre todo o conflito ou parte dele.\nÂ§ 2Âº O consenso das partes envolvendo direitos indisponÃ­veis, mas transigÃ­veis, deve ser homologado em juÃ­zo, exigida a oitiva do MinistÃ©rio PÃºblico.\nSeÃ§Ã£o II\nDos Mediadores\nSubseÃ§Ã£o I\nDisposiÃ§Ãµes Comuns",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "4",
+   "label": "Art. 4",
+   "heading": "",
+   "text": "Art. 4Âº O mediador serÃ¡ designado pelo tribunal ou escolhido pelas partes.\nÂ§ 1Âº O mediador conduzirÃ¡ o procedimento de comunicaÃ§Ã£o entre as partes, buscando o entendimento e o consenso e facilitando a resoluÃ§Ã£o do conflito.\nÂ§ 2Âº Aos necessitados serÃ¡ assegurada a gratuidade da mediaÃ§Ã£o.",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "5",
+   "label": "Art. 5",
+   "heading": "",
+   "text": "Art. 5Âº Aplicam-se ao mediador as mesmas hipÃ³teses legais de impedimento e suspeiÃ§Ã£o do juiz.\nParÃ¡grafo Ãºnico. A pessoa designada para atuar como mediador tem o dever de revelar Ã s partes, antes da aceitaÃ§Ã£o da funÃ§Ã£o, qualquer fato ou circunstÃ¢ncia que possa suscitar dÃºvida justificada em relaÃ§Ã£o Ã sua imparcialidade para mediar o conflito, oportunidade em que poderÃ¡ ser recusado por qualquer delas.",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "6",
+   "label": "Art. 6",
+   "heading": "",
+   "text": "Art. 6Âº O mediador fica impedido, pelo prazo de um ano, contado do tÃ©rmino da Ãºltima audiÃªncia em que atuou, de assessorar, representar ou patrocinar qualquer das partes.",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "7",
+   "label": "Art. 7",
+   "heading": "",
+   "text": "Art. 7Âº O mediador nÃ£o poderÃ¡ atuar como Ã¡rbitro nem funcionar como testemunha em processos judiciais ou arbitrais pertinentes a conflito em que tenha atuado como mediador.",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "8",
+   "label": "Art. 8",
+   "heading": "",
+   "text": "Art. 8Âº O mediador e todos aqueles que o assessoram no procedimento de mediaÃ§Ã£o, quando no exercÃ­cio de suas funÃ§Ãµes ou em razÃ£o delas, sÃ£o equiparados a servidor pÃºblico, para os efeitos da legislaÃ§Ã£o penal.\nSubseÃ§Ã£o II\nDos Mediadores Extrajudiciais",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "9",
+   "label": "Art. 9",
+   "heading": "",
+   "text": "Art. 9Âº PoderÃ¡ funcionar como mediador extrajudicial qualquer pessoa capaz que tenha a confianÃ§a das partes e seja capacitada para fazer mediaÃ§Ã£o, independentemente de integrar qualquer tipo de conselho, entidade de classe ou associaÃ§Ã£o, ou nele inscrever-se.",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "10",
+   "label": "Art. 10",
+   "heading": "",
+   "text": "Art. 10. As partes poderÃ£o ser assistidas por advogados ou defensores pÃºblicos.\nParÃ¡grafo Ãºnico. Comparecendo uma das partes acompanhada de advogado ou defensor pÃºblico, o mediador suspenderÃ¡ o procedimento, atÃ© que todas estejam devidamente assistidas.\nSubseÃ§Ã£o III\nDos Mediadores Judiciais",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "11",
+   "label": "Art. 11",
+   "heading": "",
+   "text": "Art. 11. PoderÃ¡ atuar como mediador judicial a pessoa capaz, graduada hÃ¡ pelo menos dois anos em curso de ensino superior de instituiÃ§Ã£o reconhecida pelo MinistÃ©rio da EducaÃ§Ã£o e que tenha obtido capacitaÃ§Ã£o em escola ou instituiÃ§Ã£o de formaÃ§Ã£o de mediadores, reconhecida pela Escola Nacional de FormaÃ§Ã£o e AperfeiÃ§oamento de Magistrados - ENFAM ou pelos tribunais, observados os requisitos mÃ­nimos estabelecidos pelo Conselho Nacional de JustiÃ§a em conjunto com o MinistÃ©rio da JustiÃ§a.",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "12",
+   "label": "Art. 12",
+   "heading": "",
+   "text": "Art. 12. Os tribunais criarÃ£o e manterÃ£o cadastros atualizados dos mediadores habilitados e autorizados a atuar em mediaÃ§Ã£o judicial.\nÂ§ 1Âº A inscriÃ§Ã£o no cadastro de mediadores judiciais serÃ¡ requerida pelo interessado ao tribunal com jurisdiÃ§Ã£o na Ã¡rea em que pretenda exercer a mediaÃ§Ã£o.\nÂ§ 2Âº Os tribunais regulamentarÃ£o o processo de inscriÃ§Ã£o e desligamento de seus mediadores.",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "13",
+   "label": "Art. 13",
+   "heading": "",
+   "text": "Art. 13. A remuneraÃ§Ã£o devida aos mediadores judiciais serÃ¡ fixada pelos tribunais e custeada pelas partes, observado o disposto no Â§ 2Âº do art. 4Âº desta Lei.\nSeÃ§Ã£o III\nDo Procedimento de MediaÃ§Ã£o\nSubseÃ§Ã£o I\nDisposiÃ§Ãµes Comuns",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "14",
+   "label": "Art. 14",
+   "heading": "",
+   "text": "Art. 14. No inÃ­cio da primeira reuniÃ£o de mediaÃ§Ã£o, e sempre que julgar necessÃ¡rio, o mediador deverÃ¡ alertar as partes acerca das regras de confidencialidade aplicÃ¡veis ao procedimento.",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "15",
+   "label": "Art. 15",
+   "heading": "",
+   "text": "Art. 15. A requerimento das partes ou do mediador, e com anuÃªncia daquelas, poderÃ£o ser admitidos outros mediadores para funcionarem no mesmo procedimento, quando isso for recomendÃ¡vel em razÃ£o da natureza e da complexidade do conflito.",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "16",
+   "label": "Art. 16",
+   "heading": "",
+   "text": "Art. 16. Ainda que haja processo arbitral ou judicial em curso, as partes poderÃ£o submeter-se Ã mediaÃ§Ã£o, hipÃ³tese em que requererÃ£o ao juiz ou Ã¡rbitro a suspensÃ£o do processo por prazo suficiente para a soluÃ§Ã£o consensual do litÃ­gio.\nÂ§ 1Âº Ã‰ irrecorrÃ­vel a decisÃ£o que suspende o processo nos termos requeridos de comum acordo pelas partes.\nÂ§ 2Âº A suspensÃ£o do processo nÃ£o obsta a concessÃ£o de medidas de urgÃªncia pelo juiz ou pelo Ã¡rbitro.",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "17",
+   "label": "Art. 17",
+   "heading": "",
+   "text": "Art. 17. Considera-se instituÃ­da a mediaÃ§Ã£o na data para a qual for marcada a primeira reuniÃ£o de mediaÃ§Ã£o.\nParÃ¡grafo Ãºnico. Enquanto transcorrer o procedimento de mediaÃ§Ã£o, ficarÃ¡ suspenso o prazo prescricional.",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "18",
+   "label": "Art. 18",
+   "heading": "",
+   "text": "Art. 18. Iniciada a mediaÃ§Ã£o, as reuniÃµes posteriores com a presenÃ§a das partes somente poderÃ£o ser marcadas com a sua anuÃªncia.",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "19",
+   "label": "Art. 19",
+   "heading": "",
+   "text": "Art. 19. No desempenho de sua funÃ§Ã£o, o mediador poderÃ¡ reunir-se com as partes, em conjunto ou separadamente, bem como solicitar das partes as informaÃ§Ãµes que entender necessÃ¡rias para facilitar o entendimento entre aquelas.",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "20",
+   "label": "Art. 20",
+   "heading": "",
+   "text": "Art. 20. O procedimento de mediaÃ§Ã£o serÃ¡ encerrado com a lavratura do seu termo final, quando for celebrado acordo ou quando nÃ£o se justificarem novos esforÃ§os para a obtenÃ§Ã£o de consenso, seja por declaraÃ§Ã£o do mediador nesse sentido ou por manifestaÃ§Ã£o de qualquer das partes.\nParÃ¡grafo Ãºnico. O termo final de mediaÃ§Ã£o, na hipÃ³tese de celebraÃ§Ã£o de acordo, constitui tÃ­tulo executivo extrajudicial e, quando homologado judicialmente, tÃ­tulo executivo judicial.\nSubseÃ§Ã£o II\nDa MediaÃ§Ã£o Extrajudicial",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "21",
+   "label": "Art. 21",
+   "heading": "",
+   "text": "Art. 21. O convite para iniciar o procedimento de mediaÃ§Ã£o extrajudicial poderÃ¡ ser feito por qualquer meio de comunicaÃ§Ã£o e deverÃ¡ estipular o escopo proposto para a negociaÃ§Ã£o, a data e o local da primeira reuniÃ£o.\nParÃ¡grafo Ãºnico. O convite formulado por uma parte Ã outra considerar-se-Ã¡ rejeitado se nÃ£o for respondido em atÃ© trinta dias da data de seu recebimento.",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "22",
+   "label": "Art. 22",
+   "heading": "",
+   "text": "Art. 22. A previsÃ£o contratual de mediaÃ§Ã£o deverÃ¡ conter, no mÃ­nimo:\nI - prazo mÃ­nimo e mÃ¡ximo para a realizaÃ§Ã£o da primeira reuniÃ£o de mediaÃ§Ã£o, contado a partir da data de recebimento do convite;\nII - local da primeira reuniÃ£o de mediaÃ§Ã£o;\nIII - critÃ©rios de escolha do mediador ou equipe de mediaÃ§Ã£o;\nIV - penalidade em caso de nÃ£o comparecimento da parte convidada Ã primeira reuniÃ£o de mediaÃ§Ã£o.\nÂ§ 1Âº A previsÃ£o contratual pode substituir a especificaÃ§Ã£o dos itens acima enumerados pela indicaÃ§Ã£o de regulamento, publicado por instituiÃ§Ã£o idÃ´nea prestadora de serviÃ§os de mediaÃ§Ã£o, no qual constem critÃ©rios claros para a escolha do mediador e realizaÃ§Ã£o da primeira reuniÃ£o de mediaÃ§Ã£o.\nÂ§ 2Âº NÃ£o havendo previsÃ£o contratual completa, deverÃ£o ser observados os seguintes critÃ©rios para a realizaÃ§Ã£o da primeira reuniÃ£o de mediaÃ§Ã£o:\nI - prazo mÃ­nimo de dez dias Ãºteis e prazo mÃ¡ximo de trÃªs meses, contados a partir do recebimento do convite;\nII - local adequado a uma reuniÃ£o que possa envolver informaÃ§Ãµes confidenciais;\nIII - lista de cinco nomes, informaÃ§Ãµes de contato e referÃªncias profissionais de mediadores capacitados; a parte convidada poderÃ¡ escolher, expressamente, qualquer um dos cinco mediadores e, caso a parte convidada nÃ£o se manifeste, considerar-se-Ã¡ aceito o primeiro nome da lista;\nIV - o nÃ£o comparecimento da parte convidada Ã primeira reuniÃ£o de mediaÃ§Ã£o acarretarÃ¡ a assunÃ§Ã£o por parte desta de cinquenta por cento das custas e honorÃ¡rios sucumbenciais caso venha a ser vencedora em procedimento arbitral ou judicial posterior, que envolva o escopo da mediaÃ§Ã£o para a qual foi convidada.\nÂ§ 3Âº Nos litÃ­gios decorrentes de contratos comerciais ou societÃ¡rios que nÃ£o contenham clÃ¡usula de mediaÃ§Ã£o, o mediador extrajudicial somente cobrarÃ¡ por seus serviÃ§os caso as partes decidam assinar o termo inicial de mediaÃ§Ã£o e permanecer, voluntariamente, no procedimento de mediaÃ§Ã£o.",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "23",
+   "label": "Art. 23",
+   "heading": "",
+   "text": "Art. 23. Se, em previsÃ£o contratual de clÃ¡usula de mediaÃ§Ã£o, as partes se comprometerem a nÃ£o iniciar procedimento arbitral ou processo judicial durante certo prazo ou atÃ© o implemento de determinada condiÃ§Ã£o, o Ã¡rbitro ou o juiz suspenderÃ¡ o curso da arbitragem ou da aÃ§Ã£o pelo prazo previamente acordado ou atÃ© o implemento dessa condiÃ§Ã£o.\nParÃ¡grafo Ãºnico. O disposto no caput nÃ£o se aplica Ã s medidas de urgÃªncia em que o acesso ao Poder JudiciÃ¡rio seja necessÃ¡rio para evitar o perecimento de direito.\nSubseÃ§Ã£o III\nDa MediaÃ§Ã£o Judicial",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "24",
+   "label": "Art. 24",
+   "heading": "",
+   "text": "Art. 24. Os tribunais criarÃ£o centros judiciÃ¡rios de soluÃ§Ã£o consensual de conflitos, responsÃ¡veis pela realizaÃ§Ã£o de sessÃµes e audiÃªncias de conciliaÃ§Ã£o e mediaÃ§Ã£o, prÃ©-processuais e processuais, e pelo desenvolvimento de programas destinados a auxiliar, orientar e estimular a autocomposiÃ§Ã£o.\nParÃ¡grafo Ãºnico. A composiÃ§Ã£o e a organizaÃ§Ã£o do centro serÃ£o definidas pelo respectivo tribunal, observadas as normas do Conselho Nacional de JustiÃ§a.",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "25",
+   "label": "Art. 25",
+   "heading": "",
+   "text": "Art. 25. Na mediaÃ§Ã£o judicial, os mediadores nÃ£o estarÃ£o sujeitos Ã prÃ©via aceitaÃ§Ã£o das partes, observado o disposto no art. 5Âº desta Lei.",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "26",
+   "label": "Art. 26",
+   "heading": "",
+   "text": "Art. 26. As partes deverÃ£o ser assistidas por advogados ou defensores pÃºblicos, ressalvadas as hipÃ³teses previstas nas Leis nÂºs 9.099, de 26 de setembro de 1995, e 10.259, de 12 de julho de 2001.\nParÃ¡grafo Ãºnico. Aos que comprovarem insuficiÃªncia de recursos serÃ¡ assegurada assistÃªncia pela Defensoria PÃºblica.",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "27",
+   "label": "Art. 27",
+   "heading": "",
+   "text": "Art. 27. Se a petiÃ§Ã£o inicial preencher os requisitos essenciais e nÃ£o for o caso de improcedÃªncia liminar do pedido, o juiz designarÃ¡ audiÃªncia de mediaÃ§Ã£o.",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "28",
+   "label": "Art. 28",
+   "heading": "",
+   "text": "Art. 28. O procedimento de mediaÃ§Ã£o judicial deverÃ¡ ser concluÃ­do em atÃ© sessenta dias, contados da primeira sessÃ£o, salvo quando as partes, de comum acordo, requererem sua prorrogaÃ§Ã£o.\nParÃ¡grafo Ãºnico. Se houver acordo, os autos serÃ£o encaminhados ao juiz, que determinarÃ¡ o arquivamento do processo e, desde que requerido pelas partes, homologarÃ¡ o acordo, por sentenÃ§a, e o termo final da mediaÃ§Ã£o e determinarÃ¡ o arquivamento do processo.",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "29",
+   "label": "Art. 29",
+   "heading": "",
+   "text": "Art. 29. Solucionado o conflito pela mediaÃ§Ã£o antes da citaÃ§Ã£o do rÃ©u, nÃ£o serÃ£o devidas custas judiciais finais.\nSeÃ§Ã£o IV\nDa Confidencialidade e suas ExceÃ§Ãµes",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "30",
+   "label": "Art. 30",
+   "heading": "",
+   "text": "Art. 30. Toda e qualquer informaÃ§Ã£o relativa ao procedimento de mediaÃ§Ã£o serÃ¡ confidencial em relaÃ§Ã£o a terceiros, nÃ£o podendo ser revelada sequer em processo arbitral ou judicial salvo se as partes expressamente decidirem de forma diversa ou quando sua divulgaÃ§Ã£o for exigida por lei ou necessÃ¡ria para cumprimento de acordo obtido pela mediaÃ§Ã£o.\nÂ§ 1Âº O dever de confidencialidade aplica-se ao mediador, Ã s partes, a seus prepostos, advogados, assessores tÃ©cnicos e a outras pessoas de sua confianÃ§a que tenham, direta ou indiretamente, participado do procedimento de mediaÃ§Ã£o, alcanÃ§ando:\nI - declaraÃ§Ã£o, opiniÃ£o, sugestÃ£o, promessa ou proposta formulada por uma parte Ã outra na busca de entendimento para o conflito;\nII - reconhecimento de fato por qualquer das partes no curso do procedimento de mediaÃ§Ã£o;\nIII - manifestaÃ§Ã£o de aceitaÃ§Ã£o de proposta de acordo apresentada pelo mediador;\nIV - documento preparado unicamente para os fins do procedimento de mediaÃ§Ã£o.\nÂ§ 2Âº A prova apresentada em desacordo com o disposto neste artigo nÃ£o serÃ¡ admitida em processo arbitral ou judicial.\nÂ§ 3Âº NÃ£o estÃ¡ abrigada pela regra de confidencialidade a informaÃ§Ã£o relativa Ã ocorrÃªncia de crime de aÃ§Ã£o pÃºblica.\nÂ§ 4Âº A regra da confidencialidade nÃ£o afasta o dever de as pessoas discriminadas no caput prestarem informaÃ§Ãµes Ã administraÃ§Ã£o tributÃ¡ria apÃ³s o termo final da mediaÃ§Ã£o, aplicando-se aos seus servidores a obrigaÃ§Ã£o de manterem sigilo das informaÃ§Ãµes compartilhadas nos termos do art. 198 da Lei nÂº 5.172, de 25 de outubro de 1966 - CÃ³digo TributÃ¡rio Nacional.",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "31",
+   "label": "Art. 31",
+   "heading": "",
+   "text": "Art. 31. SerÃ¡ confidencial a informaÃ§Ã£o prestada por uma parte em sessÃ£o privada, nÃ£o podendo o mediador revelÃ¡-la Ã s demais, exceto se expressamente autorizado.\nCAPÃTULO II\nDA AUTOCOMPOSIÃ‡ÃƒO DE CONFLITOS EM QUE FOR\nSeÃ§Ã£o I\nDisposiÃ§Ãµes Comuns",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "32",
+   "label": "Art. 32",
+   "heading": "PARTE PESSOA JURÃDICA DE DIREITO PÃšBLICO",
+   "text": "Art. 32. A UniÃ£o, os Estados, o Distrito Federal e os MunicÃ­pios poderÃ£o criar cÃ¢maras de prevenÃ§Ã£o e resoluÃ§Ã£o administrativa de conflitos, no Ã¢mbito dos respectivos Ã³rgÃ£os da Advocacia PÃºblica, onde houver, com competÃªncia para:\nI - dirimir conflitos entre Ã³rgÃ£os e entidades da administraÃ§Ã£o pÃºblica;\nII - avaliar a admissibilidade dos pedidos de resoluÃ§Ã£o de conflitos, por meio de composiÃ§Ã£o, no caso de controvÃ©rsia entre particular e pessoa jurÃ­dica de direito pÃºblico;\nIII - promover, quando couber, a celebraÃ§Ã£o de termo de ajustamento de conduta.\nÂ§ 1Âº O modo de composiÃ§Ã£o e funcionamento das cÃ¢maras de que trata o caput serÃ¡ estabelecido em regulamento de cada ente federado.\nÂ§ 2Âº A submissÃ£o do conflito Ã s cÃ¢maras de que trata o caput Ã© facultativa e serÃ¡ cabÃ­vel apenas nos casos previstos no regulamento do respectivo ente federado.\nÂ§ 3Âº Se houver consenso entre as partes, o acordo serÃ¡ reduzido a termo e constituirÃ¡ tÃ­tulo executivo extrajudicial.\nÂ§ 4Âº NÃ£o se incluem na competÃªncia dos Ã³rgÃ£os mencionados no caput deste artigo as controvÃ©rsias que somente possam ser resolvidas por atos ou concessÃ£o de direitos sujeitos a autorizaÃ§Ã£o do Poder Legislativo.\nÂ§ 5Âº Compreendem-se na competÃªncia das cÃ¢maras de que trata o caput a prevenÃ§Ã£o e a resoluÃ§Ã£o de conflitos que envolvam equilÃ­brio econÃ´mico-financeiro de contratos celebrados pela administraÃ§Ã£o com particulares.",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "33",
+   "label": "Art. 33",
+   "heading": "PARTE PESSOA JURÃDICA DE DIREITO PÃšBLICO",
+   "text": "Art. 33. Enquanto nÃ£o forem criadas as cÃ¢maras de mediaÃ§Ã£o, os conflitos poderÃ£o ser dirimidos nos termos do procedimento de mediaÃ§Ã£o previsto na SubseÃ§Ã£o I da SeÃ§Ã£o III do CapÃ­tulo I desta Lei.\nParÃ¡grafo Ãºnico. A Advocacia PÃºblica da UniÃ£o, dos Estados, do Distrito Federal e dos MunicÃ­pios, onde houver, poderÃ¡ instaurar, de ofÃ­cio ou mediante provocaÃ§Ã£o, procedimento de mediaÃ§Ã£o coletiva de conflitos relacionados Ã prestaÃ§Ã£o de serviÃ§os pÃºblicos.",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "34",
+   "label": "Art. 34",
+   "heading": "PARTE PESSOA JURÃDICA DE DIREITO PÃšBLICO",
+   "text": "Art. 34. A instauraÃ§Ã£o de procedimento administrativo para a resoluÃ§Ã£o consensual de conflito no Ã¢mbito da administraÃ§Ã£o pÃºblica suspende a prescriÃ§Ã£o.\nÂ§ 1Âº Considera-se instaurado o procedimento quando o Ã³rgÃ£o ou entidade pÃºblica emitir juÃ­zo de admissibilidade, retroagindo a suspensÃ£o da prescriÃ§Ã£o Ã data de formalizaÃ§Ã£o do pedido de resoluÃ§Ã£o consensual do conflito.\nÂ§ 2Âº Em se tratando de matÃ©ria tributÃ¡ria, a suspensÃ£o da prescriÃ§Ã£o deverÃ¡ observar o disposto na Lei nÂº 5.172, de 25 de outubro de 1966 - CÃ³digo TributÃ¡rio Nacional.\nSeÃ§Ã£o II\nDos Conflitos Envolvendo a AdministraÃ§Ã£o PÃºblica Federal Direta, suas Autarquias e FundaÃ§Ãµes",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "35",
+   "label": "Art. 35",
+   "heading": "PARTE PESSOA JURÃDICA DE DIREITO PÃšBLICO",
+   "text": "Art. 35. As controvÃ©rsias jurÃ­dicas que envolvam a administraÃ§Ã£o pÃºblica federal direta, suas autarquias e fundaÃ§Ãµes poderÃ£o ser objeto de transaÃ§Ã£o por adesÃ£o, com fundamento em:\nI - autorizaÃ§Ã£o do Advogado-Geral da UniÃ£o, com base na jurisprudÃªncia pacÃ­fica do Supremo Tribunal Federal ou de tribunais superiores; ou\nII - parecer do Advogado-Geral da UniÃ£o, aprovado pelo Presidente da RepÃºblica.\nÂ§ 1Âº Os requisitos e as condiÃ§Ãµes da transaÃ§Ã£o por adesÃ£o serÃ£o definidos em resoluÃ§Ã£o administrativa prÃ³pria.\nÂ§ 2Âº Ao fazer o pedido de adesÃ£o, o interessado deverÃ¡ juntar prova de atendimento aos requisitos e Ã s condiÃ§Ãµes estabelecidos na resoluÃ§Ã£o administrativa.\nÂ§ 3Âº A resoluÃ§Ã£o administrativa terÃ¡ efeitos gerais e serÃ¡ aplicada aos casos idÃªnticos, tempestivamente habilitados mediante pedido de adesÃ£o, ainda que solucione apenas parte da controvÃ©rsia.\nÂ§ 4Âº A adesÃ£o implicarÃ¡ renÃºncia do interessado ao direito sobre o qual se fundamenta a aÃ§Ã£o ou o recurso, eventualmente pendentes, de natureza administrativa ou judicial, no que tange aos pontos compreendidos pelo objeto da resoluÃ§Ã£o administrativa.\nÂ§ 5Âº Se o interessado for parte em processo judicial inaugurado por aÃ§Ã£o coletiva, a renÃºncia ao direito sobre o qual se fundamenta a aÃ§Ã£o deverÃ¡ ser expressa, mediante petiÃ§Ã£o dirigida ao juiz da causa.\nÂ§ 6Âº A formalizaÃ§Ã£o de resoluÃ§Ã£o administrativa destinada Ã transaÃ§Ã£o por adesÃ£o nÃ£o implica a renÃºncia tÃ¡cita Ã prescriÃ§Ã£o nem sua interrupÃ§Ã£o ou suspensÃ£o.",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "36",
+   "label": "Art. 36",
+   "heading": "PARTE PESSOA JURÃDICA DE DIREITO PÃšBLICO",
+   "text": "Art. 36. No caso de conflitos que envolvam controvÃ©rsia jurÃ­dica entre Ã³rgÃ£os ou entidades de direito pÃºblico que integram a administraÃ§Ã£o pÃºblica federal, a Advocacia-Geral da UniÃ£o deverÃ¡ realizar composiÃ§Ã£o extrajudicial do conflito, observados os procedimentos previstos em ato do Advogado-Geral da UniÃ£o.\nÂ§ 1Âº Na hipÃ³tese do caput, se nÃ£o houver acordo quanto Ã controvÃ©rsia jurÃ­dica, caberÃ¡ ao Advogado-Geral da UniÃ£o dirimi-la, com fundamento na legislaÃ§Ã£o afeta.\nÂ§ 2Âº Nos casos em que a resoluÃ§Ã£o da controvÃ©rsia implicar o reconhecimento da existÃªncia de crÃ©ditos da UniÃ£o, de suas autarquias e fundaÃ§Ãµes em face de pessoas jurÃ­dicas de direito pÃºblico federais, a Advocacia-Geral da UniÃ£o poderÃ¡ solicitar ao MinistÃ©rio do Planejamento, OrÃ§amento e GestÃ£o a adequaÃ§Ã£o orÃ§amentÃ¡ria para quitaÃ§Ã£o das dÃ­vidas reconhecidas como legÃ­timas.\nÂ§ 3Âº A composiÃ§Ã£o extrajudicial do conflito nÃ£o afasta a apuraÃ§Ã£o de responsabilidade do agente pÃºblico que deu causa Ã dÃ­vida, sempre que se verificar que sua aÃ§Ã£o ou omissÃ£o constitui, em tese, infraÃ§Ã£o disciplinar.\nÂ§ 4Âº Nas hipÃ³teses em que a matÃ©ria objeto do litÃ­gio esteja sendo discutida em aÃ§Ã£o de improbidade administrativa ou sobre ela haja decisÃ£o do Tribunal de Contas da UniÃ£o, a conciliaÃ§Ã£o de que trata o caput dependerÃ¡ da anuÃªncia expressa do juiz da causa ou do Ministro Relator.",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "37",
+   "label": "Art. 37",
+   "heading": "PARTE PESSOA JURÃDICA DE DIREITO PÃšBLICO",
+   "text": "Art. 37. Ã‰ facultado aos Estados, ao Distrito Federal e aos MunicÃ­pios, suas autarquias e fundaÃ§Ãµes pÃºblicas, bem como Ã s empresas pÃºblicas e sociedades de economia mista federais, submeter seus litÃ­gios com Ã³rgÃ£os ou entidades da administraÃ§Ã£o pÃºblica federal Ã Advocacia-Geral da UniÃ£o, para fins de composiÃ§Ã£o extrajudicial do conflito.",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "38",
+   "label": "Art. 38",
+   "heading": "PARTE PESSOA JURÃDICA DE DIREITO PÃšBLICO",
+   "text": "Art. 38. Nos casos em que a controvÃ©rsia jurÃ­dica seja relativa a tributos administrados pela Secretaria da Receita Federal do Brasil ou a crÃ©ditos inscritos em dÃ­vida ativa da UniÃ£o:\nI - nÃ£o se aplicam as disposiÃ§Ãµes dos incisos II e III do caput do art. 32;\nII - as empresas pÃºblicas, sociedades de economia mista e suas subsidiÃ¡rias que explorem atividade econÃ´mica de produÃ§Ã£o ou comercializaÃ§Ã£o de bens ou de prestaÃ§Ã£o de serviÃ§os em regime de concorrÃªncia nÃ£o poderÃ£o exercer a faculdade prevista no art. 37;\nIII - quando forem partes as pessoas a que alude o caput do art. 36:\na) a submissÃ£o do conflito Ã composiÃ§Ã£o extrajudicial pela Advocacia-Geral da UniÃ£o implica renÃºncia do direito de recorrer ao Conselho Administrativo de Recursos Fiscais;\nb) a reduÃ§Ã£o ou o cancelamento do crÃ©dito dependerÃ¡ de manifestaÃ§Ã£o conjunta do Advogado-Geral da UniÃ£o e do Ministro de Estado da Fazenda.Â\nParÃ¡grafo Ãºnico. O disposto neste artigo nÃ£o afasta a competÃªncia do Advogado-Geral da UniÃ£o prevista nos incisos VI, X e XI do art. 4Âº da Lei Complementar nÂº 73, de 10 de fevereiro de 1993, e na Lei nÂº 9.469, de 10 de julho de 1997. (ParÃ¡grafo Ãºnico com redaÃ§Ã£o dada pela Lei nÂº 13.327, de 29/7/2016, produzindo efeitos a partir de 1/8/2016)",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "39",
+   "label": "Art. 39",
+   "heading": "PARTE PESSOA JURÃDICA DE DIREITO PÃšBLICO",
+   "text": "Art. 39. A propositura de aÃ§Ã£o judicial em que figurem concomitantemente nos polos ativo e passivo Ã³rgÃ£os ou entidades de direito pÃºblico que integrem a administraÃ§Ã£o pÃºblica federal deverÃ¡ ser previamente autorizada pelo Advogado-Geral da UniÃ£o.",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "40",
+   "label": "Art. 40",
+   "heading": "PARTE PESSOA JURÃDICA DE DIREITO PÃšBLICO",
+   "text": "Art. 40. Os servidores e empregados pÃºblicos que participarem do processo de composiÃ§Ã£o extrajudicial do conflito, somente poderÃ£o ser responsabilizados civil, administrativa ou criminalmente quando, mediante dolo ou fraude, receberem qualquer vantagem patrimonial indevida, permitirem ou facilitarem sua recepÃ§Ã£o por terceiro, ou para tal concorrerem.\nCAPÃTULO III\nDISPOSIÃ‡Ã•ES FINAIS",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "41",
+   "label": "Art. 41",
+   "heading": "PARTE PESSOA JURÃDICA DE DIREITO PÃšBLICO",
+   "text": "Art. 41. A Escola Nacional de MediaÃ§Ã£o e ConciliaÃ§Ã£o, no Ã¢mbito do MinistÃ©rio da JustiÃ§a, poderÃ¡ criar banco de dados sobre boas prÃ¡ticas em mediaÃ§Ã£o, bem como manter relaÃ§Ã£o de mediadores e de instituiÃ§Ãµes de mediaÃ§Ã£o.",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "42",
+   "label": "Art. 42",
+   "heading": "PARTE PESSOA JURÃDICA DE DIREITO PÃšBLICO",
+   "text": "Art. 42. Aplica-se esta Lei, no que couber, Ã s outras formas consensuais de resoluÃ§Ã£o de conflitos, tais como mediaÃ§Ãµes comunitÃ¡rias e escolares, e Ã quelas levadas a efeito nas serventias extrajudiciais, desde que no Ã¢mbito de suas competÃªncias.\nParÃ¡grafo Ãºnico. A mediaÃ§Ã£o nas relaÃ§Ãµes de trabalho serÃ¡ regulada por lei prÃ³pria.",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "43",
+   "label": "Art. 43",
+   "heading": "PARTE PESSOA JURÃDICA DE DIREITO PÃšBLICO",
+   "text": "Art. 43. Os Ã³rgÃ£os e entidades da administraÃ§Ã£o pÃºblica poderÃ£o criar cÃ¢maras para a resoluÃ§Ã£o de conflitos entre particulares, que versem sobre atividades por eles reguladas ou supervisionadas.",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "44",
+   "label": "Art. 44",
+   "heading": "PARTE PESSOA JURÃDICA DE DIREITO PÃšBLICO",
+   "text": "Art. 44. Os arts. 1Âº e 2Âº da Lei nÂº 9.469, de 10 de julho de 1997, passam a vigorar com a seguinte redaÃ§Ã£o:\n\"Art. 1Âº O Advogado-Geral da UniÃ£o, diretamente ou mediante delegaÃ§Ã£o, e os dirigentes mÃ¡ximos das empresas pÃºblicas federais, em conjunto com o dirigente estatutÃ¡rio da Ã¡rea afeta ao assunto, poderÃ£o autorizar a realizaÃ§Ã£o de acordos ou transaÃ§Ãµes para prevenir ou terminar litÃ­gios, inclusive os judiciais.\nÂ§ 1Âº PoderÃ£o ser criadas cÃ¢maras especializadas, compostas por servidores pÃºblicos ou empregados pÃºblicos efetivos, com o objetivo de analisar e formular propostas de acordos ou transaÃ§Ãµes.\nÂ§ 3Âº Regulamento disporÃ¡ sobre a forma de composiÃ§Ã£o das cÃ¢maras de que trata o Â§ 1Âº, que deverÃ£o ter como integrante pelo menos um membro efetivo da Advocacia-Geral da UniÃ£o ou, no caso das empresas pÃºblicas, um assistente jurÃ­dico ou ocupante de funÃ§Ã£o equivalente.\nÂ§ 4Âº Quando o litÃ­gio envolver valores superiores aos fixados em regulamento, o acordo ou a transaÃ§Ã£o, sob pena de nulidade, dependerÃ¡ de prÃ©via e expressa autorizaÃ§Ã£o do Advogado-Geral da UniÃ£o e do Ministro de Estado a cuja Ã¡rea de competÃªncia estiver afeto o assunto, ou ainda do Presidente da CÃ¢mara dos Deputados, do Senado Federal, do Tribunal de Contas da UniÃ£o, de Tribunal ou Conselho, ou do Procurador-Geral da RepÃºblica, no caso de interesse dos Ã³rgÃ£os dos Poderes Legislativo e JudiciÃ¡rio ou do MinistÃ©rio PÃºblico da UniÃ£o, excluÃ­das as empresas pÃºblicas federais nÃ£o dependentes, que necessitarÃ£o apenas de prÃ©via e expressa autorizaÃ§Ã£o dos dirigentes de que trata o caput.\nÂ§ 5Âº Na transaÃ§Ã£o ou acordo celebrado diretamente pela parte ou por intermÃ©dio de procurador para extinguir ou encerrar processo judicial, inclusive os casos de extensÃ£o administrativa de pagamentos postulados em juÃ­zo, as partes poderÃ£o definir a responsabilidade de cada uma pelo pagamento dos honorÃ¡rios dos respectivos advogados.\" (NR)\n\"Art. 2Âº O Procurador-Geral da UniÃ£o, o Procurador-Geral Federal, o Procurador-Geral do Banco Central do Brasil e os dirigentes das empresas pÃºblicas federais mencionadas no caput do art. 1Âº poderÃ£o autorizar, diretamente ou mediante delegaÃ§Ã£o, a realizaÃ§Ã£o de acordos para prevenir ou terminar, judicial ou extrajudicialmente, litÃ­gio que envolver valores inferiores aos fixados em regulamento.\nÂ§ 1Âº No caso das empresas pÃºblicas federais, a delegaÃ§Ã£o Ã© restrita a Ã³rgÃ£o colegiado formalmente constituÃ­do, composto por pelo menos um dirigente estatutÃ¡rio.\nÂ§ 2Âº O acordo de que trata o caput poderÃ¡ consistir no pagamento do dÃ©bito em parcelas mensais e sucessivas, atÃ© o limite mÃ¡ximo de sessenta.\nÂ§ 3Âº O valor de cada prestaÃ§Ã£o mensal, por ocasiÃ£o do pagamento, serÃ¡ acrescido de juros equivalentes Ã taxa referencial do Sistema Especial de LiquidaÃ§Ã£o e de CustÃ³dia - SELIC para tÃ­tulos federais, acumulada mensalmente, calculados a partir do mÃªs subsequente ao da consolidaÃ§Ã£o atÃ© o mÃªs anterior ao do pagamento e de um por cento relativamente ao mÃªs em que o pagamento estiver sendo efetuado.\nÂ§ 4Âº Inadimplida qualquer parcela, apÃ³s trinta dias, instaurar-se-Ã¡ o processo de execuÃ§Ã£o ou nele prosseguir-se-Ã¡, pelo saldo.\"(NR)",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "45",
+   "label": "Art. 45",
+   "heading": "PARTE PESSOA JURÃDICA DE DIREITO PÃšBLICO",
+   "text": "Art. 45. O Decreto nÂº 70.235, de 6 de marÃ§o de 1972, passa a vigorar acrescido do seguinte art. 14-A:\n\"Art. 14-A. No caso de determinaÃ§Ã£o e exigÃªncia de crÃ©ditos tributÃ¡rios da UniÃ£o cujo sujeito passivo seja Ã³rgÃ£o ou entidade de direito pÃºblico da administraÃ§Ã£o pÃºblica federal, a submissÃ£o do litÃ­gio Ã composiÃ§Ã£o extrajudicial pela Advocacia-Geral da UniÃ£o Ã© considerada reclamaÃ§Ã£o, para fins do disposto no inciso III do art. 151 da Lei nÂº 5.172, de 25 de outubro de 1966 - CÃ³digo TributÃ¡rio Nacional.\"",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "46",
+   "label": "Art. 46",
+   "heading": "PARTE PESSOA JURÃDICA DE DIREITO PÃšBLICO",
+   "text": "Art. 46. A mediaÃ§Ã£o poderÃ¡ ser feita pela internet ou por outro meio de comunicaÃ§Ã£o que permita a transaÃ§Ã£o Ã distÃ¢ncia, desde que as partes estejam de acordo.\nParÃ¡grafo Ãºnico. Ã‰ facultado Ã parte domiciliada no exterior submeter-se Ã mediaÃ§Ã£o segundo as regras estabelecidas nesta Lei.",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "47",
+   "label": "Art. 47",
+   "heading": "PARTE PESSOA JURÃDICA DE DIREITO PÃšBLICO",
+   "text": "Art. 47. Esta Lei entra em vigor apÃ³s decorridos cento e oitenta dias de sua publicaÃ§Ã£o oficial.",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "48",
+   "label": "Art. 48",
+   "heading": "PARTE PESSOA JURÃDICA DE DIREITO PÃšBLICO",
+   "text": "Art. 48. Revoga-se o Â§ 2Âº do art. 6Âº da Lei nÂº 9.469, de 10 de julho de 1997.\nBrasÃ­lia, 26 de junho de 2015; 194Âº da IndependÃªncia e 127Âº da RepÃºblica.\nDILMA ROUSSEFF\nJosÃ© Eduardo Cardozo\nJoaquim Vieira Ferreira Levy\nNelson Barbosa\nLuÃ­s InÃ¡cio Lucena Adams",
+   "status": "vigente",
+   "hasHistory": false
+  }
+ ]
+}
