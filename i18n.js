@@ -196,7 +196,8 @@ window.ROSS_I18N = {
       generic: 'Algo deu errado ao preparar a resposta. Tente novamente em instantes.',
       not_granted: 'O Modo IA não foi autorizado neste navegador. A resposta não foi gerada. Você pode permitir no menu de permissões do artifact ou desativar o Modo IA nas configurações.',
       rate_limited: 'O Modo IA atingiu o limite de uso por agora. Tente mais tarde ou use o modo de demonstração.',
-      cancelled: 'Resposta cancelada.',
+      cancelled: 'Resposta interrompida a seu pedido. Um pedido já enviado ao servidor pode ter sido processado e contado no limite de uso mesmo assim.',
+      timeout: 'A resposta demorou mais do que o esperado e a espera foi encerrada. Tente novamente; se continuar, faça uma pergunta mais específica.',
       invalid_json: 'O modelo respondeu em um formato inesperado. Tente novamente.',
       images_unavailable: 'Este ambiente não permite enviar imagens ao modelo. Cole o texto do trecho na mensagem.',
       image_rejected: 'Uma das imagens não foi aceita pelo modelo. Tente outro formato ou tamanho.',
@@ -319,7 +320,20 @@ window.ROSS_I18N = {
       documentDefaultQuestion: 'Explique o que este documento diz e o que é importante observar.',
       historyFiles: 'arquivos anexados',
       historyDocument: 'Documento analisado nesta resposta',
-      historyReattach: 'O arquivo original não foi reenviado. Se a pergunta depender de partes do documento que não aparecem acima, peça que a pessoa anexe o arquivo novamente.'
+      historyReattach: 'O arquivo original não foi reenviado. Se a pergunta depender de partes do documento que não aparecem acima, peça que a pessoa anexe o arquivo novamente.',
+      partialCoverage: 'Não consegui carregar o texto de: {laws}. A resposta usa apenas as normas que carregaram, por isso a cobertura pode estar incompleta. Tente novamente mais tarde para incluir essas normas.'
+    },
+    storage: {
+      title: 'O histórico não está sendo salvo neste navegador',
+      failed: 'As conversas continuam na tela, mas não foi possível gravá-las no armazenamento local. Ao fechar ou recarregar a página, elas podem se perder. Exporte o histórico para guardar uma cópia.',
+      quota: 'O armazenamento local deste navegador está cheio. As conversas continuam na tela, mas não foi possível gravá-las. Exporte o histórico e apague conversas antigas para liberar espaço.',
+      failedToast: 'Não foi possível salvar o histórico neste navegador.',
+      quotaToast: 'Armazenamento cheio: o histórico não foi salvo.',
+      export: 'Exportar histórico',
+      retry: 'Tentar salvar de novo',
+      exported: 'Histórico exportado como arquivo de texto.',
+      copied: 'Histórico copiado para a área de transferência.',
+      exportTitle: 'Histórico de conversas'
     },
     pages: {
       privacy: {
@@ -650,7 +664,8 @@ window.ROSS_I18N = {
       generic: 'Something went wrong while preparing the answer. Try again in a moment.',
       not_granted: 'AI mode was not allowed in this browser, so no answer was generated. You can allow it in the artifact permissions menu or turn AI mode off in settings.',
       rate_limited: 'AI mode reached its usage limit for now. Try later or use the demonstration mode.',
-      cancelled: 'Answer cancelled.',
+      cancelled: 'Answer stopped at your request. A request already sent to the server may still have been processed and counted against the usage limit.',
+      timeout: 'The answer took longer than expected and the wait was ended. Try again; if it keeps happening, ask a more specific question.',
       invalid_json: 'The model replied in an unexpected format. Try again.',
       images_unavailable: 'This environment cannot send images to the model. Paste the text of the excerpt instead.',
       image_rejected: 'One of the images was not accepted by the model. Try another format or size.',
@@ -773,7 +788,20 @@ window.ROSS_I18N = {
       documentDefaultQuestion: 'Explain what this document says and what is important to note.',
       historyFiles: 'attached files',
       historyDocument: 'Document analysed in this answer',
-      historyReattach: 'The original file was not sent again. If the question depends on parts of the document not shown above, ask the person to attach the file again.'
+      historyReattach: 'The original file was not sent again. If the question depends on parts of the document not shown above, ask the person to attach the file again.',
+      partialCoverage: 'I could not load the text of: {laws}. The answer uses only the laws that loaded, so coverage may be incomplete. Try again later to include those laws.'
+    },
+    storage: {
+      title: 'History is not being saved in this browser',
+      failed: 'Conversations remain on screen, but they could not be written to local storage. Closing or reloading the page may lose them. Export the history to keep a copy.',
+      quota: 'This browser\'s local storage is full. Conversations remain on screen, but they could not be saved. Export the history and delete old conversations to free up space.',
+      failedToast: 'History could not be saved in this browser.',
+      quotaToast: 'Storage full: history was not saved.',
+      export: 'Export history',
+      retry: 'Try saving again',
+      exported: 'History exported as a text file.',
+      copied: 'History copied to the clipboard.',
+      exportTitle: 'Conversation history'
     },
     pages: {
       privacy: {

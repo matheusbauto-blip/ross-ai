@@ -38,7 +38,8 @@
     alert: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v6M12 16.5h.01"/></svg>',
     arrow: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>',
     back: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>',
-    check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg>'
+    check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg>',
+    stop: '<svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>'
   };
 
   /* ---------- Estado e armazenamento ---------- */
@@ -100,8 +101,56 @@
         const data = {};
         PERSIST.forEach((k) => { data[k] = state[k]; });
         localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-      } catch (e) { /* sem persistência */ }
+        if (state.storageError) { state.storageError = null; renderStorageNotice(); }
+      } catch (e) {
+        /* O histórico continua em memória; a pessoa é avisada e pode exportá-lo. */
+        const quota = /quota|exceeded|storage/i.test(String(e && (e.name + ' ' + e.message)));
+        const first = !state.storageError;
+        state.storageError = { quota: quota, at: Date.now() };
+        if (first) toast(t(quota ? 'storage.quotaToast' : 'storage.failedToast'));
+        renderStorageNotice();
+      }
     }, 120);
+  }
+  function storageNoticeHTML() {
+    if (!state.storageError) return '';
+    return '<div class="storage-notice callout callout-warn" role="alert" id="storage-notice">' + ICONS.warn + '<div><b>' + esc(t('storage.title')) + '</b><br>' + esc(t(state.storageError.quota ? 'storage.quota' : 'storage.failed')) +
+      '<div class="row"><button type="button" class="btn btn-secondary btn-sm" data-export-history>' + esc(t('storage.export')) + '</button><button type="button" class="btn btn-secondary btn-sm" data-retry-save>' + esc(t('storage.retry')) + '</button></div></div></div>';
+  }
+  function bindStorageNotice(root) {
+    const exportBtn = $('[data-export-history]', root); if (exportBtn) exportBtn.addEventListener('click', exportHistory);
+    const retryBtn = $('[data-retry-save]', root); if (retryBtn) retryBtn.addEventListener('click', () => save());
+  }
+  function renderStorageNotice() {
+    const slot = $('#storage-slot'); if (!slot) return;
+    slot.innerHTML = storageNoticeHTML();
+    bindStorageNotice(slot);
+  }
+  function historyExportText() {
+    const lines = ['ROSS AI · ' + t('storage.exportTitle') + ' · ' + fmtDate(Date.now(), { dateStyle: 'medium', timeStyle: 'short' }), ''];
+    state.conversations.forEach((conv) => {
+      lines.push('=== ' + (conv.title || t('chat.untitled')) + ' · ' + jurisdictionLabel(conv.country, conv.region) + ' · ' + fmtDate(conv.updatedAt, { dateStyle: 'medium', timeStyle: 'short' }) + ' ===');
+      conv.messages.forEach((m) => {
+        if (m.role === 'user') { lines.push('', t('chat.you') + ': ' + (m.text || '') + ((m.attachments || []).length ? ' [' + t('chat.attachments') + ': ' + m.attachments.map((f) => f.name).join(', ') + ']' : '')); return; }
+        lines.push('', t('chat.assistant') + ':');
+        if (m.status === 'done' && m.answer) lines.push(answerToText(m.answer, m)); else lines.push(m.error || t('errors.interrupted'));
+      });
+      lines.push('');
+    });
+    return lines.join('\n');
+  }
+  function exportHistory() {
+    const text = historyExportText();
+    try {
+      if (typeof Blob !== 'function' || !URL.createObjectURL) throw new Error('download unavailable');
+      const url = URL.createObjectURL(new Blob([text], { type: 'text/plain;charset=utf-8' }));
+      const a = document.createElement('a'); a.href = url; a.download = 'ross-ai-historico-' + new Date().toISOString().slice(0, 10) + '.txt'; document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      toast(t('storage.exported'));
+    } catch (e) {
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(() => toast(t('storage.copied')), () => toast(t('chat.copyFailed')));
+      else toast(t('chat.copyFailed'));
+    }
   }
 
   /* ---------- Idioma ---------- */
@@ -275,7 +324,8 @@
       (mode === 'home' ? jurisdictionSelectsHTML(country, region, 'home') : '') +
       '</div>' +
       '<div class="composer-right">' +
-      '<button type="submit" class="send-btn" id="btn-send" aria-label="' + esc(t('composer.send')) + '" title="' + esc(t('composer.send')) + '" disabled>' + ICONS.send + '</button>' +
+      '<button type="submit" class="send-btn" id="btn-send" aria-label="' + esc(t('composer.send')) + '" title="' + esc(t('composer.send')) + '" disabled' + (state.busy ? ' hidden' : '') + '>' + ICONS.send + '</button>' +
+      '<button type="button" class="send-btn stop-btn" id="btn-stop" aria-label="' + esc(t('composer.stop')) + '" title="' + esc(t('composer.stop')) + '"' + (state.busy ? '' : ' hidden') + '>' + ICONS.stop + '</button>' +
       '</div></div></form>';
   }
   function jurisdictionSelectsHTML(country, region, prefix) {
@@ -292,7 +342,14 @@
     const ta = $('#composer-input');
     const send = $('#btn-send');
     const grow = () => { ta.style.height = 'auto'; ta.style.height = clamp(ta.scrollHeight, 48, window.innerHeight * 0.4) + 'px'; };
-    const refresh = () => { send.disabled = !!state.busy || (!ta.value.trim() && !state.pending.length); };
+    const stop = $('#btn-stop');
+    const refresh = () => {
+      const busy = !!state.busy;
+      send.disabled = busy || (!ta.value.trim() && !state.pending.length);
+      if (busy) send.setAttribute('hidden', ''); else send.removeAttribute('hidden');
+      if (stop) { if (busy) stop.removeAttribute('hidden'); else stop.setAttribute('hidden', ''); }
+    };
+    if (stop) stop.addEventListener('click', stopAnswer);
     ta.addEventListener('input', () => { state.draft = ta.value; grow(); refresh(); });
     ta.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) { e.preventDefault(); state.draft = ta.value; refresh(); if (!send.disabled) form.requestSubmit(); } });
     form.addEventListener('submit', (e) => { e.preventDefault(); const text = ta.value.trim(); if (!text && !state.pending.length) return; submitMessage(text); });
@@ -371,6 +428,7 @@
     const ex = t('home.examples');
     main.innerHTML = '<section class="home"><div class="container">' +
       '<div class="hero">' + brandHTML('brand-lg') + '<h1>' + esc(t('home.headline')) + '</h1><p class="tagline">' + esc(t('tagline')) + '</p></div>' +
+      '<div id="storage-slot">' + storageNoticeHTML() + '</div>' +
       composerHTML('home') +
       '<div><div class="examples-label">' + esc(t('home.examplesLabel')) + '</div><div class="examples">' +
       ex.map((e) => '<button type="button" class="example" data-example="' + esc(e.label) + '">' + ICONS.arrow + '<span>' + esc(e.label) + '</span></button>').join('') +
@@ -381,6 +439,7 @@
       '<p>' + esc(t('home.footnote')) + '</p>' +
       '<div class="links"><a href="#privacidade" data-go="privacy">' + esc(t('nav.privacy')) + '</a><a href="#termos" data-go="terms">' + esc(t('nav.terms')) + '</a><a href="#ajuda" data-go="help">' + esc(t('nav.help')) + '</a></div>' +
       '</div></div></section>';
+    bindStorageNotice($('#storage-slot'));
     bindComposer('home');
     $$('[data-example]', main).forEach((b) => b.addEventListener('click', () => submitMessage(b.dataset.example)));
     $$('a[data-go]', main).forEach((a) => a.addEventListener('click', (e) => { e.preventDefault(); go(a.dataset.go); }));
@@ -390,10 +449,11 @@
   function renderChat(main) {
     const conv = currentConv();
     if (!conv) { state.view = 'home'; renderHome(main); return; }
-    main.innerHTML = '<section class="chat"><div class="chat-scroll"><div class="container"><div id="jur-slot"></div><div class="messages" id="messages"></div></div></div>' +
+    main.innerHTML = '<section class="chat"><div class="chat-scroll"><div class="container"><div id="jur-slot"></div><div id="storage-slot">' + storageNoticeHTML() + '</div><div class="messages" id="messages"></div></div></div>' +
       '<div class="chat-composer"><div class="container">' + composerHTML('chat') + '<p class="composer-hint">' + esc(t('composer.disclaimer')) + '</p></div></div></section>';
     const list = $('#messages');
     conv.messages.forEach((m) => list.appendChild(renderMessage(m, conv)));
+    bindStorageNotice($('#storage-slot'));
     bindComposer('chat');
   }
   function scrollToEnd(instant) {
@@ -446,8 +506,11 @@
   function loadingHTML(provider, step) {
     const steps = t('loading.' + (provider === 'ai' ? 'ai' : provider === 'oficial' ? 'oficial' : 'demo'));
     return '<ul class="steps" aria-live="polite">' + steps.map((s, i) => '<li class="' + (i < step ? 'is-done' : i === step ? 'is-active' : '') + '"><span class="dot"></span><span>' + esc(s) + (provider === 'demo' ? ' <span class="badge badge-fict">' + esc(t('chat.modeDemo').toLowerCase()) + '</span>' : '') + '</span></li>').join('') + '</ul>' +
-      '<div class="skeleton" aria-hidden="true"><span></span><span></span><span></span></div>';
+      '<div class="skeleton" aria-hidden="true"><span></span><span></span><span></span></div>' +
+      '<div class="row loading-actions"><button type="button" class="btn btn-secondary btn-sm" data-stop>' + esc(t('composer.stop')) + '</button></div>';
   }
+  /* Interrompe a espera no cliente. Um pedido já enviado ao servidor pode ter sido processado e contado mesmo assim. */
+  function stopAnswer() { if (state.busy && state.busy.ctl) state.busy.ctl.abort(); }
   function errorHTML(m) {
     return '<div class="error-card" role="alert"><h4>' + esc(t('errors.title')) + '</h4><p>' + esc(m.error || t('errors.generic')) + '</p><div class="row"><button type="button" class="btn btn-secondary btn-sm" data-retry>' + esc(t('chat.retry')) + '</button></div></div>';
   }
@@ -528,6 +591,7 @@
     }));
     const att = $('[data-attach]', node); if (att) att.addEventListener('click', () => pickFiles());
     const retry = $('[data-retry]', node); if (retry) retry.addEventListener('click', () => retryMessage(m, conv));
+    const stop = $('[data-stop]', node); if (stop) stop.addEventListener('click', stopAnswer);
     $$('[data-quick]', node).forEach((b) => b.addEventListener('click', () => {
       const q = m.answer.quickReplies[Number(b.dataset.quick)];
       if (q.action === 'attach') pickFiles(); else if (q.send) submitMessage(q.send);
@@ -539,7 +603,7 @@
     const lines = [];
     const push = (title, items) => { if (!items || !items.length) return; lines.push('', title.toUpperCase()); items.forEach((x) => lines.push('- ' + x)); };
     lines.push('ROSS AI · ' + (a.mode === 'ai' ? t('chat.modeAI') : a.mode === 'oficial' ? t('chat.modeOficial') : t('chat.modeDemo')));
-    lines.push(a.mode === 'ai' ? t('chat.aiBanner') : a.mode === 'oficial' ? t('chat.oficialBanner', { date: a.capturedAt ? fmtDate(a.capturedAt) : '' }) : t('chat.demoBanner'));
+    lines.push(a.mode === 'ai' ? t('chat.aiBanner') : a.corpus ? t('corpus.answerNotice') : a.mode === 'oficial' ? t('chat.oficialBanner', { date: a.capturedAt ? fmtDate(a.capturedAt) : '' }) : t('chat.demoBanner'));
     if (a.document) {
       lines.push('', t('sections.document').toUpperCase() + ': ' + (a.document.name || m.docName || ''));
       (a.document.notes || []).forEach((n) => lines.push('- ' + n));
@@ -556,6 +620,7 @@
     if (a.sources && a.sources.length) {
       lines.push('', (a.mode === 'ai' ? t('sections.sourcesAI') : t('sections.sources')).toUpperCase());
       a.sources.forEach((s, i) => {
+        if (s.imported) { lines.push('[' + (i + 1) + '] ' + s.name + ' · ' + s.article + ' · ' + t('corpus.importedBadge') + ' · ' + s.corpusVersion + ' · ' + t('corpus.currency') + (httpURL(s.url) ? ' · ' + t('corpus.openSource') + ': ' + httpURL(s.url) : '') + ' · ' + t('corpus.openSnapshot') + ': ' + corpusRepoURL(s.repositoryPath, s.repositoryRef)); return; }
         if (s.lawId) { lines.push('[' + (i + 1) + '] ' + s.name + ' · ' + s.article + ' · ' + t('status.' + s.status) + ' · ' + s.url + ' · ' + t('source.captured') + ' ' + fmtDate(s.retrievedAt)); return; }
         const src = s.id ? sourceById(s.id) : null; lines.push('[' + (i + 1) + '] ' + (src ? L(src.name) : s.name) + (s.article ? ' · ' + s.article : '') + ' · ' + t('status.' + (a.mode === 'ai' ? 'unverified' : s.status)) + (src ? ' · ' + src.url + ' (' + t('source.fictional') + ')' : ''));
       });
@@ -1088,7 +1153,15 @@
       let laws = selectLaws(searchText, apiLaws && apiLaws.map((l) => l.id), context.query);
       if (!laws.length) { const picked = await selectLawsAI(context.searchQuestion); if (picked && picked.length) laws = picked; }
       if (signal.aborted) throw { code: 'cancelled' };
-      const loaded = await Promise.all(laws.map(loadLaw));
+      /* Uma norma que não carrega não derruba a consulta: os trechos disponíveis são usados e a cobertura parcial fica registrada na resposta. */
+      const settled = await Promise.allSettled(laws.map(loadLaw));
+      const loaded = settled.filter((r) => r.status === 'fulfilled').map((r) => r.value);
+      const missingLaws = laws.filter((law, i) => settled[i].status === 'rejected').map((law) => law.name);
+      if (laws.length && !loaded.length) throw { code: 'law_fetch' };
+      const withCoverage = (answer) => {
+        if (missingLaws.length && answer && answer.mode === 'oficial') answer.warnings = (answer.warnings || []).concat(t('oficial.partialCoverage', { laws: missingLaws.join(', ') }));
+        return answer;
+      };
       onStep(1);
       const hits = candidateHits(loaded, searchText, context.query);
       if (signal.aborted) throw { code: 'cancelled' };
@@ -1098,22 +1171,22 @@
         const key = s.url.replace(/#.*$/, '') + '|' + s.article;
         if (seen.has(key)) return false; seen.add(key); return true;
       })).slice(0, 200).map((s, i) => Object.assign({}, s, { n: i + 1 }));
-      if (!sources.length) return attachments && attachments.length ? documentWithoutLaw(text, attachments, conv, signal) : emptyOfficial();
-      if (modelUnavailable || (!sampleFn && !API_URL)) return retrievalOnly(sources);
+      if (!sources.length) return withCoverage(attachments && attachments.length ? await documentWithoutLaw(text, attachments, conv, signal) : emptyOfficial());
+      if (modelUnavailable || (!sampleFn && !API_URL)) return withCoverage(retrievalOnly(sources));
       if (!sampleFn && API_URL) {
         try { sources = await selectRelevantSources(context.searchQuestion, searchText, sources, signal); }
         catch (e) {
           if (signal.aborted) throw { code: 'cancelled' };
           if (e && e.code === 'rate_limited') throw e;
-          return retrievalOnly(sources, 'oficial.relevanceUnavailable');
+          return withCoverage(retrievalOnly(sources, 'oficial.relevanceUnavailable'));
         }
-        if (!sources.length) return attachments && attachments.length ? documentWithoutLaw(text, attachments, conv, signal) : emptyOfficial();
+        if (!sources.length) return withCoverage(attachments && attachments.length ? await documentWithoutLaw(text, attachments, conv, signal) : emptyOfficial());
       } else sources = sources.slice(0, 8);
       onStep(2);
       try {
         const data = sampleFn ? await askOfficial(context.answerQuestion, sources, conv, attachments, signal, question) : await askOfficialAPI(context.answerQuestion, sources, conv, attachments, signal, question);
-        return normalizeOfficial(data, sources, attachments);
-      } catch (e) { if (e && e.code === 'api_not_configured') return retrievalOnly(sources); throw e; }
+        return withCoverage(normalizeOfficial(data, sources, attachments));
+      } catch (e) { if (e && e.code === 'api_not_configured') return withCoverage(retrievalOnly(sources)); throw e; }
     }
   };
   function emptyOfficial() { return { mode: 'oficial', kind: 'nosources', summary: t('oficial.empty'), questions: t('oficial.emptyQuestions'), nextSteps: [t('oficial.emptyStep')], capturedAt: state.catalog ? state.catalog.generatedAt : '' }; }
@@ -1285,11 +1358,14 @@
     await runProvider(provider, conv, botMsg, { text: text, attachments: attachments });
   }
   const retryInputs = new WeakMap();
+  const CLIENT_TIMEOUT_MS = 180000;
   async function runProvider(provider, conv, botMsg, input) {
     const ctl = new AbortController();
     state.busy = { ctl: ctl, id: botMsg.id };
-    const sendBtn = $('#btn-send'); if (sendBtn) sendBtn.disabled = true;
-    const onStep = (i) => { botMsg.step = i; const node = $('.msg[data-id="' + botMsg.id + '"] .answer'); if (node) node.innerHTML = loadingHTML(provider.id, i); };
+    let timedOut = false;
+    const timer = setTimeout(() => { timedOut = true; ctl.abort(); }, CLIENT_TIMEOUT_MS);
+    const composer = $('#composer'); if (composer && composer._refresh) composer._refresh();
+    const onStep = (i) => { botMsg.step = i; const node = $('.msg[data-id="' + botMsg.id + '"] .answer'); if (node) { node.innerHTML = loadingHTML(provider.id, i); const stop = $('[data-stop]', node); if (stop) stop.addEventListener('click', stopAnswer); } };
     const position = conv.messages.indexOf(botMsg);
     if (!botMsg.jurisdiction) botMsg.jurisdiction = { country: conv.country, region: conv.region };
     const requestConv = Object.assign({}, conv, botMsg.jurisdiction, { messages: conv.messages.slice(0, position < 0 ? conv.messages.length : position) });
@@ -1299,12 +1375,13 @@
       botMsg.status = 'done'; botMsg.answer = answer; botMsg.provider = answer && answer.mode === 'ai' ? 'ai' : provider.id; delete botMsg.error;
     } catch (e) {
       retryInputs.set(botMsg, input);
-      const code = e && e.code;
+      const code = e && e.code === 'cancelled' && timedOut ? 'timeout' : e && e.code;
       botMsg.status = 'error';
       botMsg.error = (code && t('errors.' + code) !== 'errors.' + code) ? t('errors.' + code) : (e && e.message && code !== 'demo_error' ? t('errors.generic') : t('errors.generic'));
       if (code === 'unavailable') botMsg.error = t('errors.unavailable');
       botMsg.lastInput = { text: input.text, attachments: input.attachments.map((f) => ({ name: f.name, size: f.size, type: f.type })) };
     } finally {
+      clearTimeout(timer);
       state.busy = null;
       touch(conv);
       const node = $('.msg[data-id="' + botMsg.id + '"]');
