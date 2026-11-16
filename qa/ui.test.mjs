@@ -683,3 +683,56 @@ test('generic clarification questions appear only when the model gave no explana
   assert.match(empty.summary, /Não consegui confirmar trechos suficientes/);
   assert.equal(empty.questions.length, 2);
 });
+
+function lawServingFetcher(onOp) {
+  return async (url, options) => {
+    const address = String(url);
+    const match = address.match(/data\/(laws\/[a-z0-9_-]+\.json)/i);
+    if (match) return Response.json(JSON.parse(read('data/' + match[1])));
+    return onOp(JSON.parse(options.body));
+  };
+}
+
+test('when the relevance check fails the answer still uses the governing excerpts and says how they were chosen', async t => {
+  const ops = []; let answerExcerpts = [];
+  const { api } = setup(t, lawServingFetcher(body => {
+    ops.push(body.op);
+    if (body.op === 'search') return Response.json({ results: [] });
+    if (body.op === 'prepare') {
+      if (body.catalog.some(law => /^passage-/.test(law.id))) return Response.json({ error: 'upstream', status: 503 }, { status: 502 });
+      return Response.json({ terms: ['vício do produto', 'garantia legal'], laws: ['l8078'] });
+    }
+    answerExcerpts = body.excerpts.map(excerpt => excerpt.article);
+    return Response.json({ answer: { kind: 'answer', summary: 'Você tem 30 dias para o conserto.', sourcesSay: [{ title: 'CDC', text: 'Prazo de 30 dias.', ref: 1 }], sources: [{ ref: 1, why: 'vício' }], warnings: [] } });
+  }));
+  api.state.mode = 'oficial';
+  await api.submitMessage('comprei um celular faz 2 semanas e ele deu problema na bateria');
+  const message = api.state.conversations[0].messages.at(-1);
+  assert.equal(message.status, 'done', message.error);
+  assert.equal(message.answer.kind, 'answer');
+  assert.ok(ops.includes('answer'), 'the answer step must still run');
+  assert.ok(answerExcerpts.includes('Art. 18') && answerExcerpts.includes('Art. 26'), answerExcerpts.join(', '));
+  assert.ok(answerExcerpts.length <= 5);
+  assert.ok(message.answer.warnings.some(w => /verificação automática de relevância não estava disponível/.test(w)));
+});
+
+test('when the model is down the excerpts are still shown with an honest notice instead of only an error', async t => {
+  const { api, document } = setup(t, lawServingFetcher(body => {
+    if (body.op === 'search') return Response.json({ results: [] });
+    if (body.op === 'prepare' && !body.catalog.some(law => /^passage-/.test(law.id))) return Response.json({ terms: ['vício do produto'], laws: ['l8078'] });
+    return Response.json({ error: 'upstream_timeout' }, { status: 504 });
+  }));
+  api.state.mode = 'oficial';
+  await api.submitMessage('comprei um celular faz 2 semanas e ele deu problema na bateria');
+  const message = api.state.conversations[0].messages.at(-1);
+  assert.equal(message.status, 'done', message.error);
+  assert.match(message.answer.summary, /não está disponível neste momento/);
+  assert.ok(message.answer.sources.some(source => source.article === 'Art. 18'));
+  assert.match(document.querySelector('#messages').textContent, /Art\. 18/);
+});
+
+test('an answer produced by the fallback model carries a visible warning', t => {
+  const { api } = setup(t);
+  const answer = api.normalizeOfficial({ kind: 'answer', summary: 'Resumo.', sourcesSay: [{ title: 'Afirmação', text: 'Diz algo', ref: 1 }], sources: [{ ref: 1, why: 'x' }], warnings: [], fallbackModel: true }, officialSources, []);
+  assert.ok(answer.warnings.some(w => /modelo alternativo/.test(w)));
+});

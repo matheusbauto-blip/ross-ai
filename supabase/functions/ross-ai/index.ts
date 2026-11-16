@@ -11,6 +11,7 @@
      ROSS_ALLOWED_ORIGINS     opcional, lista separada por vírgula (padrão: GitHub Pages do projeto e localhost)
      ROSS_ANSWER_MODEL        opcional (padrão gemini-3.5-flash)
      ROSS_HELPER_MODEL        opcional (padrão gemini-3.1-flash-lite)
+     ROSS_ANSWER_FALLBACK_MODEL / ROSS_HELPER_FALLBACK_MODEL  opcionais (padrão: um usa o outro)
      ROSS_IP_DAILY_LIMIT      opcional (padrão 40 pedidos por IP por dia)
      ROSS_GLOBAL_DAILY_LIMIT  opcional (padrão 1000 pedidos por dia no total)
      ROSS_SALT                opcional, usado para não guardar o IP em claro */
@@ -24,6 +25,10 @@ import { lookupDjen } from "./djen-provider.mjs";
 
 const ANSWER_MODEL = Deno.env.get("ROSS_ANSWER_MODEL") ?? "gemini-3.5-flash";
 const HELPER_MODEL = Deno.env.get("ROSS_HELPER_MODEL") ?? "gemini-3.1-flash-lite";
+// Modelos alternativos usados quando o principal falha de forma passageira (sobrecarga, tempo esgotado).
+const ANSWER_FALLBACK_MODEL = Deno.env.get("ROSS_ANSWER_FALLBACK_MODEL") ?? HELPER_MODEL;
+const HELPER_FALLBACK_MODEL = Deno.env.get("ROSS_HELPER_FALLBACK_MODEL") ?? ANSWER_MODEL;
+const TRANSIENT_STATUS = new Set([408, 429, 500, 502, 503, 504]);
 const IP_LIMIT = Number(Deno.env.get("ROSS_IP_DAILY_LIMIT") ?? "40");
 const GLOBAL_LIMIT = Number(Deno.env.get("ROSS_GLOBAL_DAILY_LIMIT") ?? "1000");
 const ALLOWED_ORIGINS = (Deno.env.get("ROSS_ALLOWED_ORIGINS") ?? "https://matheusbauto-blip.github.io,https://ross-ai-leis.swirlingcurl2.chatgpt.site,http://localhost:8766,http://localhost:8765")
@@ -197,23 +202,46 @@ function systemPrompt(lang: string, grounded: boolean) {
   ].join("\n\n");
 }
 
+/* Tenta os modelos em ordem, com uma nova tentativa por modelo em falhas passageiras, dentro de um prazo total.
+   Uma chamada que já esgotou o tempo não é repetida no mesmo modelo. */
+type GenerateOptions = { system: string; parts: Array<{ text: string } | { inlineData: { mimeType: string; data: string } }>; schema: unknown; maxTokens: number };
+async function generate(models: string[], options: GenerateOptions, apiKey: string, perCallMs: number, budgetMs: number) {
+  const deadline = Date.now() + budgetMs;
+  let last: unknown = null;
+  const list = models.filter((model, index) => model && models.indexOf(model) === index);
+  for (const [index, model] of list.entries()) {
+    for (let attempt = 0; attempt < 2; attempt++) {
+      const remaining = deadline - Date.now();
+      if (remaining < 5_000) break;
+      try {
+        const result = await generateGemini({ apiKey, model, timeoutMs: Math.min(perCallMs, remaining), ...options });
+        return index > 0 ? { ...result, fallback: true } : result;
+      } catch (e) {
+        last = e;
+        if (!(e instanceof GeminiError) || !TRANSIENT_STATUS.has(e.status)) throw e;
+        if (e.status === 504) break;
+        await new Promise((resolve) => setTimeout(resolve, 1_000));
+      }
+    }
+  }
+  throw last ?? new GeminiError(503);
+}
+
 /* ---------- operações ---------- */
 async function opPrepare(apiKey: string, body: Record<string, unknown>) {
   const question = str(body.question, 2000);
   const catalog = arr(body.catalog).slice(0, 200).map((l: Record<string, unknown>) => `${str(l.id, 40)}: ${str(l.name, 400)}`).join("\n");
-  const response = await generateGemini({
-    apiKey,
-    model: HELPER_MODEL,
+  const response = await generate([HELPER_MODEL, HELPER_FALLBACK_MODEL], {
     maxTokens: 1200,
     schema: z.toJSONSchema(PrepareSchema),
     system: "You help a legal search engine for Brazilian federal law. Reply only with the JSON requested.",
     parts: [{ text: `Question (Portuguese): ${question}\n\nLaws in the catalog (id: name):\n${catalog}\n\nReturn: "terms" = 4 to 8 Portuguese legal search terms (single words or short phrases as used in statutes) for this question; "laws" = up to 3 catalog ids most likely to contain the relevant rules, most relevant first (empty if none applies).` }],
-  });
+  }, apiKey, 25_000, 45_000);
   if (response.error) return response;
   const parsed = PrepareSchema.safeParse(response.data);
   if (!parsed.success) return { error: "invalid_json" };
   const ids = new Set(arr(body.catalog).map((law: Record<string, unknown>) => str(law.id, 40)));
-  return { terms: parsed.data.terms.slice(0, 8), laws: parsed.data.laws.filter(id => ids.has(id)).slice(0, 3) };
+  return { terms: parsed.data.terms.slice(0, 8), laws: parsed.data.laws.filter(id => ids.has(id)).slice(0, 3), fallback: response.fallback === true };
 }
 
 async function opAnswer(apiKey: string, body: Record<string, unknown>) {
@@ -244,18 +272,16 @@ async function opAnswer(apiKey: string, body: Record<string, unknown>) {
   ].filter(Boolean).join("\n\n");
   content.push({ text });
 
-  const response = await generateGemini({
-    apiKey,
-    model: ANSWER_MODEL,
+  const response = await generate([ANSWER_MODEL, ANSWER_FALLBACK_MODEL], {
     maxTokens: 8000,
     schema: z.toJSONSchema(AnswerSchema),
     system: systemPrompt(lang, grounded),
     parts: content,
-  });
+  }, apiKey, 70_000, 110_000);
   if (response.error) return response;
   const parsed = AnswerSchema.safeParse(response.data);
   if (!parsed.success) return { error: "invalid_json" };
-  return { answer: parsed.data, model: response.model, usage: response.usage };
+  return { answer: parsed.data, model: response.model, usage: response.usage, fallback: response.fallback === true };
 }
 
 /* ---------- servidor ---------- */

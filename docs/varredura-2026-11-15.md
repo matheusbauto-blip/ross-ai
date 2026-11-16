@@ -54,6 +54,15 @@ Pergunta real: “comprei um celular faz 2 semanas e ele deu problrma na bateria
 
 Em 16/11/2026, a mesma pergunta (com o erro de digitação) foi reenviada no site publicado (versão `4640e8e9b726`, função versão 10): a resposta citou os arts. 18, 24 e 26 do CDC, com os prazos de 30 e 90 dias e links para o Planalto. A resposta levou cerca de 75 segundos, quase todo o tempo na etapa de escrita pelo modelo; a latência do modelo de resposta fica como observação.
 
+## Instabilidade do serviço do modelo — 16/11/2026
+
+Nova tentativa real da pergunta do celular às 14:59 (horário de Brasília): busca e preparação responderam em menos de 2 s, mas a verificação de relevância esgotou os 90 s da função (504) e a tela mostrou apenas “trechos encontrados por palavras”. Reprodução imediata: o Google respondeu **503** (modelo sobrecarregado) para `gemini-3.1-flash-lite` e, minutos depois, `gemini-3.5-flash` esgotou 90 s em uma resposta pequena. A causa é a instabilidade do provedor, não a busca; o ajuste abaixo torna o app resiliente a isso.
+
+| Mudança | Validação |
+| --- | --- |
+| Função (versão 11): cada chamada ao modelo tem tempo limite próprio (25 s auxiliar, 70 s principal) e prazo total (45 s / 110 s); falha passageira (408, 429, 5xx) tem uma nova tentativa e depois passa ao modelo alternativo (`ROSS_HELPER_FALLBACK_MODEL`, `ROSS_ANSWER_FALLBACK_MODEL`; por padrão um usa o outro). Uma chamada que esgotou o tempo não é repetida no mesmo modelo. A resposta indica `fallback: true` quando o alternativo foi usado. | `tests/process-route.test.mjs`: “a transient model failure is retried and then handed to the fallback model…”, “a model that times out is not retried…”, “a healthy primary model is used once…”. |
+| App: se a verificação de relevância falhar, a resposta segue com os trechos que a intenção aponta e os mais bem pontuados (até 5), com o aviso `oficial.relevanceFallback`. Se o modelo de resposta também falhar, os trechos são mostrados com o aviso `oficial.modelUnavailable` (serviço instável; tente de novo em alguns minutos) em vez de só um erro. Resposta gerada pelo modelo alternativo recebe o aviso `oficial.fallbackModel`. Prazo de espera do cliente: 4 minutos. | `qa/ui.test.mjs`: “when the relevance check fails the answer still uses the governing excerpts…”, “when the model is down the excerpts are still shown…”, “an answer produced by the fallback model carries a visible warning”. |
+
 ## Pendências prioritárias (registro original)
 
 | Prioridade | Achado e evidência | Correção indicada |
@@ -105,7 +114,7 @@ Comando da suíte completa:
 ROSS_DOM_MODULE=/tmp/ross-qa-dom/linkedom-worker.mjs node --test --test-concurrency=1 tests/*.test.mjs qa/ui.test.mjs
 ```
 
-Após as correções de 15/11/2026, a suíte completa passou com **162 testes** (118 unitários e 44 de interface).
+Após as correções de 15–16/11/2026, a suíte completa passou com **168 testes** (121 unitários e 47 de interface).
 
 Foram verificadas também a sintaxe dos arquivos JavaScript e a consistência das alterações. As reproduções adicionais usaram um DOM simulado; as duas falhas do handler usaram banco e provedor substituídos por simuladores. Não foram enviados documentos privados ou pedidos de teste ao modelo real durante a varredura.
 

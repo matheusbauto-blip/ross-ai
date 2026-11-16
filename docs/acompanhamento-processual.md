@@ -32,11 +32,11 @@ Essa opção não equivale a uma API nacional gratuita de CPF para aplicativos p
 
 ## Servidor e validação real
 
-O servidor Supabase `ross-ai` está ativo na versão 10 (publicada em 15/11/2026, com o controle de uso obrigatório para `prepare` e `answer`, leitura do corpo com limite de bytes e catálogo de relevância mais descritivo). A operação POST `process_lookup` usa DJEN por padrão.
+O servidor Supabase `ross-ai` está ativo na versão 11 (publicada em 16/11/2026: controle de uso obrigatório para `prepare` e `answer`, leitura do corpo com limite de bytes, catálogo de relevância mais descritivo e nova tentativa/modelo alternativo em falhas passageiras do Google). A operação POST `process_lookup` usa DJEN por padrão.
 
 Em 15/11/2026, uma consulta real ao servidor retornou HTTP 200, fonte `CNJ · DJEN`, cobertura `publications` e três publicações correspondentes ao número pesquisado. Os links de certidão e o texto legível também foram conferidos no adaptador real. A validação não dependeu de token do Escavador.
 
-A suíte completa passou com **162 testes**, incluindo validação CNJ, fonte correta, prevenção de mistura de processos, resultado vazio, cancelamento, paginação, cache, limites de uso, entrada pelo menu, isolamento da conversa e orientação de CPF sem envio à API.
+A suíte completa passou com **168 testes**, incluindo validação CNJ, fonte correta, prevenção de mistura de processos, resultado vazio, cancelamento, paginação, cache, limites de uso, entrada pelo menu, isolamento da conversa e orientação de CPF sem envio à API.
 
 O frontend com os avisos e ajustes finais está no pacote atualizado. Preparar o pacote não publica a nova interface.
 

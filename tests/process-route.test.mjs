@@ -6,21 +6,32 @@ import { stripTypeScriptTypes } from 'node:module';
 import { processNumber, ProcessError } from '../supabase/functions/ross-ai/process-provider.mjs';
 
 const source = readFileSync(new URL('../supabase/functions/ross-ai/index.ts', import.meta.url), 'utf8').replace(/^import .*;\s*$/gm, '');
-function server({ token = 'test-provider-value', quotaError = false, processSource = 'escavador', maxBody = '' } = {}) {
+class MockGeminiError extends Error { constructor(status) { super('google_upstream'); this.status = status; } }
+function server({ token = 'test-provider-value', quotaError = false, processSource = 'escavador', maxBody = '', models = null } = {}) {
   let handler, lookups = 0, djenLookups = 0, modelCalls = 0, quotaCalls = 0;
+  const modelsCalled = [];
   const schema = new Proxy(function () {}, { get: () => schema, apply: () => schema });
-  const env = { SUPABASE_URL: 'https://test.invalid', SUPABASE_SERVICE_ROLE_KEY: 'mock-service-role', ESCAVADOR_API_TOKEN: token, ROSS_PROCESS_SOURCE: processSource, ROSS_MAX_BODY_BYTES: maxBody };
+  const env = { SUPABASE_URL: 'https://test.invalid', SUPABASE_SERVICE_ROLE_KEY: 'mock-service-role', ESCAVADOR_API_TOKEN: token, ROSS_PROCESS_SOURCE: processSource, ROSS_MAX_BODY_BYTES: maxBody, GEMINI_API_KEY: models ? 'test-google-key' : '' };
   const context = {
-    Deno: { env: { get: key => env[key] }, serve: fn => { handler = fn; } }, z: schema,
+    Deno: { env: { get: key => env[key] }, serve: fn => { handler = fn; } }, z: schema, setTimeout: (fn) => setTimeout(fn, 0),
     createClient: () => ({ rpc: async () => { quotaCalls++; return quotaError ? { error: { message: 'simulated quota outage' } } : { data: { allowed: true } }; } }),
-    generateGemini: async () => { modelCalls++; throw new Error('process requests must not call the model'); },
+    generateGemini: async ({ model, timeoutMs }) => {
+      modelCalls++;
+      if (!models) throw new Error('process requests must not call the model');
+      modelsCalled.push(model);
+      assert.ok(timeoutMs > 0 && timeoutMs <= 90_000, 'per-call timeout must be bounded');
+      const behaviour = models[model];
+      if (typeof behaviour === 'number') throw new MockGeminiError(behaviour);
+      if (Array.isArray(behaviour)) { const next = behaviour.shift(); if (typeof next === 'number') throw new MockGeminiError(next); return { data: next, model }; }
+      return { data: behaviour, model };
+    },
     lookupProcess: async input => { lookups++; assert.equal(input.number, '00008323520184013202'); assert.equal(input.apiKey, token); return { process: { number: input.number }, movements: [] }; },
     lookupDjen: async input => { djenLookups++; assert.equal(input.number, '00008323520184013202'); return { coverage: 'publications', process: { number: input.number }, movements: [] }; },
-    processNumber, ProcessError, GeminiError: class extends Error {}, eligibleForAnswer() {}, repositoryExcerpts() {},
+    processNumber, ProcessError, GeminiError: MockGeminiError, eligibleForAnswer() {}, repositoryExcerpts() {},
     crypto, TextEncoder, TextDecoder, Response, Request, URL, AbortSignal, console: { error() {} },
   };
   vm.runInNewContext(stripTypeScriptTypes(source), context);
-  return { rawRequest: request => handler(request), raw: body => handler(new Request('https://test.invalid', { method: 'POST', headers: { Origin: 'https://matheusbauto-blip.github.io', 'Content-Type': 'application/json' }, body: JSON.stringify(body) })), request: number => handler(new Request('https://test.invalid', { method: 'POST', headers: { Origin: 'https://matheusbauto-blip.github.io', 'Content-Type': 'application/json' }, body: JSON.stringify({ op: 'process_lookup', number }) })), counts: () => ({ lookups, djenLookups, modelCalls, quotaCalls }) };
+  return { rawRequest: request => handler(request), raw: body => handler(new Request('https://test.invalid', { method: 'POST', headers: { Origin: 'https://matheusbauto-blip.github.io', 'Content-Type': 'application/json' }, body: JSON.stringify(body) })), request: number => handler(new Request('https://test.invalid', { method: 'POST', headers: { Origin: 'https://matheusbauto-blip.github.io', 'Content-Type': 'application/json' }, body: JSON.stringify({ op: 'process_lookup', number }) })), counts: () => ({ lookups, djenLookups, modelCalls, quotaCalls }), modelsCalled: () => modelsCalled };
 }
 
 test('the actual process route works independently of Google credentials and never calls the model', async () => {
@@ -69,4 +80,35 @@ test('an oversized body without Content-Length is refused by the bytes actually 
   assert.deepEqual(s.counts(), { lookups: 0, djenLookups: 0, modelCalls: 0, quotaCalls: 0 });
   const small = await s.raw({ op: 'process_lookup', number: '00008323520184013202' });
   assert.equal(small.status, 200, 'bodies within the limit still work');
+});
+
+test('a transient model failure is retried and then handed to the fallback model, flagged in the response', async () => {
+  const s = server({ models: { 'gemini-3.1-flash-lite': 503, 'gemini-3.5-flash': { terms: ['vício'], laws: [] } } });
+  const response = await s.raw({ op: 'prepare', question: 'celular com defeito', catalog: [] });
+  assert.equal(response.status, 200);
+  assert.equal((await response.json()).fallback, true);
+  assert.deepEqual(s.modelsCalled(), ['gemini-3.1-flash-lite', 'gemini-3.1-flash-lite', 'gemini-3.5-flash']);
+});
+
+test('a model that times out is not retried on the same model, and a non-transient error is not retried at all', async () => {
+  const timedOut = server({ models: { 'gemini-3.5-flash': 504, 'gemini-3.1-flash-lite': { kind: 'answer' } } });
+  const response = await timedOut.raw({ op: 'answer', question: 'pergunta', excerpts: [], history: [], attachments: [] });
+  assert.equal(response.status, 200);
+  assert.deepEqual(timedOut.modelsCalled(), ['gemini-3.5-flash', 'gemini-3.1-flash-lite']);
+  const rejected = server({ models: { 'gemini-3.1-flash-lite': 400 } });
+  const bad = await rejected.raw({ op: 'prepare', question: 'pergunta', catalog: [] });
+  assert.equal(bad.status, 502);
+  assert.deepEqual(rejected.modelsCalled(), ['gemini-3.1-flash-lite']);
+  const down = server({ models: { 'gemini-3.1-flash-lite': 503, 'gemini-3.5-flash': 503 } });
+  const unavailable = await down.raw({ op: 'prepare', question: 'pergunta', catalog: [] });
+  assert.equal(unavailable.status, 502); assert.deepEqual(await unavailable.json(), { error: 'upstream', status: 503 });
+  assert.equal(down.modelsCalled().length, 4);
+});
+
+test('a healthy primary model is used once and the response is not flagged as a fallback', async () => {
+  const s = server({ models: { 'gemini-3.1-flash-lite': { terms: [], laws: [] } } });
+  const response = await s.raw({ op: 'prepare', question: 'pergunta', catalog: [] });
+  assert.equal(response.status, 200);
+  assert.equal((await response.json()).fallback, false);
+  assert.deepEqual(s.modelsCalled(), ['gemini-3.1-flash-lite']);
 });

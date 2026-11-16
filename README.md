@@ -34,7 +34,7 @@ A tela apresenta as publicações oficiais retornadas, datas de disponibilizaç�
 
 É possível acompanhar até 20 números neste navegador. A ficha aberta é consultada a cada 15 minutos enquanto a tela estiver visível, com cache de até cinco minutos e respeito aos limites da fonte. Não há avisos com o app fechado ou sincronização entre dispositivos nesta etapa. As consultas ficam separadas do histórico das conversas e não são enviadas ao Gemini.
 
-O servidor está na versão 10 (controle de uso obrigatório para as chamadas ao modelo, leitura do corpo com limite de bytes e catálogo de relevância mais descritivo). Foi validada uma consulta real com HTTP 200 e três publicações do DJEN, sem chave de API. A documentação está em `docs/acompanhamento-processual.md`.
+O servidor está na versão 11 (controle de uso obrigatório para as chamadas ao modelo, leitura do corpo com limite de bytes, catálogo de relevância mais descritivo e nova tentativa com modelo alternativo em falhas passageiras do Google). Foi validada uma consulta real com HTTP 200 e três publicações do DJEN, sem chave de API. A documentação está em `docs/acompanhamento-processual.md`.
 
 O adaptador Escavador permanece opcional, habilitado somente por `ROSS_PROCESS_SOURCE=escavador` e pelo segredo `ESCAVADOR_API_TOKEN`, com as condições da conta contratada. Ele não é usado na configuração gratuita padrão. Não há mudança automática para serviços pagos quando uma fonte falha.
 
