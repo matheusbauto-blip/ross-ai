@@ -736,3 +736,11 @@ test('an answer produced by the fallback model carries a visible warning', t => 
   const answer = api.normalizeOfficial({ kind: 'answer', summary: 'Resumo.', sourcesSay: [{ title: 'Afirmação', text: 'Diz algo', ref: 1 }], sources: [{ ref: 1, why: 'x' }], warnings: [], fallbackModel: true }, officialSources, []);
   assert.ok(answer.warnings.some(w => /modelo alternativo/.test(w)));
 });
+
+test('the settings screen shows the version so an update can be confirmed', t => {
+  const { api, document } = setup(t);
+  api.go('settings');
+  assert.match(document.querySelector('#about-version').textContent, /Versão de desenvolvimento/);
+  api.state.lang = 'en'; api.go('settings');
+  assert.match(document.querySelector('#about-version').textContent, /Development version/);
+});
