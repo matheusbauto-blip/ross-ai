@@ -1018,7 +1018,7 @@
     const entry = state.catalog.laws.find((l) => l.id === law.id) || {};
     const ver = entry.versions && entry.versions.length ? entry.versions[entry.versions.length - 1].id : 'v1';
     const anchor = /^\d+$/.test(hit.article.id) ? '#art' + hit.article.id : '';
-    return { lawId: law.id, name: law.name, shortName: law.shortName, article: hit.article.label, heading: hit.article.heading, status: hit.article.status, nota: hit.article.nota, url: law.url + anchor, textUrl: law.textUrl || law.url, source: law.source || '', retrievedAt: law.retrievedAt, version: ver, excerpt: hit.excerpt, n: n };
+    return { lawId: law.id, name: law.name, shortName: law.shortName, article: hit.article.label, heading: hit.article.heading, status: hit.article.status, nota: hit.article.nota, url: law.url + anchor, textUrl: law.textUrl || law.url, source: law.source || '', retrievedAt: law.retrievedAt, version: ver, excerpt: hit.excerpt, score: hit.score, n: n };
   }
   function candidateHits(laws, query, question) {
     // A long article or a large code must not consume the whole recall budget
@@ -1055,6 +1055,12 @@
       const text = norm(source.excerpt).replace(/\s+/g, ' ');
       return patterns.some((pattern) => pattern.test(text));
     });
+  }
+  /* Sem a verificação automática: os trechos que a intenção aponta e os mais bem pontuados pela busca de palavras. */
+  function fallbackSelection(question, sources) {
+    const focus = focusSources(question, sources).slice(0, 2);
+    const rest = sources.filter((source) => !focus.includes(source)).sort((a, b) => (b.score || 0) - (a.score || 0));
+    return focus.concat(rest).slice(0, 5).map((source, index) => Object.assign({}, source, { n: index + 1 }));
   }
   async function selectRelevantSources(question, query, sources, signal) {
     const candidates = sources.slice(0, 200);
@@ -1191,20 +1197,30 @@
       })).slice(0, 200).map((s, i) => Object.assign({}, s, { n: i + 1 }));
       if (!sources.length) return withCoverage(attachments && attachments.length ? await documentWithoutLaw(text, attachments, conv, signal) : emptyOfficial());
       if (modelUnavailable || (!sampleFn && !API_URL)) return withCoverage(retrievalOnly(sources));
+      let relevanceFallback = false;
       if (!sampleFn && API_URL) {
         try { sources = await selectRelevantSources(context.searchQuestion, searchText, sources, signal); }
         catch (e) {
           if (signal.aborted) throw { code: 'cancelled' };
           if (e && e.code === 'rate_limited') throw e;
-          return withCoverage(retrievalOnly(sources, 'oficial.relevanceUnavailable'));
+          if (e && e.code === 'api_not_configured') return withCoverage(retrievalOnly(sources));
+          /* O serviço do modelo oscilou: a resposta segue com os trechos de reserva e avisa como foram escolhidos. */
+          sources = fallbackSelection(context.searchQuestion, sources); relevanceFallback = true;
         }
         if (!sources.length) return withCoverage(attachments && attachments.length ? await documentWithoutLaw(text, attachments, conv, signal) : emptyOfficial());
       } else sources = sources.slice(0, 8);
       onStep(2);
       try {
         const data = sampleFn ? await askOfficial(context.answerQuestion, sources, conv, attachments, signal, question) : await askOfficialAPI(context.answerQuestion, sources, conv, attachments, signal, question);
-        return withCoverage(normalizeOfficial(data, sources, attachments));
-      } catch (e) { if (e && e.code === 'api_not_configured') return withCoverage(retrievalOnly(sources)); throw e; }
+        const answer = normalizeOfficial(data, sources, attachments);
+        if (relevanceFallback && answer.kind !== 'nosources') answer.warnings = (answer.warnings || []).concat(t('oficial.relevanceFallback'));
+        return withCoverage(answer);
+      } catch (e) {
+        if (e && e.code === 'api_not_configured') return withCoverage(retrievalOnly(sources));
+        /* Modelo indisponível no momento: mostra os trechos encontrados com um aviso honesto, em vez de só um erro. */
+        if (e && ['upstream', 'upstream_timeout', 'api_error', 'internal'].includes(e.code)) return withCoverage(retrievalOnly(relevanceFallback ? sources : fallbackSelection(context.searchQuestion, sources), 'oficial.modelUnavailable'));
+        throw e;
+      }
     }
   };
   function emptyOfficial() { return { mode: 'oficial', kind: 'nosources', summary: t('oficial.empty'), questions: t('oficial.emptyQuestions'), nextSteps: [t('oficial.emptyStep')], capturedAt: state.catalog ? state.catalog.generatedAt : '' }; }
@@ -1252,13 +1268,14 @@
       excerpts: sources.map((s) => ({ n: s.n, name: s.name, article: s.article, heading: s.heading, nota: s.nota, excerpt: s.excerpt })),
       attachments: files, capturedAt: fmtDate(state.catalog.generatedAt)
     }, signal);
-    return res.answer || {};
+    return Object.assign({}, res.answer || {}, res.fallback === true ? { fallbackModel: true } : {});
   }
   /* Só aparecem afirmações e fontes ligadas a trechos que realmente foram enviados ao modelo.
      Uma afirmação com referência inexistente ou ausente é descartada; nenhuma fonte é acrescentada
      automaticamente para dar aparência de fundamentação. */
   function normalizeOfficial(d, sources, attachments) {
     const a = normalizeAI(d, attachments);
+    if (d && d.fallbackModel === true) a.warnings = (a.warnings || []).concat(t('oficial.fallbackModel'));
     a.mode = 'oficial'; a.capturedAt = state.catalog ? state.catalog.generatedAt : ''; a.corpus = sources.some((s) => s.imported);
     const byN = Object.fromEntries(sources.map((s) => [s.n, s]));
     const validRef = (value) => { const n = Number(value); return Number.isInteger(n) && byN[n] ? n : null; };
@@ -1377,7 +1394,7 @@
     await runProvider(provider, conv, botMsg, { text: text, attachments: attachments });
   }
   const retryInputs = new WeakMap();
-  const CLIENT_TIMEOUT_MS = 180000;
+  const CLIENT_TIMEOUT_MS = 240000;
   async function runProvider(provider, conv, botMsg, input) {
     const ctl = new AbortController();
     state.busy = { ctl: ctl, id: botMsg.id };

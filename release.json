@@ -1,10 +1,10 @@
 {
-  "version": "4640e8e9b726",
+  "version": "b4a714d1ef97",
   "files": [
     {
       "path": "index.html",
       "bytes": 1941,
-      "sha256": "1f75d15c2c82eb4fd7a16141e932306b52a56f4b7eca915c5ca8db8b9216e685"
+      "sha256": "8feb25eb8a70c4606e1f97ee47faad9b294c3514fc809e23fcfdb834121a0f54"
     },
     {
       "path": "styles.css",
@@ -18,8 +18,8 @@
     },
     {
       "path": "i18n.js",
-      "bytes": 73810,
-      "sha256": "f47fbcf787627c6a8c6058f86f47c177df69353676886de85e92ed257dd05c41"
+      "bytes": 75011,
+      "sha256": "dc26eaa58110786aa9b99dd64b27d0b2806b41680862a814b2651c8079d235ba"
     },
     {
       "path": "demo-data.js",
@@ -33,8 +33,8 @@
     },
     {
       "path": "app.js",
-      "bytes": 138554,
-      "sha256": "a30ea2c3960a54d23cd19d9c0ea166080ed293026ed1fe09097b8a310ab6fad2"
+      "bytes": 140045,
+      "sha256": "b93dbac769cd42d70a2f2233400f6915c8618b543a686019cbac13ad9ab0920b"
     },
     {
       "path": "data/catalog.json",
