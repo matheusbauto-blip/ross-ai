@@ -22,6 +22,8 @@ import { generateGemini, GeminiError } from "./gemini.mjs";
 import { eligibleForAnswer, repositoryExcerpts } from "./repository-excerpts.mjs";
 import { lookupProcess, processNumber, ProcessError } from "./process-provider.mjs";
 import { lookupDjen } from "./djen-provider.mjs";
+import { createRepositoryLibrary, libraryReferences, libraryStats, documentCandidates } from "./repository-library.mjs";
+import { createPublicSources } from "./public-sources.mjs";
 
 const ANSWER_MODEL = Deno.env.get("ROSS_ANSWER_MODEL") ?? "gemini-3.5-flash";
 const HELPER_MODEL = Deno.env.get("ROSS_HELPER_MODEL") ?? "gemini-3.1-flash-lite";
@@ -41,6 +43,7 @@ const ALLOWED_MEDIA = new Set(["image/jpeg", "image/png", "image/webp", "image/g
 const PrepareSchema = z.object({
   terms: z.array(z.string()),
   laws: z.array(z.string()),
+  references: z.array(z.object({ type: z.string(), number: z.string(), year: z.number().int().nullable() })).optional(),
 });
 const AnswerSchema = z.object({
   kind: z.enum(["answer", "clarify", "limit", "urgent", "document", "nosources"]),
@@ -131,12 +134,21 @@ async function corpusOperation(op: string, body: Record<string, unknown>) {
   if (!url || !key) throw new Error("corpus_not_configured");
   const sb = createClient(url, key, { auth: { persistSession: false } });
   if (op === "repository_read") {
-    const id = str(body.id, 64);
+    const id = str(body.id, 100);
+    if (/^l:[a-f0-9]{64}:\d{1,6}$/.test(id)) {
+      const result = await createRepositoryLibrary(sb).read(id);
+      return { document: result.doc, markdown: result.markdown, localCopy: result.localCopy, fetchedAt: new Date().toISOString() };
+    }
     if (!/^[a-f0-9]{64}$/.test(id)) throw new Error("invalid_id");
     const { data: doc, error } = await sb.from("ross_law_documents")
       .select("title,repository_path,repository_ref,content_sha256,text_version,is_partial,source_url,captured_at")
       .eq("id", id).single();
     if (error || !doc || !/^[a-f0-9]{40}$/.test(doc.repository_ref) || doc.repository_path.includes("..")) throw new Error("document_unavailable");
+    const { data: snapshot } = await sb.from("ross_law_versions").select("markdown,stored_at")
+      .eq("document_id", id).eq("content_sha256", doc.content_sha256).maybeSingle();
+    if (snapshot && typeof snapshot.markdown === "string" && await sha256(snapshot.markdown) === doc.content_sha256) {
+      return { document: doc, markdown: snapshot.markdown.replace(/^---\r?\n[\s\S]*?\r?\n---(?:\r?\n|$)/, ""), fetchedAt: snapshot.stored_at, localCopy: true };
+    }
     // The caller supplies an indexed ID, never an arbitrary URL. No questions,
     // conversation content or private documents are sent to GitHub.
     const path = doc.repository_path.split("/").map(encodeURIComponent).join("/");
@@ -149,8 +161,7 @@ async function corpusOperation(op: string, body: Record<string, unknown>) {
   }
   if (op === "corpus_stats") {
     if (statsCache && Date.now() - statsCache.at < 60_000) return statsCache.data;
-    const { data, error } = await sb.rpc("ross_law_stats");
-    if (error) throw new Error("corpus_unavailable");
+    const data = await libraryStats(sb);
     statsCache = { at: Date.now(), data };
     return data;
   }
@@ -158,19 +169,41 @@ async function corpusOperation(op: string, body: Record<string, unknown>) {
   if (query.length < 2) return { results: [], hasMore: false };
   const scope = ["federal", "estadual", "municipal"].includes(String(body.scope)) ? String(body.scope) : null;
   const uf = /^[A-Z]{2}$/.test(String(body.uf || "")) ? String(body.uf) : null;
-  const municipality = str(body.municipality, 100).trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, "-") || null;
+  const municipality = str(body.municipality, 100).trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "") || null;
   const offset = Math.max(0, Math.min(300, Number(body.offset) || 0));
-  const { data, error } = await sb.rpc("ross_law_search", {
+  const references = libraryReferences(body.references, str(body.originalQuery, 500) || query);
+  let sourceFailures = 0;
+  if (!offset && references.length) {
+    try {
+      const found = await createRepositoryLibrary(sb).search({ references, query, scope, uf, municipality, forAnswer: body.forAnswer === true });
+      sourceFailures = found.sourceFailures;
+      if(found.results.length)return {...found,hasMore:false,repository:"ctresb/leis",complete:false};
+    } catch { sourceFailures++; }
+  }
+  let data = await documentCandidates(sb,{query,scope,uf,municipality,forAnswer:body.forAnswer===true,offset});
+  if(!data.results.length) {
+    const fallback = await sb.rpc("ross_law_search", {
     p_query: query, p_scope: scope, p_uf: uf, p_municipality: municipality,
     p_limit: body.forAnswer === true ? 8 : 15, p_offset: offset, p_for_answer: body.forAnswer === true,
-  });
-  if (error) { console.error("corpus search", error.code); throw new Error("corpus_unavailable"); }
-  if (body.forAnswer === true && !data.results?.length) {
+    });
+    if(fallback.error){sourceFailures++;}else data=fallback.data;
+  }
+  let results = Array.isArray(data?.results) ? data.results : [];
+  if (body.forAnswer === true && results.some((doc: Record<string, unknown>) => doc.requires_read === true)) {
+    const candidates = results.filter((doc: Record<string, unknown>) => doc.requires_read === true && eligibleForAnswer(doc, municipality)).slice(0, 3);
+    const reads = await Promise.allSettled(candidates.map(async (doc: Record<string, unknown>) => {
+      const read = await corpusOperation("repository_read", {id:doc.id});
+      return repositoryExcerpts(read.markdown,query,3,2800,libraryReferences([],str(body.originalQuery,500) || query).length>0)
+        .map(p => ({...doc,...p,requires_read:false,content_mode:"full",localCopy:read.localCopy === true}));
+    }));
+    results = results.filter((doc: Record<string, unknown>) => doc.requires_read !== true).concat(reads.flatMap(r => r.status === "fulfilled" ? r.value : []));
+  }
+  if (body.forAnswer === true && !results.length) {
     const { data: candidates, error: candidateError } = await sb.rpc("ross_law_search", {
       p_query: query, p_scope: scope, p_uf: uf, p_municipality: municipality,
       p_limit: 8, p_offset: 0, p_for_answer: false,
     });
-    if (candidateError) throw new Error("corpus_unavailable");
+    if (candidateError) sourceFailures++;
     const selected = (candidates?.results || []).filter((doc: Record<string, unknown>) => eligibleForAnswer(doc, municipality)).slice(0, 2);
     const reads = await Promise.allSettled(selected.map(async (doc: Record<string, unknown>) => {
       const read = await corpusOperation("repository_read", { id: doc.id });
@@ -179,12 +212,13 @@ async function corpusOperation(op: string, body: Record<string, unknown>) {
         ...doc, ...passage, heading: "Texto do repositório; vigência não confirmada", content_mode: "on_demand",
       }));
     }));
-    return {
-      results: reads.flatMap(read => read.status === "fulfilled" ? read.value : []),
-      hasMore: false, repository: "ctresb/leis", complete: false,
-    };
+    results = reads.flatMap(read => read.status === "fulfilled" ? read.value : []);
   }
-  return { ...data, hasMore: offset < 300 && data.hasMore === true, repository: "ctresb/leis", complete: false };
+  if (!offset && !results.length && body.forAnswer !== true && references.length && scope !== 'estadual' && scope !== 'municipal') {
+    try { results = await createPublicSources(sb).senado(references,query); }
+    catch { sourceFailures++; }
+  }
+  return { ...data, results, sourceFailures, hasMore: offset < 300 && data.hasMore === true, repository: "ctresb/leis", complete: false };
 }
 
 /* ---------- instruções ---------- */
@@ -234,14 +268,14 @@ async function opPrepare(apiKey: string, body: Record<string, unknown>) {
   const response = await generate([HELPER_MODEL, HELPER_FALLBACK_MODEL], {
     maxTokens: 1200,
     schema: z.toJSONSchema(PrepareSchema),
-    system: "You help a legal search engine for Brazilian federal law. Reply only with the JSON requested.",
-    parts: [{ text: `Question (Portuguese): ${question}\n\nLaws in the catalog (id: name):\n${catalog}\n\nReturn: "terms" = 4 to 8 Portuguese legal search terms (single words or short phrases as used in statutes) for this question; "laws" = up to 3 catalog ids most likely to contain the relevant rules, most relevant first (empty if none applies).` }],
+    system: "You prepare searches of Brazilian law. The bundled catalog is only a starting collection; the searchable library is broader. Suggestions are search clues, never verified citations. Reply only with the JSON requested.",
+    parts: [{ text: `Question (Portuguese): ${question}\nJurisdiction: ${str(body.jurisdiction,120) || 'Brasil'}\n\nBundled laws (id: name):\n${catalog}\n\nReturn: "terms" = 4 to 8 Portuguese legal search terms (single words or short phrases as used in statutes); "laws" = up to 3 relevant bundled catalog ids; "references" = up to 4 additional or explicitly requested Brazilian legislative references, including laws OUTSIDE the bundled catalog, ONLY when confident about their identity. Each reference has type (lei, lei complementar, decreto-lei, decreto, medida provisoria, emenda constitucional, resolucao or portaria), number (digits as string), year (four-digit year or null). Empty arrays when uncertain. Do not confuse a bill with an enacted law, an article number with a law number, or invent a number to fill the list.` }],
   }, apiKey, 25_000, 45_000);
   if (response.error) return response;
   const parsed = PrepareSchema.safeParse(response.data);
   if (!parsed.success) return { error: "invalid_json" };
   const ids = new Set(arr(body.catalog).map((law: Record<string, unknown>) => str(law.id, 40)));
-  return { terms: parsed.data.terms.slice(0, 8), laws: parsed.data.laws.filter(id => ids.has(id)).slice(0, 3), fallback: response.fallback === true };
+  return { terms: parsed.data.terms.slice(0, 8), laws: parsed.data.laws.filter(id => ids.has(id)).slice(0, 3), references: libraryReferences(parsed.data.references, question), fallback: response.fallback === true };
 }
 
 async function opAnswer(apiKey: string, body: Record<string, unknown>) {
@@ -265,7 +299,7 @@ async function opAnswer(apiKey: string, body: Record<string, unknown>) {
   }
   const text = [
     `Context: ${jurisdiction || "Brasil"}. Today is ${new Date().toISOString().slice(0, 10)}.`,
-    grounded ? `OFFICIAL EXCERPTS (captured ${capturedAt || "recently"}):\n` + excerpts.map((e) => `[${e.n}] ${e.name} — ${e.article}${e.heading ? ` (${e.heading})` : ""}${e.nota ? ` [${e.nota}]` : ""}\n"""\n${e.excerpt}\n"""`).join("\n\n") : "",
+    grounded ? `CONSULTED EXCERPTS (bundled capture ${capturedAt || "recently"}; repository dates and versions are stated separately):\n` + excerpts.map((e) => `[${e.n}] ${e.name} — ${e.article}${e.heading ? ` (${e.heading})` : ""}${e.nota ? ` [${e.nota}]` : ""}\n"""\n${e.excerpt}\n"""`).join("\n\n") : "",
     unread.length ? `Attached files that could not be read: ${unread.join(", ")}. Say so and ask for the text or a readable file.` : "",
     history ? `CONVERSATION SO FAR:\n${history}` : "",
     `QUESTION: ${question || "(no text, only the attached document)"}`,
@@ -312,6 +346,38 @@ Deno.serve(async (req: Request) => {
     return json(400, { error: "invalid_json" }, origin);
   }
   const op = str(body.op, 20);
+  if (op === "knowledge_search") {
+    if (!["news", "precedents"].includes(String(body.kind))) return json(400,{error:"invalid_kind"},origin);
+    const quota=await checkQuota(req,true,true);
+    if(!quota.allowed)return json(quota.unavailable?503:429,{error:quota.unavailable?"knowledge_unavailable":"rate_limited"},origin);
+    try {
+      const url=Deno.env.get("SUPABASE_URL"),key=Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+      if(!url||!key)return json(503,{error:"knowledge_unavailable"},origin);
+      const sources=createPublicSources(createClient(url,key,{auth:{persistSession:false}}));
+      const query=str(body.query,500),offset=Math.max(0,Math.min(300,Number(body.offset)||0));
+      return json(200,body.kind==="news"?await sources.news(query,offset):await sources.precedents(query,offset),origin);
+    } catch {return json(503,{error:"knowledge_unavailable"},origin);}
+  }
+  if (op === "library_import") {
+    // Operator-only ingress: a short-lived, bounded grant, never the service
+    // key. No arbitrary SQL or URLs are accepted by this operation.
+    const match = (req.headers.get("authorization") || "").match(/^Bearer ([A-Za-z0-9_-]{43,100})$/);
+    if (!match) return json(401, { error: "operator_required" }, origin);
+    const url = Deno.env.get("SUPABASE_URL"), key = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+    if (!url || !key) return json(503, { error: "library_unavailable" }, origin);
+    if (!["texts", "catalog"].includes(String(body.kind)) || !Array.isArray(body.batch) || !body.batch.length ||
+      (body.kind === "texts" && body.batch.length > 20) || new TextEncoder().encode(JSON.stringify(body)).length > 8_000_000) return json(400, { error: "invalid_batch" }, origin);
+    try {
+      const sb = createClient(url, key, { auth: { persistSession: false } });
+      const auth = await sb.rpc("ross_library_authorize", { p_token_hash: await sha256(match[1]) });
+      if (auth.error) return json(503, { error: auth.error.code === "25006" ? "library_read_only" : "library_unavailable" }, origin);
+      if (auth.data !== true) return json(403, { error: "operator_grant_expired" }, origin);
+      const { data, error } = await sb.rpc(body.kind === "texts" ? "ross_library_import" : "ross_library_catalog_import", body.kind === "texts" ? { p_documents: body.batch } : { p_directories: body.batch });
+      if (error) return json(error.code === "25006" ? 503 : 422, { error: error.code === "25006" ? "library_read_only" : "library_import_failed" }, origin);
+      statsCache = null;
+      return json(200, data, origin);
+    } catch { return json(503, { error: "library_unavailable" }, origin); }
+  }
   if (op === "process_lookup") {
     try {
       const number = processNumber(body.number);

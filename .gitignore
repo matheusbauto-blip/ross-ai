@@ -4,6 +4,8 @@ node_modules/
 dist/
 .corpus-import/
 .corpus-source/
+.corpus-library/
+entrega/
 .env
 .env.*
 !.env.example

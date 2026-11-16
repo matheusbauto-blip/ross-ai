@@ -25,3 +25,9 @@ test('marks excerpt truncation and excludes partial, revoked and ambiguous munic
   assert.equal(eligibleForAnswer({ scope: 'municipal' }, null), false);
   assert.equal(eligibleForAnswer({ scope: 'municipal' }, 'uberlandia'), true);
 });
+test('a bare law reference starts with substantive articles and a requested article never matches another number', () => {
+  const text='Art. 1º Esta lei trata da aposentadoria.\nArt. 2º Os requisitos seguem os critérios desta lei.\nArt. 11 Publicada em 2013, conforme a Lei Complementar 142.';
+  assert.equal(repositoryExcerpts(text,'Lei Complementar 142/2013',2,2200,true)[0].article,'Art. 1º');
+  assert.equal(repositoryExcerpts(text,'Artigo 11 da Lei Complementar 142/2013',2,2200,true)[0].article,'Art. 11');
+  assert.equal(repositoryExcerpts(text,'Artigo 999 da Lei Complementar 142/2013',2,2200,true).length,0);
+});

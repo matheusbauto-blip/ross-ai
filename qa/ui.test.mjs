@@ -39,7 +39,7 @@ function setup(t, fetcher = async () => Response.json({ documents: 235, results:
   t.after(() => { for (const timer of timers) clearTimeout(timer); });
   const change = (selector, value) => {
     const node = document.querySelector(selector);
-    if (node.localName === 'select') for (const option of node.querySelectorAll('option')) option.selected = option.value === value;
+    if (node.localName === 'select') { for (const option of node.querySelectorAll('option')) option.selected = false; const selected = Array.from(node.querySelectorAll('option')).find(option => option.value === value); if (selected) selected.selected = true; }
     else node.value = value;
     node.dispatchEvent(new window.Event(node.localName === 'select' ? 'change' : 'input', { bubbles: true }));
   };
@@ -398,6 +398,47 @@ test('repository search and reading preserve text and escape returned markup', a
   assert.equal(document.querySelector('.corpus-fulltext script'), null);
   assert.match(document.querySelector('.corpus-fulltext').textContent, /Art\. 1º/);
   assert.ok(calls.includes('repository_read'));
+});
+
+test('news and precedents use their own search operation and keep law filters out of the way', async t => {
+  const calls=[];
+  const {api,document,window,change}=setup(t,async (_url,options)=>{
+    const body=JSON.parse(options.body);calls.push(body);
+    return Response.json(body.op==='knowledge_search'?{results:[{id:'stj-1',contentType:'precedent',title:'STJ · Tema 1',summary:'<script>unsafe</script>',source_url:'javascript:alert(1)'}],hasMore:false,fetchedAt:'2026-11-16T12:00:00Z'}:{documents:15252,fullTexts:15252,catalogDocuments:1218984});
+  });
+  api.go('search');await tick();change('#corpus-kind','precedents');
+  assert.equal(document.querySelector('#corpus-law-filters').hidden,true);
+  change('#corpus-query','consumidor');document.querySelector('#corpus-form').dispatchEvent(new window.Event('submit',{bubbles:true,cancelable:true}));
+  await tick();await tick();
+  assert.equal(calls.find(c=>c.op==='knowledge_search').kind,'precedents');
+  assert.equal(document.querySelector('.corpus-result script'),null);assert.equal(document.querySelector('.corpus-result a'),null);
+  assert.equal(document.querySelector('[data-read-corpus]'),null);
+  change('#corpus-kind','news');assert.equal(document.querySelectorAll('.corpus-result').length,0);
+  change('#corpus-kind','laws');assert.equal(document.querySelector('#corpus-law-filters').hidden,false);
+});
+
+test('source status distinguishes catalog files from stored texts without exposing administration', async t=>{
+  const {api,document}=setup(t,async()=>Response.json({documents:30,fullTexts:20,catalogDocuments:1000}));
+  api.go('sources');document.querySelector('#refresh-corpus-status').click();await tick();await tick();
+  assert.match(document.querySelector('.corpus-coverage').textContent,/20 textos importados/);
+  assert.match(document.querySelector('.corpus-coverage').textContent,/1\.000 arquivos/);
+  assert.equal(document.querySelector('input[type=password]'),null);
+});
+
+test('a law outside the bundled catalog reaches the answer as actual excerpts after search preparation', async t=>{
+  const calls=[];
+  const {api}=setup(t,async(_url,options)=>{
+    const body=JSON.parse(options.body);calls.push(body);
+    if(body.op==='prepare')return Response.json({terms:['aposentadoria deficiência'],laws:body.catalog.some(l=>l.id==='passage-1')?['passage-1']:[],references:[{family:'leis-complementares',number:'142',year:2013}]});
+    if(body.op==='search')return Response.json({results:[{id:'a'.repeat(64),title:'Lei Complementar 142/2013',article:'Art. 1º',excerpt:'Aposentadoria da pessoa com deficiência.',content_mode:'full',repository_ref:'b'.repeat(40),repository_path:'federal/leis-complementares/2013/lcp-142-2013-05-08.md',source_url:'https://www.planalto.gov.br/lei',text_version:'Edição original'}]});
+    return Response.json({answer:{kind:'answer',summary:'A lei trata da aposentadoria da pessoa com deficiência.',sourcesSay:[{title:'LCP 142',text:'Explicação do trecho consultado.',ref:1}],sources:[{ref:1,why:'Base consultada'}]}});
+  });
+  api.state.catalog.laws=[];api.state.mode='oficial';
+  await api.submitMessage('O que a Lei Complementar 142/2013 diz sobre aposentadoria?');
+  const search=calls.find(c=>c.op==='search');assert.equal(search.references[0].number,'142');
+  assert.equal(calls[0].op,'prepare');
+  const answer=calls.find(c=>c.op==='answer');assert.ok(answer.excerpts.some(e=>e.article==='Art. 1º'&&/deficiência/.test(e.excerpt)));
+  assert.equal(api.state.conversations[0].messages.at(-1).answer.sources[0].imported,true);
 });
 
 function tvConversation(api) {

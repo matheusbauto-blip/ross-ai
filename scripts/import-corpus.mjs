@@ -11,7 +11,7 @@ import { corpusDocument, DEFAULT_REF, isCorpusPath, sqlForDocuments } from './li
 const args = process.argv.slice(2);
 const opt = (key, fallback) => { const n = args.indexOf(key); return n < 0 ? fallback : args[n + 1]; };
 if (args.includes('--help') || !opt('--source-dir')) {
-  console.log('node scripts/import-corpus.mjs --source-dir /path/to/leis --out-dir /path/to/output [--ref COMMIT_SHA] [--scope federal|estaduais|municipais|reguladores|jurisprudencia|tratados|all] [--limit N] [--full-text] [--upload]');
+  console.log('node scripts/import-corpus.mjs --source-dir /path/to/leis --out-dir /path/to/output [--ref COMMIT_SHA] [--scope federal|estaduais|municipais|reguladores|jurisprudencia|tratados|all] [--limit N] [--batch N(<=500)] [--full-text] [--upload]');
   process.exit(args.includes('--help') ? 0 : 1);
 }
 const root = path.resolve(opt('--source-dir'));
@@ -19,6 +19,7 @@ const out = path.resolve(opt('--out-dir', path.join(path.dirname(fileURLToPath(i
 const ref = opt('--ref', DEFAULT_REF);
 const scope = opt('--scope', 'all');
 const limit = Number(opt('--limit', 'Infinity'));
+const batchSize = Math.min(500, Math.max(1, Number(opt('--batch', '20')) || 20));
 if (!['all', 'federal', 'estaduais', 'municipais', 'reguladores', 'jurisprudencia', 'tratados'].includes(scope) || !(limit > 0)) throw new Error('Invalid scope or limit');
 if (!/^[a-f0-9]{40}$/.test(ref)) throw new Error('Use an immutable commit SHA');
 try {
@@ -75,7 +76,7 @@ for await (const rel of walk(root)) {
     doc = corpusDocument(rel, markdown, ref, metadataOnly);
   } catch (error) { rejected++; manifest.failures.push({ path: rel, error: error.message }); continue; }
   const size = Buffer.byteLength(JSON.stringify(doc));
-  if (batch.length && (batch.length >= 20 || bytes + size > 750000)) await flush();
+  if (batch.length && (batch.length >= batchSize || bytes + size > 7500000)) await flush();
   batch.push(doc); bytes += size; count++;
   manifest.documents++; manifest.passages += doc.passages.length; if (doc.is_partial) manifest.partial++;
 }

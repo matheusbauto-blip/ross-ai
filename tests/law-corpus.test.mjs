@@ -47,3 +47,9 @@ test('lightweight indexing retains the locator and summary without the full text
   assert.equal(doc.content_mode,'metadata'); assert.equal(doc.passages.length,1);
   assert.equal(doc.passages[0].article,'Identificação da norma'); assert(!doc.passages[0].content.includes('Direito de acesso'));
 });
+test('hash metadata keys are parsed as data and article headings retain their article identity', () => {
+  const md = fixture('compilada', '## Art. 1º Texto novo.\n~~Texto antigo.~~\nParágrafo único. Condição.', 'sha256_texto: "abc"\n');
+  const d = corpusDocument('federal/leis-ordinarias/2021/lei.md', md);
+  assert(d.passages.some(p => p.article === 'Art. 1º' && p.content.includes('Texto novo')));
+  assert(!d.passages.some(p => p.content.includes('Texto antigo')));
+});

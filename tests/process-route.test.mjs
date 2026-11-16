@@ -4,6 +4,7 @@ import vm from 'node:vm';
 import { readFileSync } from 'node:fs';
 import { stripTypeScriptTypes } from 'node:module';
 import { processNumber, ProcessError } from '../supabase/functions/ross-ai/process-provider.mjs';
+import { libraryReferences } from '../supabase/functions/ross-ai/repository-library.mjs';
 
 const source = readFileSync(new URL('../supabase/functions/ross-ai/index.ts', import.meta.url), 'utf8').replace(/^import .*;\s*$/gm, '');
 class MockGeminiError extends Error { constructor(status) { super('google_upstream'); this.status = status; } }
@@ -27,7 +28,7 @@ function server({ token = 'test-provider-value', quotaError = false, processSour
     },
     lookupProcess: async input => { lookups++; assert.equal(input.number, '00008323520184013202'); assert.equal(input.apiKey, token); return { process: { number: input.number }, movements: [] }; },
     lookupDjen: async input => { djenLookups++; assert.equal(input.number, '00008323520184013202'); return { coverage: 'publications', process: { number: input.number }, movements: [] }; },
-    processNumber, ProcessError, GeminiError: MockGeminiError, eligibleForAnswer() {}, repositoryExcerpts() {},
+    processNumber, ProcessError, GeminiError: MockGeminiError, libraryReferences, eligibleForAnswer() {}, repositoryExcerpts() {},
     crypto, TextEncoder, TextDecoder, Response, Request, URL, AbortSignal, console: { error() {} },
   };
   vm.runInNewContext(stripTypeScriptTypes(source), context);
@@ -44,6 +45,21 @@ test('missing process credentials return a specific recoverable error without sp
   const s = server({ token: '' }); const response = await s.request('00008323520184013202');
   assert.equal(response.status, 503); assert.deepEqual(await response.json(), { error: 'process_not_configured' });
   assert.deepEqual(s.counts(), { lookups: 0, djenLookups: 0, modelCalls: 0, quotaCalls: 0 });
+});
+test('operator import rejects unauthenticated callers before any database or model call', async () => {
+  const s = server();
+  const r = await s.raw({ op: 'library_import', kind: 'texts', batch: [{}] });
+  assert.equal(r.status, 401); assert.deepEqual(await r.json(), { error: 'operator_required' });
+  assert.equal(s.counts().quotaCalls, 0); assert.equal(s.counts().modelCalls, 0);
+});
+test('operator ingress validates its batch and fails closed without an active grant', async () => {
+  const s = server();
+  const send = body => s.rawRequest(new Request('https://test.invalid', {method:'POST',headers:{Origin:'https://matheusbauto-blip.github.io','Content-Type':'application/json',Authorization:'Bearer '+'a'.repeat(43)},body:JSON.stringify(body)}));
+  const invalid = await send({op:'library_import',kind:'sql',batch:[{}]});
+  assert.equal(invalid.status,400); assert.equal(s.counts().quotaCalls,0);
+  const expired = await send({op:'library_import',kind:'texts',batch:[{}]});
+  assert.equal(expired.status,403); assert.deepEqual(await expired.json(),{error:'operator_grant_expired'});
+  assert.equal(s.counts().modelCalls,0);
 });
 
 test('a quota outage blocks process provider calls and invalid numbers never spend quota', async () => {
