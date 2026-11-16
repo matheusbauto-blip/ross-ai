@@ -1582,7 +1582,7 @@
       '<div class="setting stack"><div class="title">' + esc(s.jurisdiction) + '</div><div class="desc">' + esc(s.jurisdictionHelp) + '</div><div class="control" id="set-jur">' + jurisdictionSelectsHTML(state.country, state.region, 'set') + '</div></div>' +
       '<div class="setting stack"><div class="title">' + esc(s.mode) + '</div><div class="desc">' + esc(s.modeHelp) + '</div><div class="control">' + seg('set-mode', [['oficial', s.modeOficial, !state.catalog], ['demo', s.modeDemo, false], ['ai', s.modeAI, !state.aiAvailable]], state.mode) + '</div><div class="desc" id="mode-note">' + esc(modeNote()) + '</div></div>' +
       '<div class="setting stack"><div class="title">' + esc(s.data) + '</div><div class="desc">' + esc(s.dataHelp) + ' ' + esc(fmt(s.count, { n: state.conversations.length })) + '</div><div class="control" id="set-data"><button type="button" class="btn btn-secondary" id="btn-delete-all"' + (state.conversations.length ? '' : ' disabled') + '>' + ICONS.trash + esc(s.deleteAll) + '</button></div></div>' +
-      '<div class="setting stack"><div class="title">' + esc(s.about) + '</div><div class="desc">' + esc(s.aboutText) + '</div></div>' +
+      '<div class="setting stack"><div class="title">' + esc(s.about) + '</div><div class="desc">' + esc(s.aboutText) + '</div><div class="desc muted" id="about-version">' + esc(ASSET_VERSION ? t('settings.aboutVersion', { version: ASSET_VERSION }) : t('settings.aboutDev')) + '</div></div>' +
       '</div>');
     bindBack(main);
     $('#set-lang').addEventListener('change', (e) => { state.lang = e.target.value; document.documentElement.lang = state.lang; save(); render({ keep: true }); });
