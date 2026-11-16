@@ -54,7 +54,7 @@
     mode: 'oficial',
     catalog: null,
     lawPending: null,
-    corpus: { query: '', scope: '', uf: '', municipality: '', results: [], offset: 0, hasMore: false, searched: false, busy: false, error: '', stats: null, statsRequested: false },
+    corpus: { kind: 'laws', query: '', scope: '', uf: '', municipality: '', results: [], offset: 0, hasMore: false, searched: false, busy: false, error: '', stats: null, statsRequested: false },
     conversations: [],
     feedback: {},
     sourcesReview: {},
@@ -1151,22 +1151,10 @@
           return answer;
         } catch (e) { if (e && e.code === 'api_not_configured') return retrievalOnly(context.sources); throw e; }
       }
-      let aiTerms = '', apiLaws = null, modelUnavailable = false, importedSources = [];
-      if (API_URL) {
-        try {
-          const result = await apiCall('search', { query: expandQuery(context.query).slice(0, 500), scope: conv.region ? '' : 'federal', uf: conv.region || '', forAnswer: true }, signal);
-          importedSources = (Array.isArray(result.results) ? result.results : []).map((r) => ({
-            lawId: 'corpus-' + r.id, imported: true, name: r.title, shortName: r.title, article: r.article, heading: r.heading,
-            status: 'nao_confirmada', url: r.source_url, textUrl: r.source_url, retrievedAt: r.captured_at,
-            version: r.repository_ref.slice(0, 12), corpusVersion: r.text_version, repositoryPath: r.repository_path,
-            repositoryRef: r.repository_ref, excerpt: r.excerpt.length > 2200 ? r.excerpt.slice(0, 2200) + '\n[…]' : r.excerpt,
-            nota: r.text_version + ' · ' + t('corpus.currency')
-          }));
-        } catch (e) { if (signal.aborted) throw { code: 'cancelled' }; /* the bundled official texts remain available */ }
-      }
+      let aiTerms = '', apiLaws = null, modelUnavailable = false, importedSources = [], references = [];
       if (sampleFn) aiTerms = await expandQueryAI(context.searchQuestion);
       else if (API_URL) {
-        try { const p = await apiCall('prepare', { question: context.searchQuestion, catalog: state.catalog.laws.map((l) => ({ id: l.id, name: l.name })) }, signal); aiTerms = (Array.isArray(p.terms) ? p.terms : []).join(' '); apiLaws = (Array.isArray(p.laws) ? p.laws : []).map((id) => state.catalog.laws.find((l) => l.id === id)).filter(Boolean); }
+        try { const p = await apiCall('prepare', { question: context.searchQuestion, jurisdiction: jurisdictionLabel(conv.country, conv.region), catalog: state.catalog.laws.map((l) => ({ id: l.id, name: l.name })) }, signal); aiTerms = (Array.isArray(p.terms) ? p.terms : []).join(' '); references = Array.isArray(p.references) ? p.references : []; apiLaws = (Array.isArray(p.laws) ? p.laws : []).map((id) => state.catalog.laws.find((l) => l.id === id)).filter(Boolean); }
         catch (e) {
           if (e && (e.code === 'cancelled' || e.code === 'rate_limited')) throw e;
           if (e && e.code === 'api_not_configured') modelUnavailable = true;
@@ -1174,6 +1162,18 @@
       }
       const intent = searchIntent(context.query);
       const searchText = expandQuery(context.query) + ' ' + aiTerms + (intent ? ' ' + intent.terms : '');
+      if (API_URL) {
+        try {
+          const result = await apiCall('search', { query: searchText.slice(0, 500), originalQuery: context.query.slice(0,500), references, scope: conv.region ? '' : 'federal', uf: conv.region || '', forAnswer: true }, signal);
+          importedSources = (Array.isArray(result.results) ? result.results : []).filter(r => r.content_mode !== 'metadata' && typeof r.excerpt === 'string' && r.excerpt.trim()).map((r) => ({
+            lawId: 'corpus-' + r.id, imported: true, name: r.title, shortName: r.title, article: r.article, heading: r.heading,
+            status: 'nao_confirmada', url: r.source_url, textUrl: r.source_url, retrievedAt: r.captured_at,
+            version: String(r.repository_ref || '').slice(0, 12), corpusVersion: r.text_version, repositoryPath: r.repository_path,
+            repositoryRef: r.repository_ref, localCopy: r.localCopy === true || r.content_mode === 'full', excerpt: r.excerpt.length > 2800 ? r.excerpt.slice(0, 2800) + '\n[…]' : r.excerpt,
+            nota: r.text_version + ' · ' + t('corpus.currency')
+          }));
+        } catch (e) { if (signal.aborted) throw { code: 'cancelled' }; /* bundled official texts remain available */ }
+      }
       let laws = selectLaws(searchText, apiLaws && apiLaws.map((l) => l.id), context.query);
       if (!laws.length) { const picked = await selectLawsAI(context.searchQuestion); if (picked && picked.length) laws = picked; }
       if (signal.aborted) throw { code: 'cancelled' };
@@ -1245,14 +1245,14 @@
     const prompt = [
       'You are ROSS AI, a legal information assistant. You explain Brazilian law in plain language. You are not a lawyer and this is not legal advice.',
       'Write in ' + t('langName') + '. Be clear, respectful and not overly formal. Short sentences.',
-      'GROUNDING RULES: Answer ONLY from the official excerpts below (current consolidated text from official sources, Planalto or the Câmara dos Deputados, captured on ' + fmtDate(state.catalog.generatedAt) + '). Cite them by their numbers. Do not cite articles, laws, deadlines or court decisions that are not in the excerpts. If the excerpts do not answer the question, say so plainly (kind "nosources") and say what kind of rule or document would be needed. Excerpts marked […] are partial.',
+      'GROUNDING RULES: Answer ONLY from the consulted excerpts below. Bundled excerpts were captured from official sources on ' + fmtDate(state.catalog.generatedAt) + '; imported repository excerpts carry their own edition and validity warnings in nota. Preserve those warnings and do not label repository text current or consolidated. Cite excerpts by their numbers. Do not cite articles, laws, deadlines or court decisions that are not in the excerpts. If the excerpts do not answer the question, say so plainly (kind "nosources") and say what kind of rule or document would be needed. Excerpts marked […] are partial.',
       'Never state that someone will win or lose, that a clause is definitely valid or invalid, or that a lawsuit certainly applies. Say what depends on facts, documents or professional interpretation.',
       'If the question is ambiguous, use kind "clarify" with up to three objective questions. If the person asks for a high-impact personalised assessment, a litigation strategy or a definitive conclusion, use kind "limit", explain the limit briefly and refer them to a lawyer, the Defensoria Pública, a union, Procon or the relevant public service. If the situation seems urgent, use kind "urgent" and tell them to seek help without delay.',
       images.length ? 'The attached image(s) are pages of a document. Identify the clause you explain (reference and short quote), separate what the document says from what the law says, and warn if it is incomplete, unreadable or lacks context. One clause is not the conclusion for the whole case.' : '',
       unread.length ? 'Files that cannot be read in this version: ' + unread.join(', ') + '. Say so and ask for the text or an image.' : '',
       'Context: ' + jurisdictionLabel(conv.country, conv.region) + '. Today is ' + fmtDate(Date.now()) + '.',
       history ? 'CONVERSATION SO FAR:\n' + history : '',
-      'OFFICIAL EXCERPTS:\n' + exc,
+      'CONSULTED EXCERPTS:\n' + exc,
       'QUESTION: ' + plainAnswerQuestion(question),
       'Reply with ONLY one JSON object: {"kind":"answer"|"clarify"|"limit"|"urgent"|"document"|"nosources","summary":string,"sourcesSay":[{"title":string,"text":string,"ref":number}],"depends":[string],"sources":[{"ref":number,"why":string}],"nextSteps":[string],"questions":[string],"document":{"notes":[string],"excerpts":[{"ref":string,"quote":string,"inDocument":string,"inLaw":string}],"warnings":[string]}|null,"limitNotice":{"text":string,"referrals":[string]}|null,"warnings":[string]}. Every "ref" is an excerpt number. At most 5 items per array; use empty arrays or null when not applicable.'
     ].filter(Boolean).join('\n\n');
@@ -1491,7 +1491,7 @@
   function corpusLinks(sourceURL, path, ref) {
     const official = httpURL(sourceURL);
     return '<div class="corpus-links">' + (official ? '<a href="' + esc(official) + '" target="_blank" rel="noopener noreferrer">' + esc(t('corpus.openSource')) + '</a>' : '') +
-      '<a href="' + esc(corpusRepoURL(path, ref)) + '" target="_blank" rel="noopener noreferrer">' + esc(t('corpus.openSnapshot')) + '</a></div>';
+      (path && ref ? '<a href="' + esc(corpusRepoURL(path, ref)) + '" target="_blank" rel="noopener noreferrer">' + esc(t('corpus.openSnapshot')) + '</a>' : '') + '</div>';
   }
   function corpusSourceHTML(s, n, m) {
     return '<li class="src-card" id="src-' + m.id + '-' + n + '"><div class="src-name"><span>' + esc(s.name) + '</span><span class="badge badge-imported">' + esc(t('corpus.importedBadge')) + '</span></div>' +
@@ -1499,25 +1499,33 @@
       (s.retrievedAt ? '<span>' + esc(t('source.captured') + ': ' + fmtDate(s.retrievedAt)) + '</span>' : '') + '</div>' +
       corpusLinks(s.url, s.repositoryPath, s.repositoryRef) + '<details class="src-excerpt"><summary>' + esc(t('source.excerpt')) + '</summary><p>' + esc(s.excerpt).replace(/\n/g, '<br>') + '</p></details></li>';
   }
+  function corpusStatsText() {
+    const stats = state.corpus.stats;
+    return stats && stats.error ? t('corpus.unavailable') : stats ? t('corpus.count', { n: Number(stats.fullTexts ?? stats.documents ?? 0).toLocaleString(state.lang), catalog: stats.catalogDocuments == null ? '—' : Number(stats.catalogDocuments).toLocaleString(state.lang) }) : t('corpus.loadingCount');
+  }
+  function publicResultHTML(r) {
+    return '<article class="corpus-result"><div class="corpus-result-head"><h2>' + esc(r.title) + '</h2><span class="badge badge-imported">' + esc(t(r.contentType === 'news' ? 'corpus.news' : 'corpus.precedents')) + '</span></div><p class="corpus-meta">' + esc([r.source,r.court,r.status,r.published_at ? fmtDate(r.published_at) : ''].filter(Boolean).join(' · ')) + '</p>' +
+      (r.subject ? '<p>' + esc(r.subject) + '</p>' : '') + '<p>' + esc(r.summary || t('corpus.noThesis')) + '</p>' + (r.truncated ? '<p class="muted">' + esc(t('corpus.truncated')) + '</p>' : '') + corpusLinks(r.source_url) + '</article>';
+  }
   function renderCorpus(main) {
     const c = state.corpus;
     const ufOptions = GEO.regions.BR || regionsFor('BR') || [];
-    const stats = c.stats && c.stats.error ? t('corpus.unavailable') : c.stats ? t('corpus.count', { n: Number(c.stats.documents || 0).toLocaleString(state.lang) }) : t('corpus.loadingCount');
-    const resultHTML = c.results.map((r) => '<article class="corpus-result"><div class="corpus-result-head"><h2>' + esc(r.title) + '</h2><span class="badge ' + (r.is_partial ? 'badge-historico' : 'badge-imported') + '">' + esc(r.is_partial ? t('corpus.partial') : t('corpus.imported')) + '</span></div>' +
+    const stats = corpusStatsText();
+    const resultHTML = c.results.map((r) => r.contentType ? publicResultHTML(r) : '<article class="corpus-result"><div class="corpus-result-head"><h2>' + esc(r.title) + '</h2><span class="badge ' + (r.is_partial ? 'badge-historico' : 'badge-imported') + '">' + esc(r.is_partial ? t('corpus.partial') : t('corpus.imported')) + '</span></div>' +
       '<p class="corpus-meta">' + esc([t('corpus.' + r.scope), r.uf, r.municipality, r.article].filter(Boolean).join(' · ')) + '</p>' +
       (r.summary ? '<p>' + esc(r.summary) + '</p>' : '') +
       '<details class="corpus-excerpt"><summary>' + esc(t('corpus.readExcerpt')) + '</summary><p>' + esc(r.excerpt) + '</p></details>' +
       '<p class="corpus-meta">' + esc(r.text_version) + ' · ' + esc(r.status === 'repealed' || r.repealed ? t('corpus.repealed') : t('corpus.currency')) +
       (r.captured_at ? ' · ' + esc(t('source.captured') + ': ' + fmtDate(r.captured_at)) : '') + '</p>' +
-      corpusLinks(r.source_url, r.repository_path, r.repository_ref) + '<button type="button" class="btn btn-secondary btn-sm" data-read-corpus="' + esc(r.id) + '">' + esc(t('corpus.readRepository')) + '</button><div class="corpus-fulltext" hidden></div></article>').join('');
+      corpusLinks(r.source_url, r.repository_path, r.repository_ref) + (r.repository_path ? '<button type="button" class="btn btn-secondary btn-sm" data-read-corpus="' + esc(r.id) + '">' + esc(t('corpus.readRepository')) + '</button><div class="corpus-fulltext" hidden></div>' : '') + '</article>').join('');
     main.innerHTML = pageShell(t('corpus.title'), '', '<p class="prose">' + esc(t('corpus.intro')) + '</p>' +
       '<div class="corpus-coverage"><strong>' + esc(stats) + '</strong><p>' + esc(t('corpus.coverage')) + '</p></div>' +
-      '<form id="corpus-form" class="corpus-form"><label for="corpus-query">' + esc(t('corpus.query')) + '</label><div class="corpus-query-row"><input id="corpus-query" type="search" minlength="2" maxlength="500" required placeholder="' + esc(t('corpus.placeholder')) + '" value="' + esc(c.query) + '"><button class="btn" type="submit"' + (c.busy ? ' disabled' : '') + '>' + esc(c.busy ? t('corpus.searching') : t('corpus.search')) + '</button></div>' +
-      '<div class="corpus-filters"><label>' + esc(t('corpus.scope')) + '<select id="corpus-scope">' + ['', 'federal', 'estadual', 'municipal'].map((s) => '<option value="' + s + '"' + (c.scope === s ? ' selected' : '') + '>' + esc(t('corpus.' + (s || 'all'))) + '</option>').join('') + '</select></label>' +
+      '<form id="corpus-form" class="corpus-form"><label for="corpus-kind">' + esc(t('corpus.kind')) + '</label><select id="corpus-kind">' + ['laws','precedents','news'].map(k => '<option value="' + k + '"' + (c.kind === k ? ' selected' : '') + '>' + esc(t('corpus.' + k)) + '</option>').join('') + '</select><label for="corpus-query">' + esc(t('corpus.query')) + '</label><div class="corpus-query-row"><input id="corpus-query" type="search" minlength="2" maxlength="500" required placeholder="' + esc(t('corpus.placeholder')) + '" value="' + esc(c.query) + '"><button class="btn" type="submit"' + (c.busy ? ' disabled' : '') + '>' + esc(c.busy ? t('corpus.searching') : t('corpus.search')) + '</button></div>' +
+      '<div class="corpus-filters" id="corpus-law-filters"' + (c.kind !== 'laws' ? ' hidden' : '') + '><label>' + esc(t('corpus.scope')) + '<select id="corpus-scope">' + ['', 'federal', 'estadual', 'municipal'].map((s) => '<option value="' + s + '"' + (c.scope === s ? ' selected' : '') + '>' + esc(t('corpus.' + (s || 'all'))) + '</option>').join('') + '</select></label>' +
       '<label>' + esc(t('corpus.state')) + '<select id="corpus-uf"><option value="">' + esc(t('corpus.allStates')) + '</option>' + ufOptions.map((r) => '<option value="' + esc(r[0]) + '"' + (r[0] === c.uf ? ' selected' : '') + '>' + esc(r[1]) + '</option>').join('') + '</select></label>' +
       '<label>' + esc(t('corpus.city')) + '<input id="corpus-city" maxlength="100" placeholder="' + esc(t('corpus.cityPlaceholder')) + '" value="' + esc(c.municipality) + '"></label></div><p class="muted corpus-help">' + esc(t('corpus.filterHint')) + '</p></form>' +
       '<div id="corpus-results" class="corpus-results" aria-live="polite" aria-busy="' + c.busy + '">' +
-      (c.error ? callout('warn', esc(c.error)) : '') + resultHTML +
+      (c.error ? callout('warn', esc(c.error)) : '') + (c.kind !== 'laws' ? '<p class="muted">' + esc(t('corpus.separateNotice')) + '</p>' : '') + (c.fetchedAt ? '<p class="corpus-meta">' + esc(t('source.captured') + ': ' + fmtDate(c.fetchedAt)) + (c.stale ? ' · ' + esc(t('corpus.stale')) : '') + '</p>' : '') + resultHTML +
       (c.searched && !c.busy && !c.error && !c.results.length ? '<p class="corpus-empty">' + esc(t('corpus.empty')) + '</p>' : '') + '</div>' +
       '<div class="corpus-pagination">' + (c.offset ? '<button type="button" class="btn btn-secondary" id="corpus-prev"' + (c.busy ? ' disabled' : '') + '>' + esc(t('corpus.previous')) + '</button>' : '') +
       (c.hasMore ? '<button type="button" class="btn btn-secondary" id="corpus-next"' + (c.busy ? ' disabled' : '') + '>' + esc(t('corpus.next')) + '</button>' : '') + '</div>');
@@ -1538,6 +1546,7 @@
       finally { button.disabled = false; }
     }));
     const sync = () => { c.query = $('#corpus-query').value; c.scope = $('#corpus-scope').value; c.uf = $('#corpus-uf').value; c.municipality = $('#corpus-city').value; };
+    $('#corpus-kind').addEventListener('change', () => { sync(); if (corpusController) { corpusController.abort(); corpusController = null; } c.kind = $('#corpus-kind').value; c.results = []; c.searched = false; c.busy = false; c.error = ''; c.offset = 0; c.hasMore = false; c.fetchedAt = null; c.stale = false; render({keep:true}); });
     $('#corpus-form').addEventListener('submit', (e) => { e.preventDefault(); sync(); searchCorpus(0); });
     $$('input,select', $('#corpus-form')).forEach((input) => input.addEventListener('input', sync));
     const previous = $('#corpus-prev'), next = $('#corpus-next');
@@ -1552,7 +1561,7 @@
   async function searchCorpus(offset) {
     const c = state.corpus;
     if (c.query.trim().length < 2) return;
-    const signature = JSON.stringify([c.query, c.scope, c.uf, c.municipality]);
+    const signature = JSON.stringify([c.kind, c.query, c.scope, c.uf, c.municipality]);
     if (signature !== c.lastSearch) offset = 0;
     c.lastSearch = signature;
     if (corpusController) corpusController.abort();
@@ -1560,9 +1569,10 @@
     c.busy = true; c.error = ''; c.searched = true; c.offset = offset;
     render({ keep: true });
     try {
-      const data = await apiCall('search', { query: c.query, scope: c.scope, uf: c.uf, municipality: c.municipality, offset }, ctl.signal);
+      const data = c.kind === 'laws' ? await apiCall('search', { query: c.query, scope: c.scope, uf: c.uf, municipality: c.municipality, offset }, ctl.signal) : await apiCall('knowledge_search', { kind: c.kind, query: c.query, offset }, ctl.signal);
       if (corpusController !== ctl) return;
       c.results = Array.isArray(data.results) ? data.results : []; c.hasMore = data.hasMore === true;
+      c.fetchedAt = data.fetchedAt || null; c.stale = data.stale === true;
     } catch (e) {
       if (corpusController !== ctl) return;
       c.results = []; c.hasMore = false; c.error = t(e && e.code === 'rate_limited' ? 'corpus.rateLimit' : 'corpus.unavailable');
@@ -1628,8 +1638,9 @@
         '</div>';
     }).join('');
     const how = '<div class="reg-card"><h3>' + esc(sp.howTitle) + '</h3><ol class="how-list">' + sp.how.map((x) => '<li>' + esc(x) + '</li>').join('') + '</ol></div>';
-    main.innerHTML = pageShell(sp.title, '', '<p class="prose">' + esc(sp.intro) + '</p>' + officialRegistryHTML(sp) + '<details class="demo-registry"><summary>' + esc(sp.demoSection) + '</summary><div class="callout callout-warn">' + ICONS.warn + '<div>' + esc(sp.banner) + '</div></div><div class="registry">' + queue + cards + '</div></details><div class="registry">' + how + '</div>');
+    main.innerHTML = pageShell(sp.title, '', '<p class="prose">' + esc(sp.intro) + '</p><div class="corpus-coverage"><h2>' + esc(t('corpus.statusTitle')) + '</h2><strong>' + esc(corpusStatsText()) + '</strong><p>' + esc(t('corpus.coverage')) + '</p><button type="button" class="btn btn-secondary" id="refresh-corpus-status">' + esc(t('corpus.refreshStatus')) + '</button></div>' + officialRegistryHTML(sp) + '<details class="demo-registry"><summary>' + esc(sp.demoSection) + '</summary><div class="callout callout-warn">' + ICONS.warn + '<div>' + esc(sp.banner) + '</div></div><div class="registry">' + queue + cards + '</div></details><div class="registry">' + how + '</div>');
     bindBack(main);
+    $('#refresh-corpus-status').addEventListener('click', async (event) => { event.target.disabled = true; try { state.corpus.stats = await apiCall('corpus_stats', {}); } catch { state.corpus.stats = {error:true}; } if (state.view === 'sources') renderSources(main); });
     const rf = $('#reg-filter', main);
     if (rf) {
       const applyFilter = () => { const q = norm(rf.value.trim()); let shown = 0; $$('.reg-card[data-law]', main).forEach((card) => { const ok = !q || card.dataset.law.includes(q); card.hidden = !ok; if (ok) shown++; }); $('#reg-count', main).textContent = q ? fmt(sp.filterCount, { n: shown }) : ''; };
