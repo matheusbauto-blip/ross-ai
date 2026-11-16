@@ -127,6 +127,9 @@ async function checkQuota(req: Request, search = false, strict = false) {
 /* Corpus search does not call the model or require a Google key. Imported
    texts are not labelled as verified current law. Partial/repealed publications
    can be found in search, but are excluded from passages sent to the model. */
+// New corpus writes stay paused until capacity is restored and an operator
+// explicitly re-enables them. Existing snapshots and remote reads still work.
+const LIBRARY_WRITES_ENABLED = Deno.env.get("ROSS_LIBRARY_WRITES_ENABLED") === "true";
 let statsCache: { at: number; data: unknown } | null = null;
 async function corpusOperation(op: string, body: Record<string, unknown>) {
   const url = Deno.env.get("SUPABASE_URL");
@@ -136,7 +139,7 @@ async function corpusOperation(op: string, body: Record<string, unknown>) {
   if (op === "repository_read") {
     const id = str(body.id, 100);
     if (/^l:[a-f0-9]{64}:\d{1,6}$/.test(id)) {
-      const result = await createRepositoryLibrary(sb).read(id);
+      const result = await createRepositoryLibrary(sb,{persist:LIBRARY_WRITES_ENABLED}).read(id);
       return { document: result.doc, markdown: result.markdown, localCopy: result.localCopy, fetchedAt: new Date().toISOString() };
     }
     if (!/^[a-f0-9]{64}$/.test(id)) throw new Error("invalid_id");
@@ -175,7 +178,7 @@ async function corpusOperation(op: string, body: Record<string, unknown>) {
   let sourceFailures = 0;
   if (!offset && references.length) {
     try {
-      const found = await createRepositoryLibrary(sb).search({ references, query, scope, uf, municipality, forAnswer: body.forAnswer === true });
+      const found = await createRepositoryLibrary(sb,{persist:LIBRARY_WRITES_ENABLED}).search({ references, query, scope, uf, municipality, forAnswer: body.forAnswer === true });
       sourceFailures = found.sourceFailures;
       if(found.results.length)return {...found,hasMore:false,repository:"ctresb/leis",complete:false};
     } catch { sourceFailures++; }
@@ -367,6 +370,7 @@ Deno.serve(async (req: Request) => {
     if (!url || !key) return json(503, { error: "library_unavailable" }, origin);
     if (!["texts", "catalog"].includes(String(body.kind)) || !Array.isArray(body.batch) || !body.batch.length ||
       (body.kind === "texts" && body.batch.length > 20) || new TextEncoder().encode(JSON.stringify(body)).length > 8_000_000) return json(400, { error: "invalid_batch" }, origin);
+    if (!LIBRARY_WRITES_ENABLED) return json(503, { error: "library_capacity" }, origin);
     try {
       const sb = createClient(url, key, { auth: { persistSession: false } });
       const auth = await sb.rpc("ross_library_authorize", { p_token_hash: await sha256(match[1]) });

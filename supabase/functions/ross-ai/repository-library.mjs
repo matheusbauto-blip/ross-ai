@@ -68,7 +68,7 @@ function keep(cache,key,value) {
   while(cache.size && (cache.size>=30 || cacheBytes+bytes>12_000_000)){const [k,v]=cache.entries().next().value;cacheBytes-=v.bytes;cache.delete(k);}
   cache.set(key,{...value,bytes});cacheBytes+=bytes;
 }
-export function createRepositoryLibrary(sb,{fetcher=fetch,cache=memory}={}) {
+export function createRepositoryLibrary(sb,{fetcher=fetch,cache=memory,persist=true}={}) {
   async function read(id) {
     if(!/^l:[a-f0-9]{64}:\d{1,6}$/.test(id))throw new Error('invalid_locator');
     const found=await sb.rpc('ross_library_locator',{p_id:id});
@@ -92,6 +92,7 @@ export function createRepositoryLibrary(sb,{fetcher=fetch,cache=memory}={}) {
   }
   async function save(item) {
     if(item.localCopy)return item;
+    if(!persist)return {...item,localCopy:false,persistencePaused:true};
     const stored=await sb.rpc('ross_library_import',{p_documents:[{...item.doc,markdown:item.raw}]});
     return {...item,localCopy:!stored.error,cacheUnavailable:!!stored.error};
   }
