@@ -52,7 +52,7 @@ Pergunta real: “comprei um celular faz 2 semanas e ele deu problrma na bateria
 | “celular” deixa de ser sinônimo de “telefone” (que puxava venda por telefone) e passa a “produto, aparelho”. | Reprodução local da pergunta. |
 | Sem fontes, as perguntas genéricas (“sobre qual tema é a dúvida…”) só aparecem quando o modelo não deu explicação própria. | `qa/ui.test.mjs`: “generic clarification questions appear only when…”. |
 
-A pergunta não foi reenviada ao modelo real durante a correção; a validação é por reprodução local da busca e pelos testes.
+Em 16/11/2026, a mesma pergunta (com o erro de digitação) foi reenviada no site publicado (versão `4640e8e9b726`, função versão 10): a resposta citou os arts. 18, 24 e 26 do CDC, com os prazos de 30 e 90 dias e links para o Planalto. A resposta levou cerca de 75 segundos, quase todo o tempo na etapa de escrita pelo modelo; a latência do modelo de resposta fica como observação.
 
 ## Pendências prioritárias (registro original)
 
