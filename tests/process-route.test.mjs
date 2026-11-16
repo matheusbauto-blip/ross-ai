@@ -8,11 +8,11 @@ import { libraryReferences } from '../supabase/functions/ross-ai/repository-libr
 
 const source = readFileSync(new URL('../supabase/functions/ross-ai/index.ts', import.meta.url), 'utf8').replace(/^import .*;\s*$/gm, '');
 class MockGeminiError extends Error { constructor(status) { super('google_upstream'); this.status = status; } }
-function server({ token = 'test-provider-value', quotaError = false, processSource = 'escavador', maxBody = '', models = null } = {}) {
+function server({ token = 'test-provider-value', quotaError = false, processSource = 'escavador', maxBody = '', models = null, writes = false } = {}) {
   let handler, lookups = 0, djenLookups = 0, modelCalls = 0, quotaCalls = 0;
   const modelsCalled = [];
   const schema = new Proxy(function () {}, { get: () => schema, apply: () => schema });
-  const env = { SUPABASE_URL: 'https://test.invalid', SUPABASE_SERVICE_ROLE_KEY: 'mock-service-role', ESCAVADOR_API_TOKEN: token, ROSS_PROCESS_SOURCE: processSource, ROSS_MAX_BODY_BYTES: maxBody, GEMINI_API_KEY: models ? 'test-google-key' : '' };
+  const env = { SUPABASE_URL: 'https://test.invalid', SUPABASE_SERVICE_ROLE_KEY: 'mock-service-role', ESCAVADOR_API_TOKEN: token, ROSS_PROCESS_SOURCE: processSource, ROSS_MAX_BODY_BYTES: maxBody, GEMINI_API_KEY: models ? 'test-google-key' : '', ROSS_LIBRARY_WRITES_ENABLED: writes ? 'true' : '' };
   const context = {
     Deno: { env: { get: key => env[key] }, serve: fn => { handler = fn; } }, z: schema, setTimeout: (fn) => setTimeout(fn, 0),
     createClient: () => ({ rpc: async () => { quotaCalls++; return quotaError ? { error: { message: 'simulated quota outage' } } : { data: { allowed: true } }; } }),
@@ -53,13 +53,18 @@ test('operator import rejects unauthenticated callers before any database or mod
   assert.equal(s.counts().quotaCalls, 0); assert.equal(s.counts().modelCalls, 0);
 });
 test('operator ingress validates its batch and fails closed without an active grant', async () => {
-  const s = server();
-  const send = body => s.rawRequest(new Request('https://test.invalid', {method:'POST',headers:{Origin:'https://matheusbauto-blip.github.io','Content-Type':'application/json',Authorization:'Bearer '+'a'.repeat(43)},body:JSON.stringify(body)}));
-  const invalid = await send({op:'library_import',kind:'sql',batch:[{}]});
+  const s = server({ writes: true });
+  const send = (server, body) => server.rawRequest(new Request('https://test.invalid', {method:'POST',headers:{Origin:'https://matheusbauto-blip.github.io','Content-Type':'application/json',Authorization:'Bearer '+'a'.repeat(43)},body:JSON.stringify(body)}));
+  const invalid = await send(s, {op:'library_import',kind:'sql',batch:[{}]});
   assert.equal(invalid.status,400); assert.equal(s.counts().quotaCalls,0);
-  const expired = await send({op:'library_import',kind:'texts',batch:[{}]});
+  const expired = await send(s, {op:'library_import',kind:'texts',batch:[{}]});
   assert.equal(expired.status,403); assert.deepEqual(await expired.json(),{error:'operator_grant_expired'});
   assert.equal(s.counts().modelCalls,0);
+  // With corpus writes paused (the default), nothing is written even with a valid-looking grant.
+  const paused = server();
+  const refused = await send(paused, {op:'library_import',kind:'texts',batch:[{}]});
+  assert.equal(refused.status,503); assert.deepEqual(await refused.json(),{error:'library_capacity'});
+  assert.equal(paused.counts().quotaCalls,0);
 });
 
 test('a quota outage blocks process provider calls and invalid numbers never spend quota', async () => {
