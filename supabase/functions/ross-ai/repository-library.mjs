@@ -68,6 +68,27 @@ function keep(cache,key,value) {
   while(cache.size && (cache.size>=30 || cacheBytes+bytes>12_000_000)){const [k,v]=cache.entries().next().value;cacheBytes-=v.bytes;cache.delete(k);}
   cache.set(key,{...value,bytes});cacheBytes+=bytes;
 }
+// Edições do repositório cujo índice estático o site publica. Um pedido por caminho só é aceito nelas.
+export const INDEX_REFS = new Set([DEFAULT_REF]);
+/* Texto de uma entrada do índice estático: a cópia própria (snapshot) é preferida; sem ela, o GitHub, sempre na
+   edição fixa. O hash informado pelo índice (prefixo do SHA-256 do arquivo) precisa conferir. Nada é gravado. */
+export async function readIndexedDocument(sb,{path,ref,hash},{fetcher=fetch,cache=memory}={}) {
+  if(typeof path!=='string'||!isCorpusPath(path)||!/^[a-f0-9]{40}$/.test(String(ref))||!INDEX_REFS.has(ref)||!/^[a-f0-9]{16,64}$/.test(String(hash)))throw new Error('invalid_locator');
+  const key=ref+':'+path;
+  const documentId=await digestText('ctresb/leis:'+path);
+  let raw, localCopy=false;
+  const stored=await sb.from('ross_law_versions').select('markdown,stored_at').eq('document_id',documentId).eq('repository_ref',ref).order('stored_at',{ascending:false}).limit(1).maybeSingle();
+  if(stored && stored.data && typeof stored.data.markdown==='string'){raw=stored.data.markdown;localCopy=true;}
+  else if(cache.has(key))raw=cache.get(key).raw;
+  else {
+    const url='https://raw.githubusercontent.com/ctresb/leis/'+ref+'/'+path.split('/').map(encodeURIComponent).join('/');
+    raw=await boundedText(await fetcher(url,{signal:AbortSignal.timeout(15000),redirect:'error'}));
+  }
+  if(!(await digestText(raw)).startsWith(String(hash).toLowerCase()))throw new Error('document_integrity');
+  const doc=corpusDocument(path,raw,ref,true);
+  keep(cache,key,{raw});
+  return {doc,raw,markdown:raw.replace(/^---\r?\n[\s\S]*?\r?\n---(?:\r?\n|$)/,''),localCopy};
+}
 export function createRepositoryLibrary(sb,{fetcher=fetch,cache=memory,persist=true}={}) {
   async function read(id) {
     if(!/^l:[a-f0-9]{64}:\d{1,6}$/.test(id))throw new Error('invalid_locator');

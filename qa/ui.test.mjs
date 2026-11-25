@@ -785,3 +785,96 @@ test('the settings screen shows the version so an update can be confirmed', t =>
   api.state.lang = 'en'; api.go('settings');
   assert.match(document.querySelector('#about-version').textContent, /Development version/);
 });
+
+const INDEX_REF = 'c9f21b4ab11aa0d7ca6fe861d75028e94219c2d6';
+const indexManifest = { repository: 'ctresb/leis', ref: INDEX_REF, total: 1218984, units: {
+  'raiz': { scope: 'federal', family: 'constituicao', count: 1, parts: ['raiz.1.json'] },
+  'federal/leis-ordinarias': { scope: 'federal', family: 'leis-ordinarias', count: 2, parts: ['federal__leis-ordinarias.1.json'] },
+  'estaduais/SP': { scope: 'estadual', uf: 'SP', count: 1, parts: ['estaduais__SP.1.json'] },
+  'reguladores/anvisa': { scope: 'regulador', family: 'anvisa', count: 1, parts: ['reguladores__anvisa.1.json'] },
+} };
+const indexShards = {
+  'raiz.1.json': { entries: [{ p: 'constituicao.md', h: 'f'.repeat(16), t: 'Constituição Federal de 1988' }] },
+  'federal__leis-ordinarias.1.json': { entries: [
+    { p: '2020/lei-99999-2020-02-02.md', h: 'a'.repeat(16), t: 'Lei nº 99.999 de 02/02/2020', e: 'Dispõe sobre a garantia de baterias de celulares e dá outras providências.', k: 'Lei Ordinária', n: '99999', d: '2020-02-02' },
+    { p: '1990/lei-8078-1990-09-11.md', h: 'b'.repeat(16), t: 'Lei nº 8.078 de 11/09/1990', e: 'Dispõe sobre a proteção do consumidor e dá outras providências.', k: 'Lei Ordinária', n: '8078', d: '1990-09-11' },
+  ] },
+  'estaduais__SP.1.json': { entries: [{ p: 'leis-ordinarias/2015/lei-5-2015-01-01.md', h: 'c'.repeat(16), t: 'Lei nº 5 de 01/01/2015', e: 'Dispõe sobre a troca de baterias de celulares no Estado de São Paulo.', k: 'Lei Ordinária', n: '5', d: '2015-01-01' }] },
+  'reguladores__anvisa.1.json': { entries: [{ p: 'resolucoes/2020/rdc-1-2020.md', h: 'd'.repeat(16), t: 'RDC nº 1 de 2020', e: 'Dispõe sobre baterias em equipamentos médicos.', k: 'Resolução', n: '1', d: '2020-01-01' }] },
+};
+function indexFetcher(onApi) {
+  return async (url, options) => {
+    const address = String(url);
+    if (address.startsWith('https://matheusbauto-blip.github.io/ross-ai/index/')) {
+      const file = address.slice('https://matheusbauto-blip.github.io/ross-ai/index/'.length);
+      if (file === 'manifest.json') return Response.json(indexManifest);
+      return indexShards[file] ? Response.json(indexShards[file]) : new Response('', { status: 404 });
+    }
+    const match = address.match(/data\/(laws\/[a-z0-9_-]+\.json)/i);
+    if (match) return Response.json(JSON.parse(read('data/' + match[1])));
+    return onApi(JSON.parse(options.body));
+  };
+}
+
+test('the search page combines the imported corpus with the full repository index and reads an entry by path and hash', async t => {
+  const reads = [];
+  const { api, document, window, change } = setup(t, indexFetcher(body => {
+    if (body.op === 'corpus_stats') return Response.json({ documents: 15487, fullTexts: 15252, catalogDocuments: 1218984 });
+    if (body.op === 'search') return Response.json({ results: [], hasMore: false });
+    if (body.op === 'repository_read') { reads.push(body); return Response.json({ document: { title: 'Lei nº 99.999 de 02/02/2020', source_url: 'https://www.planalto.gov.br/teste' }, markdown: '# Lei\n\n**Art. 1º** As baterias de celulares têm garantia mínima de um ano.', localCopy: false }); }
+    return Response.json({});
+  }));
+  api.go('search');
+  for (let i = 0; i < 20 && !/Índice completo/.test(document.querySelector('#index-status').textContent); i++) await tick();
+  assert.match(document.querySelector('#index-status').textContent, /1\.218\.984 textos/);
+  change('#corpus-query', 'garantia bateria celular');
+  document.querySelector('#corpus-form').dispatchEvent(new window.Event('submit', { bubbles: true, cancelable: true }));
+  for (let i = 0; i < 40 && !document.querySelector('.badge-index'); i++) await tick();
+  const results = Array.from(document.querySelectorAll('.corpus-result'));
+  assert.ok(results.length >= 1, 'index results expected');
+  assert.match(results[0].textContent, /Lei nº 99\.999/);
+  assert.match(results[0].textContent, /Índice do repositório/);
+  assert.ok(!results.some(r => /São Paulo/.test(r.textContent)), 'state shards are not loaded without a state');
+  assert.match(results[0].querySelector('a[href*="github.com/ctresb/leis/blob/"]').getAttribute('href'), new RegExp(INDEX_REF + '/federal/leis-ordinarias/2020/lei-99999-2020-02-02\\.md$'));
+  results[0].querySelector('[data-read-corpus]').click();
+  for (let i = 0; i < 40 && !reads.length; i++) await tick();
+  await tick();
+  assert.deepEqual(reads[0], { op: 'repository_read', path: 'federal/leis-ordinarias/2020/lei-99999-2020-02-02.md', ref: INDEX_REF, hash: 'a'.repeat(16) });
+  assert.match(results[0].querySelector('.corpus-fulltext').textContent, /garantia mínima de um ano/);
+  // Choosing a state adds its shard; the regulatory scope needs an agency.
+  change('#corpus-uf', 'SP');
+  document.querySelector('#corpus-form').dispatchEvent(new window.Event('submit', { bubbles: true, cancelable: true }));
+  for (let i = 0; i < 40 && !/São Paulo/.test(document.querySelector('#corpus-results').textContent); i++) await tick();
+  assert.match(document.querySelector('#corpus-results').textContent, /Estado de São Paulo/);
+  change('#corpus-scope', 'regulador');
+  for (let i = 0; i < 10 && !document.querySelector('#corpus-organ option[value="anvisa"]'); i++) await tick();
+  assert.ok(document.querySelector('#corpus-organ option[value="anvisa"]'), 'agency list comes from the manifest');
+  document.querySelector('#corpus-form').dispatchEvent(new window.Event('submit', { bubbles: true, cancelable: true }));
+  for (let i = 0; i < 40 && !/escolha o órgão/.test(document.querySelector('#corpus-results').textContent); i++) await tick();
+  assert.match(document.querySelector('#corpus-results').textContent, /escolha o órgão/);
+});
+
+test('an answer can cite a law found only in the repository index, read on demand with its hash', async t => {
+  const reads = []; let answerExcerpts = [];
+  const { api } = setup(t, indexFetcher(body => {
+    if (body.op === 'search') return Response.json({ results: [] });
+    if (body.op === 'prepare') {
+      const indexed = body.catalog.find(law => /^passage-/.test(law.id) && /99\.999/.test(law.name));
+      return Response.json(body.catalog.some(law => /^passage-/.test(law.id)) ? { terms: [], laws: indexed ? [indexed.id] : [] } : { terms: ['garantia', 'bateria'], laws: [] });
+    }
+    if (body.op === 'repository_read') { reads.push(body); return Response.json({ document: { title: 'Lei nº 99.999 de 02/02/2020', source_url: 'https://www.planalto.gov.br/teste', text_version: 'compilada (texto vigente)', captured_at: '2026-10-13' }, passages: [{ article: 'Art. 1º', excerpt: 'Art. 1º As baterias de celulares têm garantia mínima de um ano, contada da entrega do aparelho.' }], localCopy: false }); }
+    answerExcerpts = body.excerpts.map(excerpt => excerpt.name + ' · ' + excerpt.article);
+    return Response.json({ answer: { kind: 'answer', summary: 'A garantia mínima é de um ano.', sourcesSay: [{ title: 'Lei 99.999', text: 'Garantia de um ano.', ref: body.excerpts.findIndex(excerpt => /99\.999/.test(excerpt.name)) + 1 }], sources: [{ ref: body.excerpts.findIndex(excerpt => /99\.999/.test(excerpt.name)) + 1, why: 'garantia' }], warnings: [] } });
+  }));
+  api.state.mode = 'oficial';
+  await api.submitMessage('qual a garantia mínima da bateria de um celular novo?');
+  const message = api.state.conversations[0].messages.at(-1);
+  assert.equal(message.status, 'done', message.error);
+  assert.equal(reads.length, 1, 'only the strongly matching index entry is read');
+  assert.equal(reads[0].path, 'federal/leis-ordinarias/2020/lei-99999-2020-02-02.md'); assert.equal(reads[0].hash, 'a'.repeat(16)); assert.match(reads[0].query, /bateria/);
+  assert.ok(answerExcerpts.some(name => /99\.999 .* Art\. 1º/.test(name)), answerExcerpts.join(' | '));
+  const source = message.answer.sources.find(s => s.fromIndex);
+  assert.ok(source, 'the index source is cited'); assert.equal(source.repositoryPath, 'federal/leis-ordinarias/2020/lei-99999-2020-02-02.md');
+  assert.equal(source.url, 'https://www.planalto.gov.br/teste');
+  assert.ok(message.answer.corpus, 'imported provenance is shown');
+});

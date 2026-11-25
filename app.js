@@ -54,7 +54,7 @@
     mode: 'oficial',
     catalog: null,
     lawPending: null,
-    corpus: { kind: 'laws', query: '', scope: '', uf: '', municipality: '', results: [], offset: 0, hasMore: false, searched: false, busy: false, error: '', stats: null, statsRequested: false },
+    corpus: { kind: 'laws', query: '', scope: '', uf: '', municipality: '', organ: '', federalActs: false, results: [], offset: 0, hasMore: false, searched: false, busy: false, error: '', indexNotice: '', stats: null, statsRequested: false },
     conversations: [],
     feedback: {},
     sourcesReview: {},
@@ -1173,6 +1173,10 @@
             nota: r.text_version + ' · ' + t('corpus.currency')
           }));
         } catch (e) { if (signal.aborted) throw { code: 'cancelled' }; /* bundled official texts remain available */ }
+        try {
+          const known = new Set(importedSources.map((s) => s.repositoryPath).filter(Boolean));
+          importedSources = importedSources.concat(await indexCandidatesForAnswer(searchText.slice(0, 500), context.query, conv, known, signal));
+        } catch (e) { if (signal.aborted) throw { code: 'cancelled' }; /* o índice é um complemento; sua falha não interrompe a resposta */ }
       }
       let laws = selectLaws(searchText, apiLaws && apiLaws.map((l) => l.id), context.query);
       if (!laws.length) { const picked = await selectLawsAI(context.searchQuestion); if (picked && picked.length) laws = picked; }
@@ -1481,6 +1485,133 @@
   }
 
   /* ---------- Pesquisa no acervo importado ---------- */
+  /* ---------- Índice estático do repositório (todas as normas do ctresb/leis, edição fixa) ----------
+     O índice fica publicado como arquivos JSON por unidade (federal/<série>, estaduais/<UF>, municipais/<UF>,
+     reguladores/<órgão>…). Ele não contém os textos: cada entrada tem título, ementa, identificação, caminho e
+     prefixo de hash; o texto integral é lido sob demanda pela função, sempre na edição fixa e conferindo o hash. */
+  const INDEX_URL = (window.ROSS_CONFIG && window.ROSS_CONFIG.indexUrl) || '';
+  const INDEX_LAW_FAMILIES = ['constituicao', 'leis-ordinarias', 'leis-complementares', 'leis-delegadas', 'decretos-lei', 'emendas-constitucionais', 'constituicoes-historicas', 'leis-constitucionais', 'regimentos', 'medidas-provisorias'];
+  const lawIndex = { manifest: null, manifestPromise: null, units: new Map(), unitPromises: new Map(), failed: false };
+  const indexRecords = new Map();
+  async function indexJSON(path, signal) {
+    const res = await fetch(INDEX_URL + path, { signal: signal, cache: 'force-cache' });
+    if (!res.ok) throw { code: 'index_unavailable', message: 'HTTP ' + res.status };
+    return res.json();
+  }
+  function indexManifest(signal) {
+    if (!INDEX_URL) return Promise.resolve(null);
+    if (lawIndex.manifest) return Promise.resolve(lawIndex.manifest);
+    if (!lawIndex.manifestPromise) lawIndex.manifestPromise = indexJSON('manifest.json', signal).then((m) => { lawIndex.manifest = m && m.units ? m : null; lawIndex.failed = !lawIndex.manifest; return lawIndex.manifest; }).catch((e) => { lawIndex.manifestPromise = null; lawIndex.failed = true; throw e; });
+    return lawIndex.manifestPromise;
+  }
+  function indexUnit(name, signal) {
+    if (lawIndex.units.has(name)) return Promise.resolve(lawIndex.units.get(name));
+    if (!lawIndex.unitPromises.has(name)) {
+      const meta = lawIndex.manifest && lawIndex.manifest.units[name];
+      if (!meta) return Promise.resolve([]);
+      lawIndex.unitPromises.set(name, Promise.all(meta.parts.map((part) => indexJSON(part, signal))).then((parts) => {
+        const entries = [];
+        parts.forEach((part) => (part.entries || []).forEach((e) => { e.unit = name; e._s = norm((e.t || '') + ' ' + (e.e || '')); entries.push(e); }));
+        lawIndex.units.set(name, entries); lawIndex.unitPromises.delete(name); return entries;
+      }).catch((e) => { lawIndex.unitPromises.delete(name); throw e; }));
+    }
+    return lawIndex.unitPromises.get(name);
+  }
+  /* Unidades a carregar para uma pesquisa: leis federais sempre; decretos e atos federais só quando pedidos;
+     estados e municípios exigem a UF (um índice nacional inteiro não cabe numa página). */
+  function indexUnitsFor(opts) {
+    const m = lawIndex.manifest; if (!m) return [];
+    const names = Object.keys(m.units);
+    const federalLaws = names.filter((u) => m.units[u].scope === 'federal' && INDEX_LAW_FAMILIES.includes(m.units[u].family));
+    const out = [];
+    if (!opts.scope || opts.scope === 'federal') out.push.apply(out, federalLaws);
+    if (opts.scope === 'federal' && opts.federalActs) out.push.apply(out, names.filter((u) => m.units[u].scope === 'federal' && !INDEX_LAW_FAMILIES.includes(m.units[u].family)));
+    if ((!opts.scope || opts.scope === 'estadual') && opts.uf && m.units['estaduais/' + opts.uf]) out.push('estaduais/' + opts.uf);
+    if ((opts.scope === 'municipal' || (!opts.scope && opts.municipality)) && opts.uf && m.units['municipais/' + opts.uf]) out.push('municipais/' + opts.uf);
+    if (opts.scope === 'regulador' && opts.organ && m.units['reguladores/' + opts.organ]) out.push('reguladores/' + opts.organ);
+    if (opts.scope === 'jurisprudencia' && m.units.jurisprudencia) out.push('jurisprudencia');
+    if (opts.scope === 'tratado' && m.units.tratados) out.push('tratados');
+    return out;
+  }
+  function indexQueryTerms(query) {
+    const number = (String(query).match(/\b(\d{1,3}(?:\.\d{3})+|\d{2,6})\b/) || [])[1];
+    return { tokens: tokensOf(query).slice(0, 12), number: number ? number.replace(/\./g, '') : '' };
+  }
+  function municipalityOf(entry) { return entry.unit && entry.unit.indexOf('municipais/') === 0 ? (entry.p.split('/')[0] || '') : ''; }
+  /* Pontuação simples e previsível: número exato pesa mais; cada termo encontrado no título ou na ementa soma;
+     todos os termos presentes dobram; o mais recente desempata. */
+  function searchIndexEntries(entries, query, limit, filter) {
+    const terms = indexQueryTerms(query);
+    if (!terms.tokens.length && !terms.number) return [];
+    const patterns = terms.tokens.map((tk) => new RegExp('(^|[^a-z0-9])' + tk.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
+    const scored = [];
+    for (let i = 0; i < entries.length; i++) {
+      const e = entries[i];
+      if (filter && !filter(e)) continue;
+      let score = 0, matched = 0;
+      const title = norm(e.t || '');
+      for (let j = 0; j < patterns.length; j++) { if (patterns[j].test(e._s)) { matched++; score += patterns[j].test(title) ? 2.5 : 1; } }
+      if (terms.number && e.n === terms.number) { score += 6; matched++; }
+      if (!matched) continue;
+      if (patterns.length && matched >= patterns.length) score *= 2;
+      if (e.x) score *= 0.9;
+      scored.push({ e: e, score: score });
+    }
+    scored.sort((a, b) => b.score - a.score || String(b.e.d || '').localeCompare(String(a.e.d || '')));
+    return scored.slice(0, limit).map((x) => Object.assign({ score: x.score }, x.e));
+  }
+  function indexRecord(e) {
+    const m = lawIndex.manifest, unit = m.units[e.unit] || {};
+    const path = e.unit === 'raiz' ? e.p : e.unit + '/' + e.p;
+    const id = 'idx:' + path;
+    const record = { id: id, fromIndex: true, title: e.t, summary: e.e || '', norm_type: e.k || '', number: e.n || '', norm_date: e.d || '',
+      scope: unit.scope || 'federal', uf: unit.uf || '', municipality: municipalityOf(e), repository_path: path, repository_ref: m.ref, hash: e.h,
+      is_partial: !!e.x, status: e.r ? 'repealed' : 'unknown', source_url: '', article: '', excerpt: '', score: e.score || 0 };
+    indexRecords.set(id, record);
+    return record;
+  }
+  async function searchIndex(query, opts, signal) {
+    const manifest = await indexManifest(signal);
+    if (!manifest) return { results: [], units: [] };
+    const units = indexUnitsFor(opts);
+    const loaded = await Promise.all(units.map((u) => indexUnit(u, signal)));
+    const all = [].concat.apply([], loaded);
+    const city = opts.municipality ? norm(opts.municipality).replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') : '';
+    const filter = city ? (e) => !e.unit || e.unit.indexOf('municipais/') !== 0 || municipalityOf(e) === city : null;
+    return { results: searchIndexEntries(all, query, opts.limit || 10, filter).map(indexRecord), units: units };
+  }
+  /* Na resposta: candidatos do índice (leis federais e, se houver UF, estaduais) que a busca local não cobre; os
+     textos são lidos pela função, que devolve só os artigos pertinentes. */
+  async function indexCandidatesForAnswer(query, originalQuestion, conv, excludePaths, signal) {
+    if (!INDEX_URL || !API_URL) return [];
+    let found;
+    try { found = await searchIndex(query, { uf: conv.region || '', limit: 6 }, signal); }
+    catch (e) { if (signal && signal.aborted) throw { code: 'cancelled' }; return []; }
+    // Normas já distribuídas com o app (as 66) não são lidas de novo pelo índice: compara o número, não o ano.
+    const catalogNumbers = new Set(state.catalog.laws.map((l) => (String(l.number || '').match(/\d[\d.]*/) || [''])[0].replace(/\./g, '')).filter(Boolean));
+    const picked = found.results.filter((r) => r.score >= 3 && !r.is_partial && r.status !== 'repealed' && !excludePaths.has(r.repository_path) && !(r.scope === 'federal' && catalogNumbers.has(r.number))).slice(0, 3);
+    const reads = await Promise.allSettled(picked.map((r) => apiCall('repository_read', { path: r.repository_path, ref: r.repository_ref, hash: r.hash, query: String(query).slice(0, 500) }, signal)));
+    const sources = [];
+    reads.forEach((read, i) => {
+      if (read.status !== 'fulfilled' || !read.value || !Array.isArray(read.value.passages)) return;
+      const r = picked[i], doc = read.value.document || {};
+      read.value.passages.forEach((pass) => {
+        if (!pass || !pass.excerpt) return;
+        sources.push({ lawId: 'index-' + r.repository_path, imported: true, fromIndex: true, name: doc.title || r.title, shortName: doc.title || r.title, article: pass.article || t('corpus.textOfNorm'), heading: '',
+          status: 'nao_confirmada', url: doc.source_url || corpusRepoURL(r.repository_path, r.repository_ref), textUrl: doc.source_url || '', retrievedAt: doc.captured_at || '',
+          version: String(r.repository_ref).slice(0, 12), corpusVersion: doc.text_version || t('corpus.editionUnknown'), repositoryPath: r.repository_path, repositoryRef: r.repository_ref, localCopy: read.value.localCopy === true,
+          excerpt: pass.excerpt.length > 2800 ? pass.excerpt.slice(0, 2800) + '\n[…]' : pass.excerpt, nota: (doc.text_version || t('corpus.editionUnknown')) + ' · ' + t('corpus.currency') });
+      });
+    });
+    return sources;
+  }
+  function indexResultHTML(r) {
+    return '<article class="corpus-result"><div class="corpus-result-head"><h2>' + esc(r.title) + '</h2><span class="badge badge-index">' + esc(t('corpus.indexBadge')) + '</span>' + (r.is_partial ? '<span class="badge badge-historico">' + esc(t('corpus.partial')) + '</span>' : '') + '</div>' +
+      '<p class="corpus-meta">' + esc([t('corpus.' + r.scope), r.uf, r.municipality, r.norm_type, r.norm_date ? fmtDate(r.norm_date) : ''].filter(Boolean).join(' · ')) + '</p>' +
+      (r.summary ? '<p>' + esc(r.summary) + '</p>' : '<p class="muted">' + esc(t('corpus.noSummary')) + '</p>') +
+      '<p class="corpus-meta">' + esc(r.status === 'repealed' ? t('corpus.repealed') : t('corpus.currency')) + '</p>' +
+      corpusLinks('', r.repository_path, r.repository_ref) + '<button type="button" class="btn btn-secondary btn-sm" data-read-corpus="' + esc(r.id) + '">' + esc(t('corpus.readRepository')) + '</button><div class="corpus-fulltext" hidden></div></article>';
+  }
   let corpusController = null;
   const repositoryReads = new Map();
   function corpusRepoURL(path, ref) {
@@ -1511,7 +1642,7 @@
     const c = state.corpus;
     const ufOptions = GEO.regions.BR || regionsFor('BR') || [];
     const stats = corpusStatsText();
-    const resultHTML = c.results.map((r) => r.contentType ? publicResultHTML(r) : '<article class="corpus-result"><div class="corpus-result-head"><h2>' + esc(r.title) + '</h2><span class="badge ' + (r.is_partial ? 'badge-historico' : 'badge-imported') + '">' + esc(r.is_partial ? t('corpus.partial') : t('corpus.imported')) + '</span></div>' +
+    const resultHTML = c.results.map((r) => r.contentType ? publicResultHTML(r) : r.fromIndex ? indexResultHTML(r) : '<article class="corpus-result"><div class="corpus-result-head"><h2>' + esc(r.title) + '</h2><span class="badge ' + (r.is_partial ? 'badge-historico' : 'badge-imported') + '">' + esc(r.is_partial ? t('corpus.partial') : t('corpus.imported')) + '</span></div>' +
       '<p class="corpus-meta">' + esc([t('corpus.' + r.scope), r.uf, r.municipality, r.article].filter(Boolean).join(' · ')) + '</p>' +
       (r.summary ? '<p>' + esc(r.summary) + '</p>' : '') +
       '<details class="corpus-excerpt"><summary>' + esc(t('corpus.readExcerpt')) + '</summary><p>' + esc(r.excerpt) + '</p></details>' +
@@ -1519,13 +1650,15 @@
       (r.captured_at ? ' · ' + esc(t('source.captured') + ': ' + fmtDate(r.captured_at)) : '') + '</p>' +
       corpusLinks(r.source_url, r.repository_path, r.repository_ref) + (r.repository_path ? '<button type="button" class="btn btn-secondary btn-sm" data-read-corpus="' + esc(r.id) + '">' + esc(t('corpus.readRepository')) + '</button><div class="corpus-fulltext" hidden></div>' : '') + '</article>').join('');
     main.innerHTML = pageShell(t('corpus.title'), '', '<p class="prose">' + esc(t('corpus.intro')) + '</p>' +
-      '<div class="corpus-coverage"><strong>' + esc(stats) + '</strong><p>' + esc(t('corpus.coverage')) + '</p></div>' +
+      '<div class="corpus-coverage"><strong>' + esc(stats) + '</strong><p>' + esc(t('corpus.coverage')) + '</p><p id="index-status" class="corpus-meta">' + esc(indexStatusText()) + '</p></div>' +
       '<form id="corpus-form" class="corpus-form"><label for="corpus-kind">' + esc(t('corpus.kind')) + '</label><select id="corpus-kind">' + ['laws','precedents','news'].map(k => '<option value="' + k + '"' + (c.kind === k ? ' selected' : '') + '>' + esc(t('corpus.' + k)) + '</option>').join('') + '</select><label for="corpus-query">' + esc(t('corpus.query')) + '</label><div class="corpus-query-row"><input id="corpus-query" type="search" minlength="2" maxlength="500" required placeholder="' + esc(t('corpus.placeholder')) + '" value="' + esc(c.query) + '"><button class="btn" type="submit"' + (c.busy ? ' disabled' : '') + '>' + esc(c.busy ? t('corpus.searching') : t('corpus.search')) + '</button></div>' +
-      '<div class="corpus-filters" id="corpus-law-filters"' + (c.kind !== 'laws' ? ' hidden' : '') + '><label>' + esc(t('corpus.scope')) + '<select id="corpus-scope">' + ['', 'federal', 'estadual', 'municipal'].map((s) => '<option value="' + s + '"' + (c.scope === s ? ' selected' : '') + '>' + esc(t('corpus.' + (s || 'all'))) + '</option>').join('') + '</select></label>' +
+      '<div class="corpus-filters" id="corpus-law-filters"' + (c.kind !== 'laws' ? ' hidden' : '') + '><label>' + esc(t('corpus.scope')) + '<select id="corpus-scope">' + ['', 'federal', 'estadual', 'municipal', 'regulador'].map((s) => '<option value="' + s + '"' + (c.scope === s ? ' selected' : '') + '>' + esc(t('corpus.' + (s || 'all'))) + '</option>').join('') + '</select></label>' +
+      '<label' + (c.scope === 'regulador' ? '' : ' hidden') + '>' + esc(t('corpus.organ')) + '<select id="corpus-organ"><option value="">' + esc(t('corpus.chooseOrgan')) + '</option>' + indexOrgans().map((o) => '<option value="' + esc(o) + '"' + (o === c.organ ? ' selected' : '') + '>' + esc(o.toUpperCase()) + '</option>').join('') + '</select></label>' +
+      '<label class="check"' + (c.scope === 'federal' ? '' : ' hidden') + '><input type="checkbox" id="corpus-acts"' + (c.federalActs ? ' checked' : '') + '> ' + esc(t('corpus.federalActs')) + '</label>' +
       '<label>' + esc(t('corpus.state')) + '<select id="corpus-uf"><option value="">' + esc(t('corpus.allStates')) + '</option>' + ufOptions.map((r) => '<option value="' + esc(r[0]) + '"' + (r[0] === c.uf ? ' selected' : '') + '>' + esc(r[1]) + '</option>').join('') + '</select></label>' +
       '<label>' + esc(t('corpus.city')) + '<input id="corpus-city" maxlength="100" placeholder="' + esc(t('corpus.cityPlaceholder')) + '" value="' + esc(c.municipality) + '"></label></div><p class="muted corpus-help">' + esc(t('corpus.filterHint')) + '</p></form>' +
       '<div id="corpus-results" class="corpus-results" aria-live="polite" aria-busy="' + c.busy + '">' +
-      (c.error ? callout('warn', esc(c.error)) : '') + (c.kind !== 'laws' ? '<p class="muted">' + esc(t('corpus.separateNotice')) + '</p>' : '') + (c.fetchedAt ? '<p class="corpus-meta">' + esc(t('source.captured') + ': ' + fmtDate(c.fetchedAt)) + (c.stale ? ' · ' + esc(t('corpus.stale')) : '') + '</p>' : '') + resultHTML +
+      (c.error ? callout('warn', esc(c.error)) : '') + (c.indexNotice ? '<p class="muted">' + esc(c.indexNotice) + '</p>' : '') + (c.kind !== 'laws' ? '<p class="muted">' + esc(t('corpus.separateNotice')) + '</p>' : '') + (c.fetchedAt ? '<p class="corpus-meta">' + esc(t('source.captured') + ': ' + fmtDate(c.fetchedAt)) + (c.stale ? ' · ' + esc(t('corpus.stale')) : '') + '</p>' : '') + resultHTML +
       (c.searched && !c.busy && !c.error && !c.results.length ? '<p class="corpus-empty">' + esc(t('corpus.empty')) + '</p>' : '') + '</div>' +
       '<div class="corpus-pagination">' + (c.offset ? '<button type="button" class="btn btn-secondary" id="corpus-prev"' + (c.busy ? ' disabled' : '') + '>' + esc(t('corpus.previous')) + '</button>' : '') +
       (c.hasMore ? '<button type="button" class="btn btn-secondary" id="corpus-next"' + (c.busy ? ' disabled' : '') + '>' + esc(t('corpus.next')) + '</button>' : '') + '</div>');
@@ -1537,7 +1670,8 @@
       try {
         let data = repositoryReads.get(button.dataset.readCorpus);
         if (!data) {
-          data = await apiCall('repository_read', { id: button.dataset.readCorpus });
+          const record = indexRecords.get(button.dataset.readCorpus);
+          data = record ? await apiCall('repository_read', { path: record.repository_path, ref: record.repository_ref, hash: record.hash }) : await apiCall('repository_read', { id: button.dataset.readCorpus });
           if (repositoryReads.size >= 3) repositoryReads.delete(repositoryReads.keys().next().value);
           repositoryReads.set(button.dataset.readCorpus, data);
         }
@@ -1545,7 +1679,8 @@
       } catch (e) { box.textContent = t('corpus.unavailable'); box.hidden = false; button.textContent = t('corpus.readRepository'); }
       finally { button.disabled = false; }
     }));
-    const sync = () => { c.query = $('#corpus-query').value; c.scope = $('#corpus-scope').value; c.uf = $('#corpus-uf').value; c.municipality = $('#corpus-city').value; };
+    const sync = () => { c.query = $('#corpus-query').value; c.scope = $('#corpus-scope').value; c.uf = $('#corpus-uf').value; c.municipality = $('#corpus-city').value; const organ = $('#corpus-organ'); c.organ = organ ? organ.value : ''; const acts = $('#corpus-acts'); c.federalActs = !!(acts && acts.checked); };
+    $('#corpus-scope').addEventListener('change', () => { sync(); render({ keep: true }); });
     $('#corpus-kind').addEventListener('change', () => { sync(); if (corpusController) { corpusController.abort(); corpusController = null; } c.kind = $('#corpus-kind').value; c.results = []; c.searched = false; c.busy = false; c.error = ''; c.offset = 0; c.hasMore = false; c.fetchedAt = null; c.stale = false; render({keep:true}); });
     $('#corpus-form').addEventListener('submit', (e) => { e.preventDefault(); sync(); searchCorpus(0); });
     $$('input,select', $('#corpus-form')).forEach((input) => input.addEventListener('input', sync));
@@ -1557,6 +1692,14 @@
       apiCall('corpus_stats', {}).then((data) => { c.stats = data; if (state.view === 'search') render({ keep: true }); })
         .catch(() => { c.stats = { error: true }; if (state.view === 'search') render({ keep: true }); });
     }
+    if (INDEX_URL && !lawIndex.manifest && !lawIndex.failed) indexManifest().then(() => { if (state.view === 'search') render({ keep: true }); }).catch(() => { if (state.view === 'search') render({ keep: true }); });
+  }
+  function indexOrgans() { const m = lawIndex.manifest; return m ? Object.keys(m.units).filter((u) => u.indexOf('reguladores/') === 0).map((u) => u.slice(12)).sort() : []; }
+  function indexStatusText() {
+    if (!INDEX_URL) return '';
+    const m = lawIndex.manifest;
+    if (m) return t('corpus.indexReady', { n: Number(m.total || 0).toLocaleString(state.lang), ref: String(m.ref || '').slice(0, 8) });
+    return lawIndex.failed ? t('corpus.indexUnavailable') : t('corpus.indexLoading');
   }
   async function searchCorpus(offset) {
     const c = state.corpus;
@@ -1569,10 +1712,29 @@
     c.busy = true; c.error = ''; c.searched = true; c.offset = offset;
     render({ keep: true });
     try {
-      const data = c.kind === 'laws' ? await apiCall('search', { query: c.query, scope: c.scope, uf: c.uf, municipality: c.municipality, offset }, ctl.signal) : await apiCall('knowledge_search', { kind: c.kind, query: c.query, offset }, ctl.signal);
-      if (corpusController !== ctl) return;
-      c.results = Array.isArray(data.results) ? data.results : []; c.hasMore = data.hasMore === true;
-      c.fetchedAt = data.fetchedAt || null; c.stale = data.stale === true;
+      if (c.kind !== 'laws') {
+        const data = await apiCall('knowledge_search', { kind: c.kind, query: c.query, offset }, ctl.signal);
+        if (corpusController !== ctl) return;
+        c.results = Array.isArray(data.results) ? data.results : []; c.hasMore = data.hasMore === true;
+        c.fetchedAt = data.fetchedAt || null; c.stale = data.stale === true;
+      } else {
+        const serverScope = ['federal', 'estadual', 'municipal'].includes(c.scope) ? c.scope : '';
+        const wantsIndex = INDEX_URL && (offset === 0);
+        const [server, index] = await Promise.allSettled([
+          c.scope === 'regulador' ? Promise.resolve({ results: [] }) : apiCall('search', { query: c.query, scope: serverScope, uf: c.uf, municipality: c.municipality, offset }, ctl.signal),
+          wantsIndex ? searchIndex(c.query, { scope: c.scope, uf: c.uf, municipality: c.municipality, organ: c.organ, federalActs: c.federalActs, limit: 12 }, ctl.signal) : Promise.resolve({ results: [], units: [] })
+        ]);
+        if (corpusController !== ctl) return;
+        if (server.status === 'rejected' && index.status === 'rejected') throw server.reason;
+        const data = server.status === 'fulfilled' ? server.value : { results: [] };
+        const fromServer = Array.isArray(data.results) ? data.results : [];
+        const known = new Set(fromServer.map((r) => r.repository_path).filter(Boolean));
+        const fromIndex = index.status === 'fulfilled' ? index.value.results.filter((r) => !known.has(r.repository_path)) : [];
+        c.results = fromServer.concat(fromIndex); c.hasMore = data.hasMore === true;
+        c.fetchedAt = data.fetchedAt || null; c.stale = data.stale === true;
+        c.indexNotice = index.status === 'rejected' ? t('corpus.indexUnavailable') : (wantsIndex && !index.value.units.length && (c.scope === 'estadual' || c.scope === 'municipal' || c.scope === 'regulador') ? t('corpus.indexNeedsFilter') : '');
+        if (server.status === 'rejected' && server.reason && server.reason.code === 'rate_limited') c.error = t('corpus.rateLimit');
+      }
     } catch (e) {
       if (corpusController !== ctl) return;
       c.results = []; c.hasMore = false; c.error = t(e && e.code === 'rate_limited' ? 'corpus.rateLimit' : 'corpus.unavailable');

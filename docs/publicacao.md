@@ -22,6 +22,14 @@ git remote add origin https://github.com/matheusbauto-blip/ross-ai.git
 git push --force origin gh-pages
 ```
 
+Antes do commit, copie também o índice completo do repositório (gerado por `scripts/build-index.mjs`, ver `docs/indice-repositorio.md`) para a pasta `index/` da publicação:
+
+```bash
+mkdir -p /tmp/ross-release/index && cp -R .law-index/. /tmp/ross-release/index/
+```
+
+Sem essa pasta o site funciona, mas a pesquisa usa só o acervo do servidor.
+
 O `--force` substitui a publicação anterior; o histórico do código continua na `main`. Depois do push, conferir `https://matheusbauto-blip.github.io/ross-ai/release.json`: o campo `version` deve ser o mesmo impresso pelo `build-release.mjs`.
 
 ## Publicar em outro local

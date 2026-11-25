@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
-import { createRepositoryLibrary, libraryReferences, boundedText, libraryStats, documentCandidates, CATALOG_SNAPSHOT } from '../supabase/functions/ross-ai/repository-library.mjs';
+import { createRepositoryLibrary, libraryReferences, boundedText, libraryStats, documentCandidates, CATALOG_SNAPSHOT, readIndexedDocument, INDEX_REFS } from '../supabase/functions/ross-ai/repository-library.mjs';
 const ref='a'.repeat(40),path='federal/leis-complementares/2013/lcp-142-2013-05-08.md';
 const raw='---\ntitulo: "Lei Complementar 142/2013"\ntipo: "Lei Complementar"\nnumero: "142"\ndata: "2013-05-08"\nfonte: "https://www.planalto.gov.br/lei"\nversao_texto: "Original"\n---\n## Art. 1º\nEsta lei trata da aposentadoria da pessoa com deficiência e estabelece critérios para a concessão do benefício previdenciário.\n## Art. 2º\nA avaliação deve considerar os requisitos estabelecidos nesta lei e observar as condições previstas na legislação aplicável.\n';
 const digest=createHash('sha1').update('blob '+Buffer.byteLength(raw)+'\0').update(raw).digest('hex');
@@ -48,4 +48,22 @@ test('topic search returns document identifiers for hydration, never metadata di
   const calls=[];const q={select:()=>q,eq:(...args)=>{calls.push(args);return q;},or:()=>q,neq:()=>q,textSearch:()=>q,order:()=>q,range:async()=>({data:[{id:'a'.repeat(64),summary:'Ementa de identificação'}]})};
   const result=await documentCandidates({from:()=>q},{query:'14.133',scope:'federal',forAnswer:true});
   assert.ok(calls.some(x=>x[0]==='number'&&x[1]==='14133'));assert.equal(result.results[0].requires_read,true);assert.equal(result.results[0].article,'Identificação da norma');
+});
+
+test('an entry of the published static index is read by path on the pinned edition and checked against its hash', async () => {
+  const pinned = Array.from(INDEX_REFS)[0];
+  const hash = createHash('sha256').update(raw).digest('hex').slice(0, 16);
+  const { sb, calls } = database();
+  let url = '';
+  const item = await readIndexedDocument(sb, { path, ref: pinned, hash }, { cache: new Map(), fetcher: async u => { url = u; return new Response(raw); } });
+  assert.equal(url, 'https://raw.githubusercontent.com/ctresb/leis/' + pinned + '/' + path);
+  assert.equal(item.doc.title, 'Lei Complementar 142/2013'); assert.equal(item.doc.source_url, 'https://www.planalto.gov.br/lei');
+  assert.match(item.markdown, /^## Art\. 1º/); assert.equal(item.localCopy, false);
+  assert.ok(!calls.some(c => c.name === 'ross_library_import'), 'index reads never write');
+  const stored = database(raw);
+  assert.equal((await readIndexedDocument(stored.sb, { path, ref: pinned, hash }, { cache: new Map(), fetcher: () => { throw new Error('network must not be used'); } })).localCopy, true);
+  await assert.rejects(() => readIndexedDocument(sb, { path, ref: pinned, hash: 'f'.repeat(16) }, { cache: new Map(), fetcher: async () => new Response(raw) }), /document_integrity/);
+  await assert.rejects(() => readIndexedDocument(sb, { path, ref: 'b'.repeat(40), hash }, { cache: new Map() }), /invalid_locator/);
+  await assert.rejects(() => readIndexedDocument(sb, { path: '../secrets.md', ref: pinned, hash }, { cache: new Map() }), /invalid_locator/);
+  await assert.rejects(() => readIndexedDocument(sb, { path, ref: pinned, hash: 'zz' }, { cache: new Map() }), /invalid_locator/);
 });

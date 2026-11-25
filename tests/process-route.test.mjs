@@ -28,7 +28,12 @@ function server({ token = 'test-provider-value', quotaError = false, processSour
     },
     lookupProcess: async input => { lookups++; assert.equal(input.number, '00008323520184013202'); assert.equal(input.apiKey, token); return { process: { number: input.number }, movements: [] }; },
     lookupDjen: async input => { djenLookups++; assert.equal(input.number, '00008323520184013202'); return { coverage: 'publications', process: { number: input.number }, movements: [] }; },
-    processNumber, ProcessError, GeminiError: MockGeminiError, libraryReferences, eligibleForAnswer() {}, repositoryExcerpts() {},
+    processNumber, ProcessError, GeminiError: MockGeminiError, libraryReferences, eligibleForAnswer() {}, repositoryExcerpts: (markdown, query) => query ? [{ article: 'Art. 1º', excerpt: 'Trecho sobre ' + query }] : [],
+    readIndexedDocument: async (sb, { path, ref, hash }) => {
+      if (!/^federal\//.test(path) || ref !== 'c'.repeat(40)) throw new Error('invalid_locator');
+      if (hash === 'bad') throw new Error('document_integrity');
+      return { doc: { title: 'Lei de teste', repository_path: path, passages: [{ ordinal: 0 }] }, markdown: '## Art. 1º\nTexto.', localCopy: false };
+    },
     crypto, TextEncoder, TextDecoder, Response, Request, URL, AbortSignal, console: { error() {} },
   };
   vm.runInNewContext(stripTypeScriptTypes(source), context);
@@ -132,4 +137,20 @@ test('a healthy primary model is used once and the response is not flagged as a 
   assert.equal(response.status, 200);
   assert.equal((await response.json()).fallback, false);
   assert.deepEqual(s.modelsCalled(), ['gemini-3.1-flash-lite']);
+});
+
+test('reading an index entry by path returns the matching articles and never the passages blob; bad locators are 400/409', async () => {
+  const s = server();
+  const ok = await s.raw({ op: 'repository_read', path: 'federal/leis-ordinarias/1990/lei-8078-1990-09-11.md', ref: 'c'.repeat(40), hash: 'a'.repeat(16), query: 'consumidor' });
+  assert.equal(ok.status, 200);
+  const body = await ok.json();
+  assert.equal(body.document.title, 'Lei de teste'); assert.equal(body.document.passages, undefined);
+  assert.deepEqual(body.passages, [{ article: 'Art. 1º', excerpt: 'Trecho sobre consumidor' }]); assert.equal(body.markdown, undefined);
+  const full = await s.raw({ op: 'repository_read', path: 'federal/leis-ordinarias/1990/lei-8078-1990-09-11.md', ref: 'c'.repeat(40), hash: 'a'.repeat(16) });
+  assert.equal((await full.json()).markdown, '## Art. 1º\nTexto.');
+  const invalid = await s.raw({ op: 'repository_read', path: '../x.md', ref: 'c'.repeat(40), hash: 'a'.repeat(16) });
+  assert.equal(invalid.status, 400); assert.deepEqual(await invalid.json(), { error: 'invalid_locator' });
+  const tampered = await s.raw({ op: 'repository_read', path: 'federal/x.md', ref: 'c'.repeat(40), hash: 'bad' });
+  assert.equal(tampered.status, 409); assert.deepEqual(await tampered.json(), { error: 'document_integrity' });
+  assert.equal(s.counts().modelCalls, 0);
 });

@@ -26,6 +26,10 @@ Proteções: só aceita chamadas das origens listadas, limita pedidos por IP e p
 
 Configure `GEMINI_API_KEY` (ou `GOOGLE_API_KEY`) em Supabase → Edge Functions → Secrets. Alternativamente, guarde a chave no Vault com o nome `ross_ai_google_api_key` e aplique `supabase/schema/google-key.sql`: a função de leitura usa os privilégios de quem chama e permite execução somente a `service_role`. As variáveis de ambiente têm prioridade. Nunca coloque a chave em `config.js`, no Git ou no navegador. Variáveis opcionais: `ROSS_ALLOWED_ORIGINS`, `ROSS_ANSWER_MODEL`, `ROSS_HELPER_MODEL`, `ROSS_IP_DAILY_LIMIT`, `ROSS_GLOBAL_DAILY_LIMIT`, `ROSS_SALT`. Ao implantar, inclua também o módulo `gemini.mjs`.
 
+## Índice completo do repositório de leis
+
+Além das 66 normas distribuídas com o app e dos textos importados no banco, o site publica um índice estático de todas as normas do [ctresb/leis](https://github.com/ctresb/leis) (edição fixa): federais, estaduais, municipais, órgãos reguladores, jurisprudência e tratados. A pesquisa e as respostas usam esse índice para encontrar a norma pelo título, ementa ou número; o texto integral é lido sob demanda, com conferência de hash. Detalhes, limites e como gerar de novo: `docs/indice-repositorio.md`.
+
 ## Acompanhamento processual
 
 O menu lateral inclui “Acompanhar processo”. A consulta padrão é gratuita e usa diretamente a API pública do DJEN/CNJ, sem conta ou token do Escavador. A busca interna é pelo número CNJ de 20 dígitos, com ou sem pontuação. Para localizar pelo CPF, a opção “Buscar por CPF no portal oficial” orienta o acesso ao Jus.br com a própria conta gov.br nível ouro; depois, o usuário cola o número encontrado no ROSS. Esse caminho abre o portal oficial e não importa resultados automaticamente.

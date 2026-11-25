@@ -9,3 +9,4 @@ entrega/
 .env
 .env.*
 !.env.example
+.law-index/

@@ -22,7 +22,7 @@ import { generateGemini, GeminiError } from "./gemini.mjs";
 import { eligibleForAnswer, repositoryExcerpts } from "./repository-excerpts.mjs";
 import { lookupProcess, processNumber, ProcessError } from "./process-provider.mjs";
 import { lookupDjen } from "./djen-provider.mjs";
-import { createRepositoryLibrary, libraryReferences, libraryStats, documentCandidates } from "./repository-library.mjs";
+import { createRepositoryLibrary, libraryReferences, libraryStats, documentCandidates, readIndexedDocument } from "./repository-library.mjs";
 import { createPublicSources } from "./public-sources.mjs";
 
 const ANSWER_MODEL = Deno.env.get("ROSS_ANSWER_MODEL") ?? "gemini-3.5-flash";
@@ -136,6 +136,15 @@ async function corpusOperation(op: string, body: Record<string, unknown>) {
   const key = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
   if (!url || !key) throw new Error("corpus_not_configured");
   const sb = createClient(url, key, { auth: { persistSession: false } });
+  if (op === "repository_read" && typeof body.path === "string") {
+    // Entrada do índice estático publicado no site: caminho, edição fixa e prefixo de hash vêm do índice,
+    // nunca de uma URL arbitrária. Com "query", devolve só os artigos pertinentes em vez do texto inteiro.
+    const item = await readIndexedDocument(sb, { path: str(body.path, 300), ref: str(body.ref, 40), hash: str(body.hash, 64) });
+    const { passages: _ignored, ...document } = item.doc as Record<string, unknown>;
+    const query = str(body.query, 500).trim();
+    if (query) return { document, passages: repositoryExcerpts(item.markdown, query, 3, 2800, true), localCopy: item.localCopy, fetchedAt: new Date().toISOString() };
+    return { document, markdown: item.markdown, localCopy: item.localCopy, fetchedAt: new Date().toISOString() };
+  }
   if (op === "repository_read") {
     const id = str(body.id, 100);
     if (/^l:[a-f0-9]{64}:\d{1,6}$/.test(id)) {
@@ -185,6 +194,13 @@ async function corpusOperation(op: string, body: Record<string, unknown>) {
   }
   let data = await documentCandidates(sb,{query,scope,uf,municipality,forAnswer:body.forAnswer===true,offset});
   if(!data.results.length) {
+    const compact = await sb.rpc("ross_law_compact_search", {
+      p_query:query,p_scope:scope,p_uf:uf,p_municipality:municipality,
+      p_limit:body.forAnswer===true?8:15,p_offset:offset,p_for_answer:body.forAnswer===true
+    });
+    if(!compact.error && Array.isArray(compact.data?.results) && compact.data.results.length) data=compact.data;
+  }
+  if(!data.results.length) {
     const fallback = await sb.rpc("ross_law_search", {
     p_query: query, p_scope: scope, p_uf: uf, p_municipality: municipality,
     p_limit: body.forAnswer === true ? 8 : 15, p_offset: offset, p_for_answer: body.forAnswer === true,
@@ -192,14 +208,15 @@ async function corpusOperation(op: string, body: Record<string, unknown>) {
     if(fallback.error){sourceFailures++;}else data=fallback.data;
   }
   let results = Array.isArray(data?.results) ? data.results : [];
-  if (body.forAnswer === true && results.some((doc: Record<string, unknown>) => doc.requires_read === true)) {
-    const candidates = results.filter((doc: Record<string, unknown>) => doc.requires_read === true && eligibleForAnswer(doc, municipality)).slice(0, 3);
+  const needsRead = (doc: Record<string, unknown>) => doc.requires_read === true || doc.article === "Identificação da norma";
+  if (body.forAnswer === true && results.some(needsRead)) {
+    const candidates = results.filter((doc: Record<string, unknown>) => needsRead(doc) && eligibleForAnswer(doc, municipality)).slice(0, 3);
     const reads = await Promise.allSettled(candidates.map(async (doc: Record<string, unknown>) => {
       const read = await corpusOperation("repository_read", {id:doc.id});
       return repositoryExcerpts(read.markdown,query,3,2800,libraryReferences([],str(body.originalQuery,500) || query).length>0)
         .map(p => ({...doc,...p,requires_read:false,content_mode:"full",localCopy:read.localCopy === true}));
     }));
-    results = results.filter((doc: Record<string, unknown>) => doc.requires_read !== true).concat(reads.flatMap(r => r.status === "fulfilled" ? r.value : []));
+    results = results.filter((doc: Record<string, unknown>) => !needsRead(doc)).concat(reads.flatMap(r => r.status === "fulfilled" ? r.value : []));
   }
   if (body.forAnswer === true && !results.length) {
     const { data: candidates, error: candidateError } = await sb.rpc("ross_law_search", {
@@ -400,7 +417,12 @@ Deno.serve(async (req: Request) => {
     try {
       if (op !== "corpus_stats" && !(await checkQuota(req, true)).allowed) return json(429, { error: "rate_limited" }, origin);
       return json(200, await corpusOperation(op, body), origin);
-    } catch { return json(503, { error: "corpus_unavailable" }, origin); }
+    } catch (e) {
+      const code = e && typeof (e as { message?: unknown }).message === "string" ? (e as { message: string }).message : "";
+      if (code === "invalid_locator" || code === "invalid_id") return json(400, { error: code }, origin);
+      if (code === "document_integrity") return json(409, { error: code }, origin);
+      return json(503, { error: "corpus_unavailable" }, origin);
+    }
   }
   if (op !== "prepare" && op !== "answer") return json(400, { error: "unknown_op" }, origin);
 

@@ -507,3 +507,7 @@ img { max-width: 100%; }
 .storage-notice { margin: 12px 0; }
 .storage-notice .row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
 #storage-slot:empty { display: none; }
+
+/* Índice do repositório */
+.badge-index { background: var(--info-soft); color: var(--info); }
+.corpus-filters label.check { display: flex; align-items: center; gap: 8px; }
