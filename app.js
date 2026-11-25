@@ -1544,8 +1544,10 @@
   function municipalityOf(entry) { return entry.unit && entry.unit.indexOf('municipais/') === 0 ? (entry.p.split('/')[0] || '') : ''; }
   /* Pontuação simples e previsível: número exato pesa mais; cada termo encontrado no título ou na ementa soma;
      todos os termos presentes dobram; o mais recente desempata. */
+  const INDEX_AMENDMENT = /^(?:altera|acrescenta|revoga|d[aá] nova reda|modifica|inclui|insere|prorroga|disp[oõ]e sobre a altera)/;
   function searchIndexEntries(entries, query, limit, filter) {
     const terms = indexQueryTerms(query);
+    const queryText = ' ' + norm(query).replace(/[^a-z0-9]+/g, ' ').trim() + ' ';
     if (!terms.tokens.length && !terms.number) return [];
     const patterns = terms.tokens.map((tk) => new RegExp('(^|[^a-z0-9])' + tk.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
     const scored = [];
@@ -1558,8 +1560,29 @@
       if (terms.number && e.n === terms.number) { score += 6; matched++; }
       if (!matched) continue;
       if (patterns.length && matched >= patterns.length) score *= 2;
+      const ementa = norm(e.e || '');
+      if (INDEX_AMENDMENT.test(ementa)) score *= 0.6;
+      else {
+        // Nome popular entre parênteses na própria ementa ("Estatuto da Pessoa com Deficiência") citado na pergunta.
+        const names = ementa.match(/\(([^()]{8,90})\)/g) || [];
+        if (names.some((n) => { const name = n.slice(1, -1).replace(/[^a-z0-9]+/g, ' ').trim(); return name.split(' ').length >= 2 && queryText.indexOf(name) >= 0; })) score += 6;
+      }
       if (e.x) score *= 0.9;
       scored.push({ e: e, score: score });
+    }
+    /* Alterações encontradas apontam para a norma principal: uma lei citada por várias delas ("Altera a Lei nº 13.146…")
+       entra na lista mesmo que a própria ementa use outras palavras. */
+    const cited = new Map();
+    scored.forEach((x) => { if (!INDEX_AMENDMENT.test(norm(x.e.e || ''))) return; (norm(x.e.e).replace(/decreto[- ]lei n[oº°.]*\s*[\d.]+/g, ' ').match(/lei(?: complementar)? n[oº°.]*\s*(\d{1,3}(?:\.\d{3})*)/g) || []).slice(0, 2).forEach((ref) => { const n = ref.replace(/^.*?(\d[\d.]*)$/, '$1').replace(/\./g, ''); const c = cited.get(n) || { count: 0, best: 0 }; c.count++; c.best = Math.max(c.best, x.score); cited.set(n, c); }); });
+    if (cited.size) {
+      const present = new Map(scored.map((x) => [x.e, x]));
+      entries.forEach((e) => {
+        const c = e.n && cited.get(e.n);
+        if (!c || c.count < 2 || !/^leis-(?:ordinarias|complementares)$/.test(String(e.unit || '').split('/')[1] || '') || (filter && !filter(e))) return;
+        const boost = c.best + 1 + Math.min(c.count, 5) * 0.5;
+        const existing = present.get(e);
+        if (existing) existing.score = Math.max(existing.score, boost); else scored.push({ e: e, score: e.x ? boost * 0.9 : boost });
+      });
     }
     scored.sort((a, b) => b.score - a.score || String(b.e.d || '').localeCompare(String(a.e.d || '')));
     return scored.slice(0, limit).map((x) => Object.assign({ score: x.score }, x.e));
