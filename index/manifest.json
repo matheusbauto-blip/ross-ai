@@ -1,10 +1,11 @@
 {
  "repository": "ctresb/leis",
  "ref": "c9f21b4ab11aa0d7ca6fe861d75028e94219c2d6",
- "generatedAt": "2026-11-25T15:13:04.020Z",
+ "generatedAt": "2026-11-25T15:28:48.405Z",
  "ementaMax": 240,
  "units": {
   "estaduais/AC": {
+   "format": 2,
    "scope": "estadual",
    "uf": "AC",
    "count": 5206,
@@ -13,10 +14,11 @@
    "parts": [
     "estaduais__AC.1.json"
    ],
-   "bytes": 1554298,
+   "bytes": 1554339,
    "family": null
   },
   "estaduais/AL": {
+   "format": 2,
    "scope": "estadual",
    "uf": "AL",
    "count": 3891,
@@ -25,10 +27,11 @@
    "parts": [
     "estaduais__AL.1.json"
    ],
-   "bytes": 1268264,
+   "bytes": 1268309,
    "family": null
   },
   "estaduais/AM": {
+   "format": 2,
    "scope": "estadual",
    "uf": "AM",
    "count": 10419,
@@ -41,6 +44,7 @@
    "family": null
   },
   "estaduais/AP": {
+   "format": 2,
    "scope": "estadual",
    "uf": "AP",
    "count": 5532,
@@ -49,10 +53,11 @@
    "parts": [
     "estaduais__AP.1.json"
    ],
-   "bytes": 1778942,
+   "bytes": 1779092,
    "family": null
   },
   "estaduais/BA": {
+   "format": 2,
    "scope": "estadual",
    "uf": "BA",
    "count": 38943,
@@ -63,10 +68,11 @@
     "estaduais__BA.2.json",
     "estaduais__BA.3.json"
    ],
-   "bytes": 11959678,
+   "bytes": 11966759,
    "family": null
   },
   "estaduais/CE": {
+   "format": 2,
    "scope": "estadual",
    "uf": "CE",
    "count": 11232,
@@ -75,10 +81,11 @@
    "parts": [
     "estaduais__CE.1.json"
    ],
-   "bytes": 3466201,
+   "bytes": 3470759,
    "family": null
   },
   "estaduais/DF": {
+   "format": 2,
    "scope": "estadual",
    "uf": "DF",
    "count": 83314,
@@ -96,6 +103,7 @@
    "family": null
   },
   "estaduais/ES": {
+   "format": 2,
    "scope": "estadual",
    "uf": "ES",
    "count": 16787,
@@ -105,10 +113,11 @@
     "estaduais__ES.1.json",
     "estaduais__ES.2.json"
    ],
-   "bytes": 5033902,
+   "bytes": 5033956,
    "family": null
   },
   "estaduais/GO": {
+   "format": 2,
    "scope": "estadual",
    "uf": "GO",
    "count": 52278,
@@ -124,6 +133,7 @@
    "family": null
   },
   "estaduais/MA": {
+   "format": 2,
    "scope": "estadual",
    "uf": "MA",
    "count": 8807,
@@ -132,10 +142,11 @@
    "parts": [
     "estaduais__MA.1.json"
    ],
-   "bytes": 2493841,
+   "bytes": 2503642,
    "family": null
   },
   "estaduais/MG": {
+   "format": 2,
    "scope": "estadual",
    "uf": "MG",
    "count": 84839,
@@ -149,10 +160,11 @@
     "estaduais__MG.5.json",
     "estaduais__MG.6.json"
    ],
-   "bytes": 24628675,
+   "bytes": 24628783,
    "family": null
   },
   "estaduais/MS": {
+   "format": 2,
    "scope": "estadual",
    "uf": "MS",
    "count": 22988,
@@ -162,10 +174,11 @@
     "estaduais__MS.1.json",
     "estaduais__MS.2.json"
    ],
-   "bytes": 7154192,
+   "bytes": 7154443,
    "family": null
   },
   "estaduais/MT": {
+   "format": 2,
    "scope": "estadual",
    "uf": "MT",
    "count": 26358,
@@ -175,10 +188,11 @@
     "estaduais__MT.1.json",
     "estaduais__MT.2.json"
    ],
-   "bytes": 7264567,
+   "bytes": 7267444,
    "family": null
   },
   "estaduais/PA": {
+   "format": 2,
    "scope": "estadual",
    "uf": "PA",
    "count": 28580,
@@ -188,10 +202,11 @@
     "estaduais__PA.1.json",
     "estaduais__PA.2.json"
    ],
-   "bytes": 10569969,
+   "bytes": 10570222,
    "family": null
   },
   "estaduais/PB": {
+   "format": 2,
    "scope": "estadual",
    "uf": "PB",
    "count": 17585,
@@ -201,10 +216,11 @@
     "estaduais__PB.1.json",
     "estaduais__PB.2.json"
    ],
-   "bytes": 5546428,
+   "bytes": 5546551,
    "family": null
   },
   "estaduais/PE": {
+   "format": 2,
    "scope": "estadual",
    "uf": "PE",
    "count": 50387,
@@ -216,10 +232,11 @@
     "estaduais__PE.3.json",
     "estaduais__PE.4.json"
    ],
-   "bytes": 15565362,
+   "bytes": 15565618,
    "family": null
   },
   "estaduais/PI": {
+   "format": 2,
    "scope": "estadual",
    "uf": "PI",
    "count": 6948,
@@ -228,10 +245,11 @@
    "parts": [
     "estaduais__PI.1.json"
    ],
-   "bytes": 2202332,
+   "bytes": 2202591,
    "family": null
   },
   "estaduais/PR": {
+   "format": 2,
    "scope": "estadual",
    "uf": "PR",
    "count": 8,
@@ -240,10 +258,11 @@
    "parts": [
     "estaduais__PR.1.json"
    ],
-   "bytes": 2674,
+   "bytes": 2715,
    "family": null
   },
   "estaduais/RJ": {
+   "format": 2,
    "scope": "estadual",
    "uf": "RJ",
    "count": 1335,
@@ -252,10 +271,11 @@
    "parts": [
     "estaduais__RJ.1.json"
    ],
-   "bytes": 452957,
+   "bytes": 453014,
    "family": null
   },
   "estaduais/RN": {
+   "format": 2,
    "scope": "estadual",
    "uf": "RN",
    "count": 5413,
@@ -264,10 +284,11 @@
    "parts": [
     "estaduais__RN.1.json"
    ],
-   "bytes": 1704872,
+   "bytes": 1704915,
    "family": null
   },
   "estaduais/RO": {
+   "format": 2,
    "scope": "estadual",
    "uf": "RO",
    "count": 12365,
@@ -280,6 +301,7 @@
    "family": null
   },
   "estaduais/RR": {
+   "format": 2,
    "scope": "estadual",
    "uf": "RR",
    "count": 3226,
@@ -288,10 +310,11 @@
    "parts": [
     "estaduais__RR.1.json"
    ],
-   "bytes": 1131912,
+   "bytes": 1132165,
    "family": null
   },
   "estaduais/RS": {
+   "format": 2,
    "scope": "estadual",
    "uf": "RS",
    "count": 37100,
@@ -302,10 +325,11 @@
     "estaduais__RS.2.json",
     "estaduais__RS.3.json"
    ],
-   "bytes": 10505610,
+   "bytes": 10505756,
    "family": null
   },
   "estaduais/SC": {
+   "format": 2,
    "scope": "estadual",
    "uf": "SC",
    "count": 51199,
@@ -317,10 +341,11 @@
     "estaduais__SC.3.json",
     "estaduais__SC.4.json"
    ],
-   "bytes": 8136997,
+   "bytes": 11998992,
    "family": null
   },
   "estaduais/SE": {
+   "format": 2,
    "scope": "estadual",
    "uf": "SE",
    "count": 10878,
@@ -329,10 +354,11 @@
    "parts": [
     "estaduais__SE.1.json"
    ],
-   "bytes": 3454281,
+   "bytes": 3454570,
    "family": null
   },
   "estaduais/SP": {
+   "format": 2,
    "scope": "estadual",
    "uf": "SP",
    "count": 104172,
@@ -347,10 +373,11 @@
     "estaduais__SP.6.json",
     "estaduais__SP.7.json"
    ],
-   "bytes": 31144238,
+   "bytes": 31320750,
    "family": null
   },
   "estaduais/TO": {
+   "format": 2,
    "scope": "estadual",
    "uf": "TO",
    "count": 3562,
@@ -359,10 +386,11 @@
    "parts": [
     "estaduais__TO.1.json"
    ],
-   "bytes": 1044815,
+   "bytes": 1117583,
    "family": null
   },
   "federal/constituicoes-historicas": {
+   "format": 2,
    "scope": "federal",
    "uf": null,
    "count": 7,
@@ -375,6 +403,7 @@
    "family": "constituicoes-historicas"
   },
   "federal/decretos": {
+   "format": 2,
    "scope": "federal",
    "uf": null,
    "count": 109616,
@@ -394,6 +423,7 @@
    "family": "decretos"
   },
   "federal/decretos-legislativos": {
+   "format": 2,
    "scope": "federal",
    "uf": null,
    "count": 21359,
@@ -403,10 +433,11 @@
     "federal__decretos-legislativos.1.json",
     "federal__decretos-legislativos.2.json"
    ],
-   "bytes": 7589594,
+   "bytes": 7593286,
    "family": "decretos-legislativos"
   },
   "federal/decretos-lei": {
+   "format": 2,
    "scope": "federal",
    "uf": null,
    "count": 12376,
@@ -419,6 +450,7 @@
    "family": "decretos-lei"
   },
   "federal/decretos-nao-numerados": {
+   "format": 2,
    "scope": "federal",
    "uf": null,
    "count": 14510,
@@ -431,6 +463,7 @@
    "family": "decretos-nao-numerados"
   },
   "federal/emendas-constitucionais": {
+   "format": 2,
    "scope": "federal",
    "uf": null,
    "count": 172,
@@ -443,6 +476,7 @@
    "family": "emendas-constitucionais"
   },
   "federal/leis-complementares": {
+   "format": 2,
    "scope": "federal",
    "uf": null,
    "count": 239,
@@ -455,6 +489,7 @@
    "family": "leis-complementares"
   },
   "federal/leis-constitucionais": {
+   "format": 2,
    "scope": "federal",
    "uf": null,
    "count": 21,
@@ -467,6 +502,7 @@
    "family": "leis-constitucionais"
   },
   "federal/leis-delegadas": {
+   "format": 2,
    "scope": "federal",
    "uf": null,
    "count": 13,
@@ -479,6 +515,7 @@
    "family": "leis-delegadas"
   },
   "federal/leis-ordinarias": {
+   "format": 2,
    "scope": "federal",
    "uf": null,
    "count": 16784,
@@ -492,6 +529,7 @@
    "family": "leis-ordinarias"
   },
   "federal/medidas-provisorias": {
+   "format": 2,
    "scope": "federal",
    "uf": null,
    "count": 7499,
@@ -504,6 +542,7 @@
    "family": "medidas-provisorias"
   },
   "federal/regimentos": {
+   "format": 2,
    "scope": "federal",
    "uf": null,
    "count": 3,
@@ -516,6 +555,7 @@
    "family": "regimentos"
   },
   "federal/regulamentos": {
+   "format": 2,
    "scope": "federal",
    "uf": null,
    "count": 20,
@@ -528,6 +568,7 @@
    "family": "regulamentos"
   },
   "federal/resolucoes-camara": {
+   "format": 2,
    "scope": "federal",
    "uf": null,
    "count": 2280,
@@ -540,6 +581,7 @@
    "family": "resolucoes-camara"
   },
   "federal/resolucoes-congresso": {
+   "format": 2,
    "scope": "federal",
    "uf": null,
    "count": 91,
@@ -552,6 +594,7 @@
    "family": "resolucoes-congresso"
   },
   "federal/resolucoes-senado": {
+   "format": 2,
    "scope": "federal",
    "uf": null,
    "count": 6574,
@@ -564,6 +607,7 @@
    "family": "resolucoes-senado"
   },
   "jurisprudencia": {
+   "format": 2,
    "scope": "jurisprudencia",
    "uf": null,
    "count": 11700,
@@ -572,10 +616,11 @@
    "parts": [
     "jurisprudencia.1.json"
    ],
-   "bytes": 1526217,
+   "bytes": 2551271,
    "family": null
   },
   "municipais/AC": {
+   "format": 2,
    "scope": "municipal",
    "uf": "AC",
    "count": 367,
@@ -584,10 +629,11 @@
    "parts": [
     "municipais__AC.1.json"
    ],
-   "bytes": 76000,
+   "bytes": 122875,
    "family": null
   },
   "municipais/AL": {
+   "format": 2,
    "scope": "municipal",
    "uf": "AL",
    "count": 18,
@@ -596,10 +642,11 @@
    "parts": [
     "municipais__AL.1.json"
    ],
-   "bytes": 3427,
+   "bytes": 6644,
    "family": null
   },
   "municipais/AM": {
+   "format": 2,
    "scope": "municipal",
    "uf": "AM",
    "count": 92,
@@ -608,10 +655,11 @@
    "parts": [
     "municipais__AM.1.json"
    ],
-   "bytes": 19031,
+   "bytes": 31258,
    "family": null
   },
   "municipais/AP": {
+   "format": 2,
    "scope": "municipal",
    "uf": "AP",
    "count": 1,
@@ -620,10 +668,11 @@
    "parts": [
     "municipais__AP.1.json"
    ],
-   "bytes": 311,
+   "bytes": 413,
    "family": null
   },
   "municipais/BA": {
+   "format": 2,
    "scope": "municipal",
    "uf": "BA",
    "count": 430,
@@ -632,10 +681,11 @@
    "parts": [
     "municipais__BA.1.json"
    ],
-   "bytes": 88305,
+   "bytes": 140877,
    "family": null
   },
   "municipais/CE": {
+   "format": 2,
    "scope": "municipal",
    "uf": "CE",
    "count": 2044,
@@ -644,10 +694,11 @@
    "parts": [
     "municipais__CE.1.json"
    ],
-   "bytes": 405654,
+   "bytes": 650413,
    "family": null
   },
   "municipais/ES": {
+   "format": 2,
    "scope": "municipal",
    "uf": "ES",
    "count": 70,
@@ -656,10 +707,11 @@
    "parts": [
     "municipais__ES.1.json"
    ],
-   "bytes": 15850,
+   "bytes": 24439,
    "family": null
   },
   "municipais/GO": {
+   "format": 2,
    "scope": "municipal",
    "uf": "GO",
    "count": 2258,
@@ -668,10 +720,11 @@
    "parts": [
     "municipais__GO.1.json"
    ],
-   "bytes": 448868,
+   "bytes": 728693,
    "family": null
   },
   "municipais/MA": {
+   "format": 2,
    "scope": "municipal",
    "uf": "MA",
    "count": 4,
@@ -680,10 +733,11 @@
    "parts": [
     "municipais__MA.1.json"
    ],
-   "bytes": 956,
+   "bytes": 1272,
    "family": null
   },
   "municipais/MG": {
+   "format": 2,
    "scope": "municipal",
    "uf": "MG",
    "count": 5558,
@@ -692,10 +746,11 @@
    "parts": [
     "municipais__MG.1.json"
    ],
-   "bytes": 1136731,
+   "bytes": 1915657,
    "family": null
   },
   "municipais/MS": {
+   "format": 2,
    "scope": "municipal",
    "uf": "MS",
    "count": 12,
@@ -704,10 +759,11 @@
    "parts": [
     "municipais__MS.1.json"
    ],
-   "bytes": 2847,
+   "bytes": 3780,
    "family": null
   },
   "municipais/MT": {
+   "format": 2,
    "scope": "municipal",
    "uf": "MT",
    "count": 178,
@@ -716,10 +772,11 @@
    "parts": [
     "municipais__MT.1.json"
    ],
-   "bytes": 39761,
+   "bytes": 65509,
    "family": null
   },
   "municipais/PA": {
+   "format": 2,
    "scope": "municipal",
    "uf": "PA",
    "count": 41,
@@ -728,10 +785,11 @@
    "parts": [
     "municipais__PA.1.json"
    ],
-   "bytes": 8042,
+   "bytes": 13908,
    "family": null
   },
   "municipais/PB": {
+   "format": 2,
    "scope": "municipal",
    "uf": "PB",
    "count": 252,
@@ -740,10 +798,11 @@
    "parts": [
     "municipais__PB.1.json"
    ],
-   "bytes": 51259,
+   "bytes": 78092,
    "family": null
   },
   "municipais/PE": {
+   "format": 2,
    "scope": "municipal",
    "uf": "PE",
    "count": 6146,
@@ -752,10 +811,11 @@
    "parts": [
     "municipais__PE.1.json"
    ],
-   "bytes": 1086493,
+   "bytes": 2158740,
    "family": null
   },
   "municipais/PI": {
+   "format": 2,
    "scope": "municipal",
    "uf": "PI",
    "count": 422,
@@ -764,10 +824,11 @@
    "parts": [
     "municipais__PI.1.json"
    ],
-   "bytes": 84735,
+   "bytes": 139678,
    "family": null
   },
   "municipais/PR": {
+   "format": 2,
    "scope": "municipal",
    "uf": "PR",
    "count": 3307,
@@ -776,10 +837,11 @@
    "parts": [
     "municipais__PR.1.json"
    ],
-   "bytes": 675399,
+   "bytes": 1142234,
    "family": null
   },
   "municipais/RJ": {
+   "format": 2,
    "scope": "municipal",
    "uf": "RJ",
    "count": 2841,
@@ -788,10 +850,11 @@
    "parts": [
     "municipais__RJ.1.json"
    ],
-   "bytes": 595275,
+   "bytes": 957073,
    "family": null
   },
   "municipais/RN": {
+   "format": 2,
    "scope": "municipal",
    "uf": "RN",
    "count": 519,
@@ -800,10 +863,11 @@
    "parts": [
     "municipais__RN.1.json"
    ],
-   "bytes": 106841,
+   "bytes": 183481,
    "family": null
   },
   "municipais/RO": {
+   "format": 2,
    "scope": "municipal",
    "uf": "RO",
    "count": 5312,
@@ -812,10 +876,11 @@
    "parts": [
     "municipais__RO.1.json"
    ],
-   "bytes": 1022229,
+   "bytes": 1753885,
    "family": null
   },
   "municipais/RR": {
+   "format": 2,
    "scope": "municipal",
    "uf": "RR",
    "count": 261,
@@ -824,10 +889,11 @@
    "parts": [
     "municipais__RR.1.json"
    ],
-   "bytes": 52788,
+   "bytes": 95046,
    "family": null
   },
   "municipais/RS": {
+   "format": 2,
    "scope": "municipal",
    "uf": "RS",
    "count": 6822,
@@ -836,10 +902,11 @@
    "parts": [
     "municipais__RS.1.json"
    ],
-   "bytes": 1247860,
+   "bytes": 2319801,
    "family": null
   },
   "municipais/SC": {
+   "format": 2,
    "scope": "municipal",
    "uf": "SC",
    "count": 165,
@@ -848,10 +915,11 @@
    "parts": [
     "municipais__SC.1.json"
    ],
-   "bytes": 36607,
+   "bytes": 68883,
    "family": null
   },
   "municipais/SE": {
+   "format": 2,
    "scope": "municipal",
    "uf": "SE",
    "count": 1,
@@ -864,6 +932,7 @@
    "family": null
   },
   "municipais/SP": {
+   "format": 2,
    "scope": "municipal",
    "uf": "SP",
    "count": 1602,
@@ -872,10 +941,11 @@
    "parts": [
     "municipais__SP.1.json"
    ],
-   "bytes": 335908,
+   "bytes": 590561,
    "family": null
   },
   "municipais/TO": {
+   "format": 2,
    "scope": "municipal",
    "uf": "TO",
    "count": 37,
@@ -884,10 +954,11 @@
    "parts": [
     "municipais__TO.1.json"
    ],
-   "bytes": 8284,
+   "bytes": 13236,
    "family": null
   },
   "raiz": {
+   "format": 2,
    "scope": "federal",
    "uf": null,
    "count": 1,
@@ -896,10 +967,11 @@
    "parts": [
     "raiz.1.json"
    ],
-   "bytes": 179,
+   "bytes": 444,
    "family": "constituicao"
   },
   "reguladores/agu": {
+   "format": 2,
    "scope": "regulador",
    "uf": null,
    "count": 537,
@@ -908,10 +980,11 @@
    "parts": [
     "reguladores__agu.1.json"
    ],
-   "bytes": 107442,
+   "bytes": 191581,
    "family": "agu"
   },
   "reguladores/ana": {
+   "format": 2,
    "scope": "regulador",
    "uf": null,
    "count": 264,
@@ -920,10 +993,11 @@
    "parts": [
     "reguladores__ana.1.json"
    ],
-   "bytes": 53215,
+   "bytes": 93091,
    "family": "ana"
   },
   "reguladores/anac": {
+   "format": 2,
    "scope": "regulador",
    "uf": null,
    "count": 9613,
@@ -932,10 +1006,11 @@
    "parts": [
     "reguladores__anac.1.json"
    ],
-   "bytes": 1874111,
+   "bytes": 2354753,
    "family": "anac"
   },
   "reguladores/anatel": {
+   "format": 2,
    "scope": "regulador",
    "uf": null,
    "count": 186,
@@ -944,10 +1019,11 @@
    "parts": [
     "reguladores__anatel.1.json"
    ],
-   "bytes": 37996,
+   "bytes": 63111,
    "family": "anatel"
   },
   "reguladores/ancine": {
+   "format": 2,
    "scope": "regulador",
    "uf": null,
    "count": 353,
@@ -956,10 +1032,11 @@
    "parts": [
     "reguladores__ancine.1.json"
    ],
-   "bytes": 72402,
+   "bytes": 114099,
    "family": "ancine"
   },
   "reguladores/aneel": {
+   "format": 2,
    "scope": "regulador",
    "uf": null,
    "count": 1158,
@@ -968,10 +1045,11 @@
    "parts": [
     "reguladores__aneel.1.json"
    ],
-   "bytes": 252990,
+   "bytes": 489721,
    "family": "aneel"
   },
   "reguladores/anm": {
+   "format": 2,
    "scope": "regulador",
    "uf": null,
    "count": 153,
@@ -980,10 +1058,11 @@
    "parts": [
     "reguladores__anm.1.json"
    ],
-   "bytes": 30358,
+   "bytes": 57187,
    "family": "anm"
   },
   "reguladores/anp": {
+   "format": 2,
    "scope": "regulador",
    "uf": null,
    "count": 361,
@@ -992,10 +1071,11 @@
    "parts": [
     "reguladores__anp.1.json"
    ],
-   "bytes": 70816,
+   "bytes": 123684,
    "family": "anp"
   },
   "reguladores/ans": {
+   "format": 2,
    "scope": "regulador",
    "uf": null,
    "count": 835,
@@ -1004,10 +1084,11 @@
    "parts": [
     "reguladores__ans.1.json"
    ],
-   "bytes": 188431,
+   "bytes": 306010,
    "family": "ans"
   },
   "reguladores/antaq": {
+   "format": 2,
    "scope": "regulador",
    "uf": null,
    "count": 3088,
@@ -1016,10 +1097,11 @@
    "parts": [
     "reguladores__antaq.1.json"
    ],
-   "bytes": 635183,
+   "bytes": 959939,
    "family": "antaq"
   },
   "reguladores/antt": {
+   "format": 2,
    "scope": "regulador",
    "uf": null,
    "count": 7553,
@@ -1028,10 +1110,11 @@
    "parts": [
     "reguladores__antt.1.json"
    ],
-   "bytes": 1496691,
+   "bytes": 2093404,
    "family": "antt"
   },
   "reguladores/anvisa": {
+   "format": 2,
    "scope": "regulador",
    "uf": null,
    "count": 26244,
@@ -1041,10 +1124,11 @@
     "reguladores__anvisa.1.json",
     "reguladores__anvisa.2.json"
    ],
-   "bytes": 5408559,
+   "bytes": 6626894,
    "family": "anvisa"
   },
   "reguladores/atos-do-poder-executivo": {
+   "format": 2,
    "scope": "regulador",
    "uf": null,
    "count": 9,
@@ -1053,10 +1137,11 @@
    "parts": [
     "reguladores__atos-do-poder-executivo.1.json"
    ],
-   "bytes": 2000,
+   "bytes": 3780,
    "family": "atos-do-poder-executivo"
   },
   "reguladores/bcb": {
+   "format": 2,
    "scope": "regulador",
    "uf": null,
    "count": 1838,
@@ -1065,10 +1150,11 @@
    "parts": [
     "reguladores__bcb.1.json"
    ],
-   "bytes": 392187,
+   "bytes": 763093,
    "family": "bcb"
   },
   "reguladores/bndes": {
+   "format": 2,
    "scope": "regulador",
    "uf": null,
    "count": 8,
@@ -1077,10 +1163,11 @@
    "parts": [
     "reguladores__bndes.1.json"
    ],
-   "bytes": 1853,
+   "bytes": 3245,
    "family": "bndes"
   },
   "reguladores/cade": {
+   "format": 2,
    "scope": "regulador",
    "uf": null,
    "count": 102,
@@ -1089,10 +1176,11 @@
    "parts": [
     "reguladores__cade.1.json"
    ],
-   "bytes": 20330,
+   "bytes": 35474,
    "family": "cade"
   },
   "reguladores/capes": {
+   "format": 2,
    "scope": "regulador",
    "uf": null,
    "count": 398,
@@ -1101,10 +1189,11 @@
    "parts": [
     "reguladores__capes.1.json"
    ],
-   "bytes": 77197,
+   "bytes": 139565,
    "family": "capes"
   },
   "reguladores/carf": {
+   "format": 2,
    "scope": "regulador",
    "uf": null,
    "count": 76,
@@ -1113,10 +1202,11 @@
    "parts": [
     "reguladores__carf.1.json"
    ],
-   "bytes": 15544,
+   "bytes": 29026,
    "family": "carf"
   },
   "reguladores/cfc": {
+   "format": 2,
    "scope": "regulador",
    "uf": null,
    "count": 266,
@@ -1125,10 +1215,11 @@
    "parts": [
     "reguladores__cfc.1.json"
    ],
-   "bytes": 54507,
+   "bytes": 96537,
    "family": "cfc"
   },
   "reguladores/cgu": {
+   "format": 2,
    "scope": "regulador",
    "uf": null,
    "count": 454,
@@ -1137,10 +1228,11 @@
    "parts": [
     "reguladores__cgu.1.json"
    ],
-   "bytes": 91137,
+   "bytes": 149818,
    "family": "cgu"
   },
   "reguladores/cidades": {
+   "format": 2,
    "scope": "regulador",
    "uf": null,
    "count": 880,
@@ -1149,10 +1241,11 @@
    "parts": [
     "reguladores__cidades.1.json"
    ],
-   "bytes": 176074,
+   "bytes": 366691,
    "family": "cidades"
   },
   "reguladores/cne": {
+   "format": 2,
    "scope": "regulador",
    "uf": null,
    "count": 264,
@@ -1161,10 +1254,11 @@
    "parts": [
     "reguladores__cne.1.json"
    ],
-   "bytes": 45047,
+   "bytes": 80128,
    "family": "cne"
   },
   "reguladores/cnmp": {
+   "format": 2,
    "scope": "regulador",
    "uf": null,
    "count": 223,
@@ -1173,10 +1267,11 @@
    "parts": [
     "reguladores__cnmp.1.json"
    ],
-   "bytes": 45384,
+   "bytes": 78389,
    "family": "cnmp"
   },
   "reguladores/cns": {
+   "format": 2,
    "scope": "regulador",
    "uf": null,
    "count": 211,
@@ -1185,10 +1280,11 @@
    "parts": [
     "reguladores__cns.1.json"
    ],
-   "bytes": 41612,
+   "bytes": 77346,
    "family": "cns"
   },
   "reguladores/coaf": {
+   "format": 2,
    "scope": "regulador",
    "uf": null,
    "count": 67,
@@ -1197,10 +1293,11 @@
    "parts": [
     "reguladores__coaf.1.json"
    ],
-   "bytes": 13352,
+   "bytes": 27631,
    "family": "coaf"
   },
   "reguladores/comunicacoes": {
+   "format": 2,
    "scope": "regulador",
    "uf": null,
    "count": 8117,
@@ -1209,10 +1306,11 @@
    "parts": [
     "reguladores__comunicacoes.1.json"
    ],
-   "bytes": 1663222,
+   "bytes": 2063664,
    "family": "comunicacoes"
   },
   "reguladores/conama": {
+   "format": 2,
    "scope": "regulador",
    "uf": null,
    "count": 26,
@@ -1221,10 +1319,11 @@
    "parts": [
     "reguladores__conama.1.json"
    ],
-   "bytes": 5341,
+   "bytes": 9978,
    "family": "conama"
   },
   "reguladores/confaz": {
+   "format": 2,
    "scope": "regulador",
    "uf": null,
    "count": 1581,
@@ -1233,10 +1332,11 @@
    "parts": [
     "reguladores__confaz.1.json"
    ],
-   "bytes": 325346,
+   "bytes": 601032,
    "family": "confaz"
   },
   "reguladores/conselhos-profissionais": {
+   "format": 2,
    "scope": "regulador",
    "uf": null,
    "count": 8207,
@@ -1245,10 +1345,11 @@
    "parts": [
     "reguladores__conselhos-profissionais.1.json"
    ],
-   "bytes": 1658306,
+   "bytes": 2803596,
    "family": "conselhos-profissionais"
   },
   "reguladores/contran": {
+   "format": 2,
    "scope": "regulador",
    "uf": null,
    "count": 237,
@@ -1257,10 +1358,11 @@
    "parts": [
     "reguladores__contran.1.json"
    ],
-   "bytes": 48777,
+   "bytes": 98817,
    "family": "contran"
   },
   "reguladores/cultura": {
+   "format": 2,
    "scope": "regulador",
    "uf": null,
    "count": 4123,
@@ -1269,10 +1371,11 @@
    "parts": [
     "reguladores__cultura.1.json"
    ],
-   "bytes": 840481,
+   "bytes": 1161440,
    "family": "cultura"
   },
   "reguladores/cvm": {
+   "format": 2,
    "scope": "regulador",
    "uf": null,
    "count": 393,
@@ -1281,10 +1384,11 @@
    "parts": [
     "reguladores__cvm.1.json"
    ],
-   "bytes": 80000,
+   "bytes": 140113,
    "family": "cvm"
   },
   "reguladores/defesa": {
+   "format": 2,
    "scope": "regulador",
    "uf": null,
    "count": 4839,
@@ -1293,10 +1397,11 @@
    "parts": [
     "reguladores__defesa.1.json"
    ],
-   "bytes": 1000283,
+   "bytes": 1569274,
    "family": "defesa"
   },
   "reguladores/dpu": {
+   "format": 2,
    "scope": "regulador",
    "uf": null,
    "count": 240,
@@ -1305,10 +1410,11 @@
    "parts": [
     "reguladores__dpu.1.json"
    ],
-   "bytes": 49169,
+   "bytes": 63265,
    "family": "dpu"
   },
   "reguladores/editais-e-avisos": {
+   "format": 2,
    "scope": "regulador",
    "uf": null,
    "count": 8,
@@ -1317,10 +1423,11 @@
    "parts": [
     "reguladores__editais-e-avisos.1.json"
    ],
-   "bytes": 1761,
+   "bytes": 2700,
    "family": "editais-e-avisos"
   },
   "reguladores/empreendedorismo": {
+   "format": 2,
    "scope": "regulador",
    "uf": null,
    "count": 138,
@@ -1329,10 +1436,11 @@
    "parts": [
     "reguladores__empreendedorismo.1.json"
    ],
-   "bytes": 26736,
+   "bytes": 51069,
    "family": "empreendedorismo"
   },
   "reguladores/entidades-de-fiscalizacao-dos-profission": {
+   "format": 2,
    "scope": "regulador",
    "uf": null,
    "count": 1,
@@ -1341,10 +1449,11 @@
    "parts": [
     "reguladores__entidades-de-fiscalizacao-dos-profission.1.json"
    ],
-   "bytes": 379,
+   "bytes": 576,
    "family": "entidades-de-fiscalizacao-dos-profission"
   },
   "reguladores/esporte": {
+   "format": 2,
    "scope": "regulador",
    "uf": null,
    "count": 714,
@@ -1353,10 +1462,11 @@
    "parts": [
     "reguladores__esporte.1.json"
    ],
-   "bytes": 144403,
+   "bytes": 262795,
    "family": "esporte"
   },
   "reguladores/fazenda": {
+   "format": 2,
    "scope": "regulador",
    "uf": null,
    "count": 847,
@@ -1365,10 +1475,11 @@
    "parts": [
     "reguladores__fazenda.1.json"
    ],
-   "bytes": 168604,
+   "bytes": 312478,
    "family": "fazenda"
   },
   "reguladores/gestao": {
+   "format": 2,
    "scope": "regulador",
    "uf": null,
    "count": 1842,
@@ -1377,10 +1488,11 @@
    "parts": [
     "reguladores__gestao.1.json"
    ],
-   "bytes": 386378,
+   "bytes": 698346,
    "family": "gestao"
   },
   "reguladores/ibama": {
+   "format": 2,
    "scope": "regulador",
    "uf": null,
    "count": 375,
@@ -1389,10 +1501,11 @@
    "parts": [
     "reguladores__ibama.1.json"
    ],
-   "bytes": 76212,
+   "bytes": 134455,
    "family": "ibama"
   },
   "reguladores/icmbio": {
+   "format": 2,
    "scope": "regulador",
    "uf": null,
    "count": 706,
@@ -1401,10 +1514,11 @@
    "parts": [
     "reguladores__icmbio.1.json"
    ],
-   "bytes": 141742,
+   "bytes": 248616,
    "family": "icmbio"
   },
   "reguladores/igualdade-racial": {
+   "format": 2,
    "scope": "regulador",
    "uf": null,
    "count": 61,
@@ -1413,10 +1527,11 @@
    "parts": [
     "reguladores__igualdade-racial.1.json"
    ],
-   "bytes": 12075,
+   "bytes": 21793,
    "family": "igualdade-racial"
   },
   "reguladores/inep": {
+   "format": 2,
    "scope": "regulador",
    "uf": null,
    "count": 816,
@@ -1425,10 +1540,11 @@
    "parts": [
     "reguladores__inep.1.json"
    ],
-   "bytes": 152436,
+   "bytes": 246699,
    "family": "inep"
   },
   "reguladores/inmetro": {
+   "format": 2,
    "scope": "regulador",
    "uf": null,
    "count": 2248,
@@ -1437,10 +1553,11 @@
    "parts": [
     "reguladores__inmetro.1.json"
    ],
-   "bytes": 434560,
+   "bytes": 935815,
    "family": "inmetro"
   },
   "reguladores/inss": {
+   "format": 2,
    "scope": "regulador",
    "uf": null,
    "count": 552,
@@ -1449,10 +1566,11 @@
    "parts": [
     "reguladores__inss.1.json"
    ],
-   "bytes": 117650,
+   "bytes": 206066,
    "family": "inss"
   },
   "reguladores/integracao": {
+   "format": 2,
    "scope": "regulador",
    "uf": null,
    "count": 7999,
@@ -1461,10 +1579,11 @@
    "parts": [
     "reguladores__integracao.1.json"
    ],
-   "bytes": 1536711,
+   "bytes": 2255355,
    "family": "integracao"
   },
   "reguladores/iphan": {
+   "format": 2,
    "scope": "regulador",
    "uf": null,
    "count": 534,
@@ -1473,10 +1592,11 @@
    "parts": [
     "reguladores__iphan.1.json"
    ],
-   "bytes": 96519,
+   "bytes": 227931,
    "family": "iphan"
   },
   "reguladores/mapa": {
+   "format": 2,
    "scope": "regulador",
    "uf": null,
    "count": 12330,
@@ -1485,10 +1605,11 @@
    "parts": [
     "reguladores__mapa.1.json"
    ],
-   "bytes": 2433373,
+   "bytes": 3836869,
    "family": "mapa"
   },
   "reguladores/mcti": {
+   "format": 2,
    "scope": "regulador",
    "uf": null,
    "count": 4149,
@@ -1497,10 +1618,11 @@
    "parts": [
     "reguladores__mcti.1.json"
    ],
-   "bytes": 848305,
+   "bytes": 1602058,
    "family": "mcti"
   },
   "reguladores/mda": {
+   "format": 2,
    "scope": "regulador",
    "uf": null,
    "count": 2411,
@@ -1509,10 +1631,11 @@
    "parts": [
     "reguladores__mda.1.json"
    ],
-   "bytes": 470503,
+   "bytes": 877209,
    "family": "mda"
   },
   "reguladores/mdh": {
+   "format": 2,
    "scope": "regulador",
    "uf": null,
    "count": 947,
@@ -1521,10 +1644,11 @@
    "parts": [
     "reguladores__mdh.1.json"
    ],
-   "bytes": 178857,
+   "bytes": 272326,
    "family": "mdh"
   },
   "reguladores/mdic": {
+   "format": 2,
    "scope": "regulador",
    "uf": null,
    "count": 1285,
@@ -1533,10 +1657,11 @@
    "parts": [
     "reguladores__mdic.1.json"
    ],
-   "bytes": 260884,
+   "bytes": 423090,
    "family": "mdic"
   },
   "reguladores/mds": {
+   "format": 2,
    "scope": "regulador",
    "uf": null,
    "count": 1122,
@@ -1545,10 +1670,11 @@
    "parts": [
     "reguladores__mds.1.json"
    ],
-   "bytes": 222906,
+   "bytes": 379466,
    "family": "mds"
   },
   "reguladores/mec": {
+   "format": 2,
    "scope": "regulador",
    "uf": null,
    "count": 9011,
@@ -1557,10 +1683,11 @@
    "parts": [
     "reguladores__mec.1.json"
    ],
-   "bytes": 1784676,
+   "bytes": 2764875,
    "family": "mec"
   },
   "reguladores/ministerio-da-cidadania": {
+   "format": 2,
    "scope": "regulador",
    "uf": null,
    "count": 2711,
@@ -1569,10 +1696,11 @@
    "parts": [
     "reguladores__ministerio-da-cidadania.1.json"
    ],
-   "bytes": 521715,
+   "bytes": 784902,
    "family": "ministerio-da-cidadania"
   },
   "reguladores/ministerio-da-economia": {
+   "format": 2,
    "scope": "regulador",
    "uf": null,
    "count": 5940,
@@ -1581,10 +1709,11 @@
    "parts": [
     "reguladores__ministerio-da-economia.1.json"
    ],
-   "bytes": 1190839,
+   "bytes": 2110687,
    "family": "ministerio-da-economia"
   },
   "reguladores/ministerio-da-industria-comercio-exterio": {
+   "format": 2,
    "scope": "regulador",
    "uf": null,
    "count": 351,
@@ -1593,10 +1722,11 @@
    "parts": [
     "reguladores__ministerio-da-industria-comercio-exterio.1.json"
    ],
-   "bytes": 66907,
+   "bytes": 121380,
    "family": "ministerio-da-industria-comercio-exterio"
   },
   "reguladores/ministerio-da-infraestrutura": {
+   "format": 2,
    "scope": "regulador",
    "uf": null,
    "count": 893,
@@ -1605,10 +1735,11 @@
    "parts": [
     "reguladores__ministerio-da-infraestrutura.1.json"
    ],
-   "bytes": 173658,
+   "bytes": 298696,
    "family": "ministerio-da-infraestrutura"
   },
   "reguladores/ministerio-da-mulher-da-familia-e-dos-di": {
+   "format": 2,
    "scope": "regulador",
    "uf": null,
    "count": 516,
@@ -1617,10 +1748,11 @@
    "parts": [
     "reguladores__ministerio-da-mulher-da-familia-e-dos-di.1.json"
    ],
-   "bytes": 99023,
+   "bytes": 192084,
    "family": "ministerio-da-mulher-da-familia-e-dos-di"
   },
   "reguladores/ministerio-da-seguranca-publica": {
+   "format": 2,
    "scope": "regulador",
    "uf": null,
    "count": 308,
@@ -1629,10 +1761,11 @@
    "parts": [
     "reguladores__ministerio-da-seguranca-publica.1.json"
    ],
-   "bytes": 59479,
+   "bytes": 125792,
    "family": "ministerio-da-seguranca-publica"
   },
   "reguladores/ministerio-do-desenvolvimento-regional": {
+   "format": 2,
    "scope": "regulador",
    "uf": null,
    "count": 5135,
@@ -1641,10 +1774,11 @@
    "parts": [
     "reguladores__ministerio-do-desenvolvimento-regional.1.json"
    ],
-   "bytes": 989084,
+   "bytes": 1463482,
    "family": "ministerio-do-desenvolvimento-regional"
   },
   "reguladores/ministerio-extraordinario-da-seguranca-p": {
+   "format": 2,
    "scope": "regulador",
    "uf": null,
    "count": 185,
@@ -1653,10 +1787,11 @@
    "parts": [
     "reguladores__ministerio-extraordinario-da-seguranca-p.1.json"
    ],
-   "bytes": 35178,
+   "bytes": 74771,
    "family": "ministerio-extraordinario-da-seguranca-p"
   },
   "reguladores/mj": {
+   "format": 2,
    "scope": "regulador",
    "uf": null,
    "count": 5593,
@@ -1665,10 +1800,11 @@
    "parts": [
     "reguladores__mj.1.json"
    ],
-   "bytes": 1123511,
+   "bytes": 2106594,
    "family": "mj"
   },
   "reguladores/mma": {
+   "format": 2,
    "scope": "regulador",
    "uf": null,
    "count": 599,
@@ -1677,10 +1813,11 @@
    "parts": [
     "reguladores__mma.1.json"
    ],
-   "bytes": 119403,
+   "bytes": 212757,
    "family": "mma"
   },
   "reguladores/mme": {
+   "format": 2,
    "scope": "regulador",
    "uf": null,
    "count": 1628,
@@ -1689,10 +1826,11 @@
    "parts": [
     "reguladores__mme.1.json"
    ],
-   "bytes": 323154,
+   "bytes": 606081,
    "family": "mme"
   },
   "reguladores/mpi": {
+   "format": 2,
    "scope": "regulador",
    "uf": null,
    "count": 239,
@@ -1701,10 +1839,11 @@
    "parts": [
     "reguladores__mpi.1.json"
    ],
-   "bytes": 48951,
+   "bytes": 94787,
    "family": "mpi"
   },
   "reguladores/mpu": {
+   "format": 2,
    "scope": "regulador",
    "uf": null,
    "count": 1780,
@@ -1713,10 +1852,11 @@
    "parts": [
     "reguladores__mpu.1.json"
    ],
-   "bytes": 347863,
+   "bytes": 549503,
    "family": "mpu"
   },
   "reguladores/mre": {
+   "format": 2,
    "scope": "regulador",
    "uf": null,
    "count": 381,
@@ -1725,10 +1865,11 @@
    "parts": [
     "reguladores__mre.1.json"
    ],
-   "bytes": 71447,
+   "bytes": 114444,
    "family": "mre"
   },
   "reguladores/ms": {
+   "format": 2,
    "scope": "regulador",
    "uf": null,
    "count": 24393,
@@ -1738,10 +1879,11 @@
     "reguladores__ms.1.json",
     "reguladores__ms.2.json"
    ],
-   "bytes": 4824257,
+   "bytes": 9170613,
    "family": "ms"
   },
   "reguladores/mte": {
+   "format": 2,
    "scope": "regulador",
    "uf": null,
    "count": 1038,
@@ -1750,10 +1892,11 @@
    "parts": [
     "reguladores__mte.1.json"
    ],
-   "bytes": 211079,
+   "bytes": 383189,
    "family": "mte"
   },
   "reguladores/mulheres": {
+   "format": 2,
    "scope": "regulador",
    "uf": null,
    "count": 65,
@@ -1762,10 +1905,11 @@
    "parts": [
     "reguladores__mulheres.1.json"
    ],
-   "bytes": 13724,
+   "bytes": 23265,
    "family": "mulheres"
   },
   "reguladores/pesca": {
+   "format": 2,
    "scope": "regulador",
    "uf": null,
    "count": 920,
@@ -1774,10 +1918,11 @@
    "parts": [
     "reguladores__pesca.1.json"
    ],
-   "bytes": 190097,
+   "bytes": 399835,
    "family": "pesca"
   },
   "reguladores/pgfn": {
+   "format": 2,
    "scope": "regulador",
    "uf": null,
    "count": 255,
@@ -1786,10 +1931,11 @@
    "parts": [
     "reguladores__pgfn.1.json"
    ],
-   "bytes": 51366,
+   "bytes": 83853,
    "family": "pgfn"
   },
   "reguladores/planejamento": {
+   "format": 2,
    "scope": "regulador",
    "uf": null,
    "count": 1497,
@@ -1798,10 +1944,11 @@
    "parts": [
     "reguladores__planejamento.1.json"
    ],
-   "bytes": 297392,
+   "bytes": 573924,
    "family": "planejamento"
   },
   "reguladores/poder-judiciario": {
+   "format": 2,
    "scope": "regulador",
    "uf": null,
    "count": 1884,
@@ -1810,10 +1957,11 @@
    "parts": [
     "reguladores__poder-judiciario.1.json"
    ],
-   "bytes": 373864,
+   "bytes": 573345,
    "family": "poder-judiciario"
   },
   "reguladores/poder-legislativo": {
+   "format": 2,
    "scope": "regulador",
    "uf": null,
    "count": 434,
@@ -1822,10 +1970,11 @@
    "parts": [
     "reguladores__poder-legislativo.1.json"
    ],
-   "bytes": 80160,
+   "bytes": 124773,
    "family": "poder-legislativo"
   },
   "reguladores/portos-aeroportos": {
+   "format": 2,
    "scope": "regulador",
    "uf": null,
    "count": 300,
@@ -1834,10 +1983,11 @@
    "parts": [
     "reguladores__portos-aeroportos.1.json"
    ],
-   "bytes": 57876,
+   "bytes": 110350,
    "family": "portos-aeroportos"
   },
   "reguladores/presidencia": {
+   "format": 2,
    "scope": "regulador",
    "uf": null,
    "count": 2062,
@@ -1846,10 +1996,11 @@
    "parts": [
     "reguladores__presidencia.1.json"
    ],
-   "bytes": 412364,
+   "bytes": 704047,
    "family": "presidencia"
   },
   "reguladores/previc": {
+   "format": 2,
    "scope": "regulador",
    "uf": null,
    "count": 1036,
@@ -1858,10 +2009,11 @@
    "parts": [
     "reguladores__previc.1.json"
    ],
-   "bytes": 209215,
+   "bytes": 233003,
    "family": "previc"
   },
   "reguladores/rfb": {
+   "format": 2,
    "scope": "regulador",
    "uf": null,
    "count": 75512,
@@ -1875,10 +2027,11 @@
     "reguladores__rfb.5.json",
     "reguladores__rfb.6.json"
    ],
-   "bytes": 14033195,
+   "bytes": 25154368,
    "family": "rfb"
   },
   "reguladores/secretaria-especial-da-cultura": {
+   "format": 2,
    "scope": "regulador",
    "uf": null,
    "count": 2,
@@ -1891,6 +2044,7 @@
    "family": "secretaria-especial-da-cultura"
   },
   "reguladores/senatran": {
+   "format": 2,
    "scope": "regulador",
    "uf": null,
    "count": 1787,
@@ -1899,10 +2053,11 @@
    "parts": [
     "reguladores__senatran.1.json"
    ],
-   "bytes": 360995,
+   "bytes": 386337,
    "family": "senatran"
   },
   "reguladores/sfb": {
+   "format": 2,
    "scope": "regulador",
    "uf": null,
    "count": 42,
@@ -1911,10 +2066,11 @@
    "parts": [
     "reguladores__sfb.1.json"
    ],
-   "bytes": 8160,
+   "bytes": 14756,
    "family": "sfb"
   },
   "reguladores/sprev": {
+   "format": 2,
    "scope": "regulador",
    "uf": null,
    "count": 214,
@@ -1923,10 +2079,11 @@
    "parts": [
     "reguladores__sprev.1.json"
    ],
-   "bytes": 44059,
+   "bytes": 80318,
    "family": "sprev"
   },
   "reguladores/stn": {
+   "format": 2,
    "scope": "regulador",
    "uf": null,
    "count": 466,
@@ -1935,10 +2092,11 @@
    "parts": [
     "reguladores__stn.1.json"
    ],
-   "bytes": 91663,
+   "bytes": 152489,
    "family": "stn"
   },
   "reguladores/susep": {
+   "format": 2,
    "scope": "regulador",
    "uf": null,
    "count": 2336,
@@ -1947,10 +2105,11 @@
    "parts": [
     "reguladores__susep.1.json"
    ],
-   "bytes": 500769,
+   "bytes": 596115,
    "family": "susep"
   },
   "reguladores/tcu": {
+   "format": 2,
    "scope": "regulador",
    "uf": null,
    "count": 244,
@@ -1959,10 +2118,11 @@
    "parts": [
     "reguladores__tcu.1.json"
    ],
-   "bytes": 47843,
+   "bytes": 95125,
    "family": "tcu"
   },
   "reguladores/transportes": {
+   "format": 2,
    "scope": "regulador",
    "uf": null,
    "count": 919,
@@ -1971,10 +2131,11 @@
    "parts": [
     "reguladores__transportes.1.json"
    ],
-   "bytes": 176196,
+   "bytes": 303634,
    "family": "transportes"
   },
   "reguladores/turismo": {
+   "format": 2,
    "scope": "regulador",
    "uf": null,
    "count": 779,
@@ -1983,10 +2144,11 @@
    "parts": [
     "reguladores__turismo.1.json"
    ],
-   "bytes": 147852,
+   "bytes": 219591,
    "family": "turismo"
   },
   "tratados": {
+   "format": 2,
    "scope": "tratado",
    "uf": null,
    "count": 161,
@@ -1995,7 +2157,7 @@
    "parts": [
     "tratados.1.json"
    ],
-   "bytes": 27507,
+   "bytes": 60294,
    "family": null
   }
  },
