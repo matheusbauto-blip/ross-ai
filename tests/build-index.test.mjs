@@ -43,6 +43,7 @@ test('the static index records identification, summary and hash of every norm an
   assert.deepEqual(Object.keys(manifest.units).sort(), ['estaduais/SP', 'federal/leis-ordinarias', 'municipais/MG', 'raiz']);
   assert.equal(manifest.units['federal/leis-ordinarias'].count, 2); assert.equal(manifest.units['federal/leis-ordinarias'].family, 'leis-ordinarias');
   assert.equal(manifest.units['estaduais/SP'].uf, 'SP'); assert.equal(manifest.units['municipais/MG'].scope, 'municipal');
+  assert.equal(manifest.units.raiz.family, 'constituicao', 'the Constitution is loaded with the federal laws');
   const federal = JSON.parse(await readFile(join(out, manifest.units['federal/leis-ordinarias'].parts[0]), 'utf8'));
   const entry = federal.entries.find(e => e.n === '99999');
   assert.deepEqual(entry, { p: '2020/lei-99999-2020-02-02.md', h: createHash('sha256').update(lei).digest('hex').slice(0, 16), t: 'Lei nº 99.999 de 02/02/2020', e: 'Dispõe sobre a garantia de baterias de celulares e dá outras providências.', k: 'Lei Ordinária', n: '99999', d: '2020-02-02' });

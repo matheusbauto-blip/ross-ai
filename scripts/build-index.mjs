@@ -96,7 +96,7 @@ for (const unit of units) {
     await fs.writeFile(path.join(out, name), data);
     bytes += Buffer.byteLength(data); parts.push(name);
   }
-  manifest.units[unit] = { scope, uf, count: entries.length, partial, failures, parts, bytes, family: top === 'federal' ? sub || 'constituicao' : top === 'reguladores' ? sub : null };
+  manifest.units[unit] = { scope, uf, count: entries.length, partial, failures, parts, bytes, family: unit === 'raiz' ? 'constituicao' : top === 'federal' ? sub : top === 'reguladores' ? sub : null };
   manifest.total = Object.values(manifest.units).reduce((n, u) => n + u.count, 0);
   manifest.partial = Object.values(manifest.units).reduce((n, u) => n + u.partial, 0);
   manifest.failures = Object.values(manifest.units).reduce((n, u) => n + u.failures, 0);
