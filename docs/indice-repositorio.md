@@ -11,7 +11,7 @@ Cada entrada guarda somente a identificação da norma:
 | `p` | caminho do arquivo dentro da unidade |
 | `h` | 16 primeiros caracteres do SHA-256 do arquivo |
 | `t` | título |
-| `e` | ementa (até 240 caracteres) |
+| `e` | ementa (até 240 caracteres): a do cabeçalho; sem ela, o primeiro parágrafo descritivo do texto |
 | `k`, `n`, `d` | tipo, número e data |
 | `r` | revogação indicada no cabeçalho |
 | `x` | texto parcial, sem texto integral ou só com metadados |
@@ -35,6 +35,7 @@ O índice é carregado por partes conforme a pesquisa; uma pessoa que só conver
 - Normas estaduais e municipais exigem o estado; não se carrega o país inteiro numa página.
 - Textos marcados como parciais ou revogados aparecem na pesquisa, mas não são usados para fundamentar respostas.
 - A edição é fixa: normas publicadas no repositório depois dela só entram ao gerar e publicar um novo índice.
+- Atos de órgãos reguladores, municípios, jurisprudência e tratados não têm ementa no cabeçalho do repositório. O gerador usa o primeiro parágrafo descritivo do texto, ignorando título repetido, fórmula de competência (“no uso das atribuições…”), preâmbulo (“considerando…”), fecho com local e data, blocos de código/JSON/HTML e cláusulas de vigência. Atos individuais (autorizações de empresas, registros de produtos) às vezes ficam sem ementa útil e só são encontrados pelo título, número ou data.
 
 ## Gerar de novo
 
