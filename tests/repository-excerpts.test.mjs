@@ -31,3 +31,15 @@ test('a bare law reference starts with substantive articles and a requested arti
   assert.equal(repositoryExcerpts(text,'Artigo 11 da Lei Complementar 142/2013',2,2200,true)[0].article,'Art. 11');
   assert.equal(repositoryExcerpts(text,'Artigo 999 da Lei Complementar 142/2013',2,2200,true).length,0);
 });
+
+test('the chapter title and rare words pick the right articles; words present everywhere and amending articles weigh less', () => {
+  const law = ['# Estatuto', '#### CAPÍTULO I — DISPOSIÇÕES GERAIS',
+    '**Art. 1º** Esta lei assegura os direitos da pessoa com deficiência, com acessibilidade, inclusão, igualdade, transporte, educação, trabalho e saúde da pessoa com deficiência.',
+    '#### CAPÍTULO II — DO DIREITO À EDUCAÇÃO', '**Art. 2º** A educação da pessoa com deficiência é inclusiva em todos os níveis.',
+    '#### CAPÍTULO III — DO DIREITO AO TRANSPORTE E À MOBILIDADE', '**Art. 3º** O direito ao transporte da pessoa com deficiência é assegurado em igualdade de oportunidades.',
+    '**Art. 4º** As empresas de transporte coletivo devem reservar assentos à pessoa com deficiência.',
+    '#### CAPÍTULO IV — DISPOSIÇÕES FINAIS', '**Art. 5º** A Lei nº 1.000 passa a vigorar com as seguintes alterações: transporte coletivo acessível à pessoa com deficiência, com reserva de assentos.'].join('\n\n');
+  const transport = repositoryExcerpts(law, 'direitos da pessoa com deficiência no transporte coletivo', 2, 2200, true).map(p => p.article);
+  assert.deepEqual(transport.sort(), ['Art. 3º', 'Art. 4º']);
+  assert.equal(repositoryExcerpts(law, 'educação inclusiva da pessoa com deficiência', 1, 2200, true)[0].article, 'Art. 2º');
+});
