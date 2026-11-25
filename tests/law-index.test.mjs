@@ -22,7 +22,7 @@ test('index ranking prefers exact law numbers, then entries matching every term,
     entry({ p: '2021/lei-14133-2021-04-01.md', t: 'Lei nº 14.133 de 01/04/2021', e: 'Lei de Licitações e Contratos Administrativos.', n: '14133', d: '2021-04-01' }),
     entry({ p: '2020/lei-99999-2020-02-02.md', t: 'Lei nº 99.999 de 02/02/2020', e: 'Dispõe sobre a garantia de baterias de celulares.', n: '99999', d: '2020-02-02' }),
     entry({ p: '2019/lei-88888-2019-02-02.md', t: 'Lei nº 88.888 de 02/02/2019', e: 'Dispõe sobre baterias de automóveis e a sua reciclagem.', n: '88888', d: '2019-02-02', x: 1 }),
-    entry({ p: '1980/lei-1-1980-01-01.md', t: 'Lei nº 1 de 01/01/1980', e: 'Altera dispositivos sobre celulares.', n: '1', d: '1980-01-01' }),
+    entry({ p: '1980/lei-1-1980-01-01.md', t: 'Lei nº 1 de 01/01/1980', e: 'Dispõe sobre dispositivos de celulares.', n: '1', d: '1980-01-01' }),
   ];
   const byNumber = host(searchIndexEntries(entries, '14.133', 5));
   assert.equal(byNumber[0].n, '14133');
@@ -51,4 +51,17 @@ test('unit selection loads federal laws by default and needs the state for state
   assert.deepEqual(units({ scope: 'regulador', organ: 'anvisa' }), ['reguladores/anvisa']);
   assert.deepEqual(units({ scope: 'regulador' }), []);
   assert.deepEqual(units({ scope: 'jurisprudencia' }), ['jurisprudencia']);
+});
+
+test('a named statute outranks the laws that amend it, and amendments pull in the law they cite', () => {
+  const base = entry({ unit: 'federal/leis-ordinarias', p: '2015/lei-13146.md', t: 'Lei nº 13.146 de 06/07/2015', e: 'Institui a Lei Brasileira de Inclusão da Pessoa com Deficiência (Estatuto da Pessoa com Deficiência).', n: '13146', d: '2015-07-06' });
+  const amendments = [1, 2, 3].map(i => entry({ unit: 'federal/leis-ordinarias', p: '2020/alt-' + i + '.md', t: 'Lei nº 14.00' + i, e: 'Altera a Lei nº 13.146, de 6 de julho de 2015 (Estatuto da Pessoa com Deficiência), para garantir transporte coletivo acessível.', n: '1400' + i, d: '2020-01-0' + i }));
+  const penal = entry({ unit: 'federal/leis-ordinarias', p: '1956/lei-2848.md', t: 'Lei nº 2.848 de 18/08/1956', e: 'Concede isenção de direitos de importação para um aparelho.', n: '2848', d: '1956-08-18' });
+  const amendsPenal = [1, 2].map(i => entry({ unit: 'federal/leis-ordinarias', p: '2021/penal-' + i + '.md', t: 'Lei nº 15.00' + i, e: 'Altera o Decreto-Lei nº 2.848, de 7 de dezembro de 1940 (Código Penal), para proteger a pessoa com deficiência no transporte coletivo.', n: '1500' + i, d: '2021-01-0' + i }));
+  const all = [base, penal].concat(amendments, amendsPenal);
+  const named = host(searchIndexEntries(all, 'direitos no transporte coletivo segundo o Estatuto da Pessoa com Deficiência', 10));
+  assert.equal(named[0].n, '13146', 'the statute itself comes first');
+  const plain = host(searchIndexEntries(all, 'transporte coletivo acessível', 10));
+  assert.ok(plain.some(r => r.n === '13146'), 'the law cited by several matching amendments is included');
+  assert.ok(!plain.some(r => r.n === '2848'), 'a Decreto-Lei number does not pull in an ordinary law with the same number');
 });
