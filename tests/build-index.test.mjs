@@ -21,6 +21,7 @@ async function fixtureRepository() {
     'federal/_fonte/ignorado.md': lei,
     'estaduais/SP/leis-ordinarias/2001/lei-1-2001-01-01.md': lei.replace('99999', '1'),
     'municipais/MG/uberlandia/lei-organica/1990/lei-organica-1-1990.md': municipal,
+    'reguladores/anvisa/instrucoes-normativas/2020/in-61-2020.md': '---\ntitulo: "INSTRUÇÃO NORMATIVA - IN Nº 61, DE 6 DE MARÇO DE 2020"\ntipo: "Instrução Normativa"\nnumero: "61"\ndata: 2020-03-06\n---\n# INSTRUÇÃO NORMATIVA - IN Nº 61, DE 6 DE MARÇO DE 2020\n\nINSTRUÇÃO NORMATIVA - IN Nº 61, DE 6 DE MARÇO DE 2020\n\nEstabelece os assuntos para alterações de informações no processo de regularização de dispositivos médicos na ANVISA.\n\nA Diretoria Colegiada da Agência Nacional de Vigilância Sanitária, no uso da atribuição que lhe confere o art. 15, resolve:\n\n**Art. 1º** Esta Instrução Normativa estabelece os assuntos.\n',
     'constituicao.md': '---\ntitulo: "Constituição Federal de 1988"\n---\n# Constituição\n\n' + 'Texto. '.repeat(40),
     'README.md': '# não é norma',
   };
@@ -37,10 +38,12 @@ test('the static index records identification, summary and hash of every norm an
   const out = join(dir, '..', 'index-' + ref.slice(0, 8));
   const { stdout } = await run('node', [script, '--source-dir', dir, '--out-dir', out, '--ref', ref, '--no-checkout', '--part-size', '1000']);
   const summary = JSON.parse(stdout.trim().split('\n').pop());
-  assert.equal(summary.total, 5); assert.equal(summary.failures, 0);
+  assert.equal(summary.total, 6); assert.equal(summary.failures, 0);
   const manifest = JSON.parse(await readFile(join(out, 'manifest.json'), 'utf8'));
   assert.equal(manifest.ref, ref);
-  assert.deepEqual(Object.keys(manifest.units).sort(), ['estaduais/SP', 'federal/leis-ordinarias', 'municipais/MG', 'raiz']);
+  assert.deepEqual(Object.keys(manifest.units).sort(), ['estaduais/SP', 'federal/leis-ordinarias', 'municipais/MG', 'raiz', 'reguladores/anvisa']);
+  const anvisa = JSON.parse(await readFile(join(out, manifest.units['reguladores/anvisa'].parts[0]), 'utf8')).entries[0];
+  assert.equal(anvisa.e, 'Estabelece os assuntos para alterações de informações no processo de regularização de dispositivos médicos na ANVISA.', 'summary taken from the body, skipping the repeated title');
   assert.equal(manifest.units['federal/leis-ordinarias'].count, 2); assert.equal(manifest.units['federal/leis-ordinarias'].family, 'leis-ordinarias');
   assert.equal(manifest.units['estaduais/SP'].uf, 'SP'); assert.equal(manifest.units['municipais/MG'].scope, 'municipal');
   assert.equal(manifest.units.raiz.family, 'constituicao', 'the Constitution is loaded with the federal laws');
@@ -52,6 +55,8 @@ test('the static index records identification, summary and hash of every norm an
   const city = JSON.parse(await readFile(join(out, manifest.units['municipais/MG'].parts[0]), 'utf8')).entries[0];
   assert.equal(city.p, 'uberlandia/lei-organica/1990/lei-organica-1-1990.md');
   assert.ok(city.e.length <= manifest.ementaMax && city.e.endsWith('…'), 'long summaries are truncated');
+  // A text without a summary paragraph gets none rather than its enacting clause.
+  assert.equal(partial.e, undefined);
   assert.ok(!JSON.stringify(federal).includes('ignorado'), 'working folders are not indexed');
   // Rerunning is idempotent and does not regenerate finished units.
   const again = await run('node', [script, '--source-dir', dir, '--out-dir', out, '--ref', ref, '--no-checkout']);

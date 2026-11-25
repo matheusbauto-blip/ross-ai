@@ -15,7 +15,7 @@ const run = promisify(execFile);
 const args = process.argv.slice(2);
 const opt = (key, fallback) => { const n = args.indexOf(key); return n < 0 ? fallback : args[n + 1]; };
 if (args.includes('--help') || !opt('--source-dir')) {
-  console.log('node scripts/build-index.mjs --source-dir /path/to/leis --out-dir /path/to/index [--ref COMMIT_SHA] [--units federal/leis-ordinarias,estaduais/SP] [--part-size 15000] [--no-checkout]');
+  console.log('node scripts/build-index.mjs --source-dir /path/to/leis --out-dir /path/to/index [--ref COMMIT_SHA] [--units federal/leis-ordinarias,estaduais/SP] [--part-size 15000] [--no-checkout] [--force]');
   process.exit(args.includes('--help') ? 0 : 1);
 }
 const root = path.resolve(opt('--source-dir'));
@@ -25,6 +25,8 @@ const out = path.resolve(opt('--out-dir', path.join(root, '..', 'index')));
 const partSize = Math.max(1000, Number(opt('--part-size', '15000')) || 15000);
 const onlyUnits = opt('--units', '') ? opt('--units', '').split(',').map((s) => s.trim()).filter(Boolean) : null;
 const noCheckout = args.includes('--no-checkout');
+const force = args.includes('--force');
+const INDEX_FORMAT = 2; // 2: ementa extraída do corpo quando o cabeçalho não a traz
 const EMENTA_MAX = 240;
 const TOP = ['federal', 'estaduais', 'municipais', 'reguladores', 'jurisprudencia', 'tratados'];
 
@@ -50,13 +52,41 @@ try { const existing = JSON.parse(await fs.readFile(manifestPath, 'utf8')); if (
 
 function shortHash(text) { return createHash('sha256').update(text).digest('hex').slice(0, 16); }
 function titleFromPath(file) { return path.basename(file, '.md').replace(/-/g, ' '); }
+/* Muitos atos (órgãos reguladores, municípios, jurisprudência, tratados e parte dos estaduais) não trazem a ementa
+   no cabeçalho, mas no primeiro parágrafo depois do título. Usa esse parágrafo, pulando título repetido, cabeçalhos,
+   linhas só em maiúsculas, fórmulas de promulgação e artigos; prefere frases que começam como ementa. */
+const EMENTA_VERB = /^(?:disp[oõ]e|altera|aprova|estabelece|institui|regulamenta|define|autoriza|revoga|determina|prorroga|fixa|torna|concede|cria|declara|denomina|acrescenta|d[aá] |homologa|reconhece|atualiza|disciplina|divulga|inclui|exclui|credencia|habilita|designa|nomeia|suspende|mant[eé]m|pro[ií]be|obriga|considera|consolida|publica|delega|organiza|modifica|retifica|ratifica|promulga|trata|regula|cancela|indefere|defere|deferir|indeferir|julga|nega|d[aá] provimento|ementa)/i;
+const ENACTING = /^(?:o |a |os |as )?(?:presidente|presidenta|governador|governadora|prefeito|prefeita|diretor|diretora|diretoria|secret[aá]ri[oa]|ministr[oa]|congresso|assembleia|c[aâ]mara|mesa|superintendente|conselho|coordenador|chefe|delegad[oa]|faço saber|fa[çc]o saber)/i;
+function plainLine(line) { return line.replace(/<[^>]*>/g, ' ').replace(/!\[[^\]]*\]\([^)]*\)/g, '').replace(/\[([^\]]*)\]\([^)]*\)/g, '$1').replace(/\\([.\-*_#])/g, '$1').replace(/[*_`>#|~]+/g, ' ').replace(/\s+/g, ' ').trim(); }
+const NOT_SUMMARY = /^(?:\d+\s*[.)-]\s|[-•]\s|revogam-se|revogad[ao]s? as disposi|ficam revogad|esta (?:lei|resolu[cç][aã]o|portaria|instru[cç][aã]o|delibera[cç][aã]o|emenda)[^.]{0,60}entra(?:r[aá])? em vigor|texto obtido|nota[:\s]|observa[cç][aã]o[:\s]|aviso[:\s]|publicad[ao] no|este texto n[aã]o substitui|considerando\b|resolve\b|decreta\b)/i;
+function summaryFromBody(body, title) {
+  const fold = (x) => x.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+  const titleKey = fold(title || '');
+  // Blocos de código (```), tabelas e restos de HTML/JSON não são ementa.
+  const raw = body.replace(/```[\s\S]*?(?:```|$)/g, '\n\n');
+  const paragraphs = raw.split(/\r?\n\s*\r?\n/).slice(0, 12)
+    .filter((p) => !/^\s*(?:[{[|]|<(?:div|table|p)\b)/i.test(p) && !/"[a-z_]+"\s*:/i.test(p))
+    .map((p) => p.split(/\r?\n/).filter((l) => !/^\s*#/.test(l)).map(plainLine).join(' ').trim()).filter(Boolean);
+  const candidates = paragraphs.filter((p) => {
+    const letters = p.replace(/[^A-Za-zÀ-ÿ]/g, '');
+    if (p.length < 25 || /^art\.?\s*\d/i.test(p) || /:\s*$/.test(p) || ENACTING.test(p) || NOT_SUMMARY.test(p) || /class=|<\/?[a-z]+\b|&\s?#?\d+;/i.test(p)) return false;
+    // Fórmula de competência ("no uso das atribuições…") e fecho com local e data não descrevem o assunto.
+    if (/no uso d[ae]s? (?:suas )?atribui[cç]|usando d[ae]s? atribui[cç]|tendo em vista o disposto/i.test(p.slice(0, 220))) return false;
+    if (/^[A-ZÀ-Ú][^,]{1,60}, (?:em )?\d{1,2}[ºo°]? de [a-zç]+ de [\d.]{4,5}\.?$/i.test(p) || /\bCEP:?\s*\d{2}\.?\d{3}-?\d{3}/.test(p)) return false;
+    if (letters && letters === letters.toUpperCase()) return false;
+    const key = fold(p);
+    return !(titleKey && (key === titleKey || key.startsWith(titleKey) && key.length < titleKey.length + 15));
+  });
+  return (candidates.find((p) => EMENTA_VERB.test(p)) || candidates[0] || '').slice(0, 600);
+}
 function entryFor(file, unit, markdown) {
   const rel = file === 'constituicao.md' ? file : file.slice(unit.length + 1);
   const entry = { p: rel, h: shortHash(markdown) };
   let m = {}, body = markdown;
   try { ({ metadata: m, body } = parseFrontmatter(markdown)); } catch { entry.x = 1; }
   entry.t = String(m.titulo || titleFromPath(file)).slice(0, 160);
-  const ementa = String(m.ementa || '').replace(/\s+/g, ' ').trim();
+  let ementa = String(m.ementa || '').replace(/\s+/g, ' ').trim();
+  if (!ementa) ementa = summaryFromBody(body, entry.t);
   if (ementa) entry.e = ementa.length > EMENTA_MAX ? ementa.slice(0, EMENTA_MAX - 1) + '…' : ementa;
   if (m.tipo) entry.k = String(m.tipo).slice(0, 40);
   const number = String(m.numero || '').replace(/\D/g, ''); if (number) entry.n = number;
@@ -70,7 +100,7 @@ function entryFor(file, unit, markdown) {
 for (const unit of units) {
   const files = unitFiles.get(unit);
   const done = manifest.units[unit];
-  if (done && done.count === files.length && done.parts && done.parts.length) { console.log('ok (já gerado)', unit, files.length); continue; }
+  if (!force && done && done.count === files.length && done.parts && done.parts.length && done.format === INDEX_FORMAT) { console.log('ok (já gerado)', unit, files.length); continue; }
   const started = Date.now();
   if (!noCheckout && unit !== 'raiz') {
     await run('git', ['-C', root, 'sparse-checkout', 'set', unit], { maxBuffer: 1 << 24 });
@@ -96,7 +126,7 @@ for (const unit of units) {
     await fs.writeFile(path.join(out, name), data);
     bytes += Buffer.byteLength(data); parts.push(name);
   }
-  manifest.units[unit] = { scope, uf, count: entries.length, partial, failures, parts, bytes, family: unit === 'raiz' ? 'constituicao' : top === 'federal' ? sub : top === 'reguladores' ? sub : null };
+  manifest.units[unit] = { format: INDEX_FORMAT, scope, uf, count: entries.length, partial, failures, parts, bytes, family: unit === 'raiz' ? 'constituicao' : top === 'federal' ? sub : top === 'reguladores' ? sub : null };
   manifest.total = Object.values(manifest.units).reduce((n, u) => n + u.count, 0);
   manifest.partial = Object.values(manifest.units).reduce((n, u) => n + u.partial, 0);
   manifest.failures = Object.values(manifest.units).reduce((n, u) => n + u.failures, 0);
