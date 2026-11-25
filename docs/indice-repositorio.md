@@ -56,3 +56,12 @@ A pasta `.law-index/` fica fora do Git. Para publicar, copie seu conteúdo para 
 - `tests/law-index.test.mjs` — ordenação (número exato, todos os termos, parciais rebaixados) e escolha das partes por esfera, estado e órgão.
 - `tests/repository-library.test.mjs` e `tests/process-route.test.mjs` — leitura por caminho na edição fixa, conferência de hash, recusa de caminhos e edições inválidos (400/409).
 - `qa/ui.test.mjs` — pesquisa combinada, leitura de um texto do índice, resposta citando uma norma encontrada só no índice e índice lento que não atrasa a resposta (prazo de 12 s).
+
+## Verificação na produção — 25/11/2026
+
+Site `89b21efc00cf`, função `ross-ai` versão 20, índice formato 2 (1.218.982 textos, 162 unidades, 404 MB; ementa em 100% das normas federais, 98% das estaduais, 97% das municipais, 81% dos atos de órgãos reguladores e 46% da jurisprudência).
+
+- O manifesto é servido com `Access-Control-Allow-Origin: *` e compactado (a primeira parte das leis ordinárias federais baixa ~1 MB).
+- Pesquisa → Órgãos reguladores → ANVISA → “rotulagem de alimentos”: traz a RDC 727/2022 (“Dispõe sobre a rotulagem dos alimentos embalados”) e outras RDCs; “Ler texto do repositório” abre o texto integral pela função, por caminho e hash.
+- `repository_read` por caminho: LC 142/2013 devolveu os Arts. 9º, 3º e 1º para uma pergunta sobre aposentadoria da pessoa com deficiência; hash errado → 409; edição não publicada → 400.
+- Conversa: “Quais são os direitos da pessoa com deficiência no transporte coletivo segundo o Estatuto da Pessoa com Deficiência?” passou a citar os Arts. 46 e 48 da Lei 13.146/2015 (antes trazia o Art. 3º e artigos que alteram outras leis), depois de duas correções: a ordenação do índice (a norma citada pelo nome vem antes das leis que a alteram) e a escolha de artigos dentro da norma (raridade das palavras, título do capítulo e frases da pergunta).
