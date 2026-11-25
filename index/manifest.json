@@ -1,0 +1,2005 @@
+{
+ "repository": "ctresb/leis",
+ "ref": "c9f21b4ab11aa0d7ca6fe861d75028e94219c2d6",
+ "generatedAt": "2026-11-25T15:13:04.020Z",
+ "ementaMax": 240,
+ "units": {
+  "estaduais/AC": {
+   "scope": "estadual",
+   "uf": "AC",
+   "count": 5206,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "estaduais__AC.1.json"
+   ],
+   "bytes": 1554298,
+   "family": null
+  },
+  "estaduais/AL": {
+   "scope": "estadual",
+   "uf": "AL",
+   "count": 3891,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "estaduais__AL.1.json"
+   ],
+   "bytes": 1268264,
+   "family": null
+  },
+  "estaduais/AM": {
+   "scope": "estadual",
+   "uf": "AM",
+   "count": 10419,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "estaduais__AM.1.json"
+   ],
+   "bytes": 3574294,
+   "family": null
+  },
+  "estaduais/AP": {
+   "scope": "estadual",
+   "uf": "AP",
+   "count": 5532,
+   "partial": 1,
+   "failures": 0,
+   "parts": [
+    "estaduais__AP.1.json"
+   ],
+   "bytes": 1778942,
+   "family": null
+  },
+  "estaduais/BA": {
+   "scope": "estadual",
+   "uf": "BA",
+   "count": 38943,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "estaduais__BA.1.json",
+    "estaduais__BA.2.json",
+    "estaduais__BA.3.json"
+   ],
+   "bytes": 11959678,
+   "family": null
+  },
+  "estaduais/CE": {
+   "scope": "estadual",
+   "uf": "CE",
+   "count": 11232,
+   "partial": 16,
+   "failures": 0,
+   "parts": [
+    "estaduais__CE.1.json"
+   ],
+   "bytes": 3466201,
+   "family": null
+  },
+  "estaduais/DF": {
+   "scope": "estadual",
+   "uf": "DF",
+   "count": 83314,
+   "partial": 23,
+   "failures": 0,
+   "parts": [
+    "estaduais__DF.1.json",
+    "estaduais__DF.2.json",
+    "estaduais__DF.3.json",
+    "estaduais__DF.4.json",
+    "estaduais__DF.5.json",
+    "estaduais__DF.6.json"
+   ],
+   "bytes": 26808370,
+   "family": null
+  },
+  "estaduais/ES": {
+   "scope": "estadual",
+   "uf": "ES",
+   "count": 16787,
+   "partial": 4514,
+   "failures": 0,
+   "parts": [
+    "estaduais__ES.1.json",
+    "estaduais__ES.2.json"
+   ],
+   "bytes": 5033902,
+   "family": null
+  },
+  "estaduais/GO": {
+   "scope": "estadual",
+   "uf": "GO",
+   "count": 52278,
+   "partial": 451,
+   "failures": 0,
+   "parts": [
+    "estaduais__GO.1.json",
+    "estaduais__GO.2.json",
+    "estaduais__GO.3.json",
+    "estaduais__GO.4.json"
+   ],
+   "bytes": 14930420,
+   "family": null
+  },
+  "estaduais/MA": {
+   "scope": "estadual",
+   "uf": "MA",
+   "count": 8807,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "estaduais__MA.1.json"
+   ],
+   "bytes": 2493841,
+   "family": null
+  },
+  "estaduais/MG": {
+   "scope": "estadual",
+   "uf": "MG",
+   "count": 84839,
+   "partial": 1,
+   "failures": 0,
+   "parts": [
+    "estaduais__MG.1.json",
+    "estaduais__MG.2.json",
+    "estaduais__MG.3.json",
+    "estaduais__MG.4.json",
+    "estaduais__MG.5.json",
+    "estaduais__MG.6.json"
+   ],
+   "bytes": 24628675,
+   "family": null
+  },
+  "estaduais/MS": {
+   "scope": "estadual",
+   "uf": "MS",
+   "count": 22988,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "estaduais__MS.1.json",
+    "estaduais__MS.2.json"
+   ],
+   "bytes": 7154192,
+   "family": null
+  },
+  "estaduais/MT": {
+   "scope": "estadual",
+   "uf": "MT",
+   "count": 26358,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "estaduais__MT.1.json",
+    "estaduais__MT.2.json"
+   ],
+   "bytes": 7264567,
+   "family": null
+  },
+  "estaduais/PA": {
+   "scope": "estadual",
+   "uf": "PA",
+   "count": 28580,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "estaduais__PA.1.json",
+    "estaduais__PA.2.json"
+   ],
+   "bytes": 10569969,
+   "family": null
+  },
+  "estaduais/PB": {
+   "scope": "estadual",
+   "uf": "PB",
+   "count": 17585,
+   "partial": 1,
+   "failures": 0,
+   "parts": [
+    "estaduais__PB.1.json",
+    "estaduais__PB.2.json"
+   ],
+   "bytes": 5546428,
+   "family": null
+  },
+  "estaduais/PE": {
+   "scope": "estadual",
+   "uf": "PE",
+   "count": 50387,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "estaduais__PE.1.json",
+    "estaduais__PE.2.json",
+    "estaduais__PE.3.json",
+    "estaduais__PE.4.json"
+   ],
+   "bytes": 15565362,
+   "family": null
+  },
+  "estaduais/PI": {
+   "scope": "estadual",
+   "uf": "PI",
+   "count": 6948,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "estaduais__PI.1.json"
+   ],
+   "bytes": 2202332,
+   "family": null
+  },
+  "estaduais/PR": {
+   "scope": "estadual",
+   "uf": "PR",
+   "count": 8,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "estaduais__PR.1.json"
+   ],
+   "bytes": 2674,
+   "family": null
+  },
+  "estaduais/RJ": {
+   "scope": "estadual",
+   "uf": "RJ",
+   "count": 1335,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "estaduais__RJ.1.json"
+   ],
+   "bytes": 452957,
+   "family": null
+  },
+  "estaduais/RN": {
+   "scope": "estadual",
+   "uf": "RN",
+   "count": 5413,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "estaduais__RN.1.json"
+   ],
+   "bytes": 1704872,
+   "family": null
+  },
+  "estaduais/RO": {
+   "scope": "estadual",
+   "uf": "RO",
+   "count": 12365,
+   "partial": 1,
+   "failures": 0,
+   "parts": [
+    "estaduais__RO.1.json"
+   ],
+   "bytes": 4363827,
+   "family": null
+  },
+  "estaduais/RR": {
+   "scope": "estadual",
+   "uf": "RR",
+   "count": 3226,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "estaduais__RR.1.json"
+   ],
+   "bytes": 1131912,
+   "family": null
+  },
+  "estaduais/RS": {
+   "scope": "estadual",
+   "uf": "RS",
+   "count": 37100,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "estaduais__RS.1.json",
+    "estaduais__RS.2.json",
+    "estaduais__RS.3.json"
+   ],
+   "bytes": 10505610,
+   "family": null
+  },
+  "estaduais/SC": {
+   "scope": "estadual",
+   "uf": "SC",
+   "count": 51199,
+   "partial": 133,
+   "failures": 0,
+   "parts": [
+    "estaduais__SC.1.json",
+    "estaduais__SC.2.json",
+    "estaduais__SC.3.json",
+    "estaduais__SC.4.json"
+   ],
+   "bytes": 8136997,
+   "family": null
+  },
+  "estaduais/SE": {
+   "scope": "estadual",
+   "uf": "SE",
+   "count": 10878,
+   "partial": 1,
+   "failures": 0,
+   "parts": [
+    "estaduais__SE.1.json"
+   ],
+   "bytes": 3454281,
+   "family": null
+  },
+  "estaduais/SP": {
+   "scope": "estadual",
+   "uf": "SP",
+   "count": 104172,
+   "partial": 1,
+   "failures": 0,
+   "parts": [
+    "estaduais__SP.1.json",
+    "estaduais__SP.2.json",
+    "estaduais__SP.3.json",
+    "estaduais__SP.4.json",
+    "estaduais__SP.5.json",
+    "estaduais__SP.6.json",
+    "estaduais__SP.7.json"
+   ],
+   "bytes": 31144238,
+   "family": null
+  },
+  "estaduais/TO": {
+   "scope": "estadual",
+   "uf": "TO",
+   "count": 3562,
+   "partial": 36,
+   "failures": 0,
+   "parts": [
+    "estaduais__TO.1.json"
+   ],
+   "bytes": 1044815,
+   "family": null
+  },
+  "federal/constituicoes-historicas": {
+   "scope": "federal",
+   "uf": null,
+   "count": 7,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "federal__constituicoes-historicas.1.json"
+   ],
+   "bytes": 1993,
+   "family": "constituicoes-historicas"
+  },
+  "federal/decretos": {
+   "scope": "federal",
+   "uf": null,
+   "count": 109616,
+   "partial": 445,
+   "failures": 0,
+   "parts": [
+    "federal__decretos.1.json",
+    "federal__decretos.2.json",
+    "federal__decretos.3.json",
+    "federal__decretos.4.json",
+    "federal__decretos.5.json",
+    "federal__decretos.6.json",
+    "federal__decretos.7.json",
+    "federal__decretos.8.json"
+   ],
+   "bytes": 31626444,
+   "family": "decretos"
+  },
+  "federal/decretos-legislativos": {
+   "scope": "federal",
+   "uf": null,
+   "count": 21359,
+   "partial": 102,
+   "failures": 0,
+   "parts": [
+    "federal__decretos-legislativos.1.json",
+    "federal__decretos-legislativos.2.json"
+   ],
+   "bytes": 7589594,
+   "family": "decretos-legislativos"
+  },
+  "federal/decretos-lei": {
+   "scope": "federal",
+   "uf": null,
+   "count": 12376,
+   "partial": 7835,
+   "failures": 0,
+   "parts": [
+    "federal__decretos-lei.1.json"
+   ],
+   "bytes": 3407975,
+   "family": "decretos-lei"
+  },
+  "federal/decretos-nao-numerados": {
+   "scope": "federal",
+   "uf": null,
+   "count": 14510,
+   "partial": 322,
+   "failures": 0,
+   "parts": [
+    "federal__decretos-nao-numerados.1.json"
+   ],
+   "bytes": 4903845,
+   "family": "decretos-nao-numerados"
+  },
+  "federal/emendas-constitucionais": {
+   "scope": "federal",
+   "uf": null,
+   "count": 172,
+   "partial": 1,
+   "failures": 0,
+   "parts": [
+    "federal__emendas-constitucionais.1.json"
+   ],
+   "bytes": 55411,
+   "family": "emendas-constitucionais"
+  },
+  "federal/leis-complementares": {
+   "scope": "federal",
+   "uf": null,
+   "count": 239,
+   "partial": 14,
+   "failures": 0,
+   "parts": [
+    "federal__leis-complementares.1.json"
+   ],
+   "bytes": 81470,
+   "family": "leis-complementares"
+  },
+  "federal/leis-constitucionais": {
+   "scope": "federal",
+   "uf": null,
+   "count": 21,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "federal__leis-constitucionais.1.json"
+   ],
+   "bytes": 4982,
+   "family": "leis-constitucionais"
+  },
+  "federal/leis-delegadas": {
+   "scope": "federal",
+   "uf": null,
+   "count": 13,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "federal__leis-delegadas.1.json"
+   ],
+   "bytes": 3318,
+   "family": "leis-delegadas"
+  },
+  "federal/leis-ordinarias": {
+   "scope": "federal",
+   "uf": null,
+   "count": 16784,
+   "partial": 748,
+   "failures": 0,
+   "parts": [
+    "federal__leis-ordinarias.1.json",
+    "federal__leis-ordinarias.2.json"
+   ],
+   "bytes": 5175333,
+   "family": "leis-ordinarias"
+  },
+  "federal/medidas-provisorias": {
+   "scope": "federal",
+   "uf": null,
+   "count": 7499,
+   "partial": 41,
+   "failures": 0,
+   "parts": [
+    "federal__medidas-provisorias.1.json"
+   ],
+   "bytes": 2625964,
+   "family": "medidas-provisorias"
+  },
+  "federal/regimentos": {
+   "scope": "federal",
+   "uf": null,
+   "count": 3,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "federal__regimentos.1.json"
+   ],
+   "bytes": 736,
+   "family": "regimentos"
+  },
+  "federal/regulamentos": {
+   "scope": "federal",
+   "uf": null,
+   "count": 20,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "federal__regulamentos.1.json"
+   ],
+   "bytes": 6399,
+   "family": "regulamentos"
+  },
+  "federal/resolucoes-camara": {
+   "scope": "federal",
+   "uf": null,
+   "count": 2280,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "federal__resolucoes-camara.1.json"
+   ],
+   "bytes": 709288,
+   "family": "resolucoes-camara"
+  },
+  "federal/resolucoes-congresso": {
+   "scope": "federal",
+   "uf": null,
+   "count": 91,
+   "partial": 1,
+   "failures": 0,
+   "parts": [
+    "federal__resolucoes-congresso.1.json"
+   ],
+   "bytes": 27246,
+   "family": "resolucoes-congresso"
+  },
+  "federal/resolucoes-senado": {
+   "scope": "federal",
+   "uf": null,
+   "count": 6574,
+   "partial": 48,
+   "failures": 0,
+   "parts": [
+    "federal__resolucoes-senado.1.json"
+   ],
+   "bytes": 2331738,
+   "family": "resolucoes-senado"
+  },
+  "jurisprudencia": {
+   "scope": "jurisprudencia",
+   "uf": null,
+   "count": 11700,
+   "partial": 3,
+   "failures": 0,
+   "parts": [
+    "jurisprudencia.1.json"
+   ],
+   "bytes": 1526217,
+   "family": null
+  },
+  "municipais/AC": {
+   "scope": "municipal",
+   "uf": "AC",
+   "count": 367,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "municipais__AC.1.json"
+   ],
+   "bytes": 76000,
+   "family": null
+  },
+  "municipais/AL": {
+   "scope": "municipal",
+   "uf": "AL",
+   "count": 18,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "municipais__AL.1.json"
+   ],
+   "bytes": 3427,
+   "family": null
+  },
+  "municipais/AM": {
+   "scope": "municipal",
+   "uf": "AM",
+   "count": 92,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "municipais__AM.1.json"
+   ],
+   "bytes": 19031,
+   "family": null
+  },
+  "municipais/AP": {
+   "scope": "municipal",
+   "uf": "AP",
+   "count": 1,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "municipais__AP.1.json"
+   ],
+   "bytes": 311,
+   "family": null
+  },
+  "municipais/BA": {
+   "scope": "municipal",
+   "uf": "BA",
+   "count": 430,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "municipais__BA.1.json"
+   ],
+   "bytes": 88305,
+   "family": null
+  },
+  "municipais/CE": {
+   "scope": "municipal",
+   "uf": "CE",
+   "count": 2044,
+   "partial": 1,
+   "failures": 0,
+   "parts": [
+    "municipais__CE.1.json"
+   ],
+   "bytes": 405654,
+   "family": null
+  },
+  "municipais/ES": {
+   "scope": "municipal",
+   "uf": "ES",
+   "count": 70,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "municipais__ES.1.json"
+   ],
+   "bytes": 15850,
+   "family": null
+  },
+  "municipais/GO": {
+   "scope": "municipal",
+   "uf": "GO",
+   "count": 2258,
+   "partial": 2,
+   "failures": 0,
+   "parts": [
+    "municipais__GO.1.json"
+   ],
+   "bytes": 448868,
+   "family": null
+  },
+  "municipais/MA": {
+   "scope": "municipal",
+   "uf": "MA",
+   "count": 4,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "municipais__MA.1.json"
+   ],
+   "bytes": 956,
+   "family": null
+  },
+  "municipais/MG": {
+   "scope": "municipal",
+   "uf": "MG",
+   "count": 5558,
+   "partial": 7,
+   "failures": 0,
+   "parts": [
+    "municipais__MG.1.json"
+   ],
+   "bytes": 1136731,
+   "family": null
+  },
+  "municipais/MS": {
+   "scope": "municipal",
+   "uf": "MS",
+   "count": 12,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "municipais__MS.1.json"
+   ],
+   "bytes": 2847,
+   "family": null
+  },
+  "municipais/MT": {
+   "scope": "municipal",
+   "uf": "MT",
+   "count": 178,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "municipais__MT.1.json"
+   ],
+   "bytes": 39761,
+   "family": null
+  },
+  "municipais/PA": {
+   "scope": "municipal",
+   "uf": "PA",
+   "count": 41,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "municipais__PA.1.json"
+   ],
+   "bytes": 8042,
+   "family": null
+  },
+  "municipais/PB": {
+   "scope": "municipal",
+   "uf": "PB",
+   "count": 252,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "municipais__PB.1.json"
+   ],
+   "bytes": 51259,
+   "family": null
+  },
+  "municipais/PE": {
+   "scope": "municipal",
+   "uf": "PE",
+   "count": 6146,
+   "partial": 98,
+   "failures": 0,
+   "parts": [
+    "municipais__PE.1.json"
+   ],
+   "bytes": 1086493,
+   "family": null
+  },
+  "municipais/PI": {
+   "scope": "municipal",
+   "uf": "PI",
+   "count": 422,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "municipais__PI.1.json"
+   ],
+   "bytes": 84735,
+   "family": null
+  },
+  "municipais/PR": {
+   "scope": "municipal",
+   "uf": "PR",
+   "count": 3307,
+   "partial": 16,
+   "failures": 0,
+   "parts": [
+    "municipais__PR.1.json"
+   ],
+   "bytes": 675399,
+   "family": null
+  },
+  "municipais/RJ": {
+   "scope": "municipal",
+   "uf": "RJ",
+   "count": 2841,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "municipais__RJ.1.json"
+   ],
+   "bytes": 595275,
+   "family": null
+  },
+  "municipais/RN": {
+   "scope": "municipal",
+   "uf": "RN",
+   "count": 519,
+   "partial": 1,
+   "failures": 0,
+   "parts": [
+    "municipais__RN.1.json"
+   ],
+   "bytes": 106841,
+   "family": null
+  },
+  "municipais/RO": {
+   "scope": "municipal",
+   "uf": "RO",
+   "count": 5312,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "municipais__RO.1.json"
+   ],
+   "bytes": 1022229,
+   "family": null
+  },
+  "municipais/RR": {
+   "scope": "municipal",
+   "uf": "RR",
+   "count": 261,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "municipais__RR.1.json"
+   ],
+   "bytes": 52788,
+   "family": null
+  },
+  "municipais/RS": {
+   "scope": "municipal",
+   "uf": "RS",
+   "count": 6822,
+   "partial": 111,
+   "failures": 0,
+   "parts": [
+    "municipais__RS.1.json"
+   ],
+   "bytes": 1247860,
+   "family": null
+  },
+  "municipais/SC": {
+   "scope": "municipal",
+   "uf": "SC",
+   "count": 165,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "municipais__SC.1.json"
+   ],
+   "bytes": 36607,
+   "family": null
+  },
+  "municipais/SE": {
+   "scope": "municipal",
+   "uf": "SE",
+   "count": 1,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "municipais__SE.1.json"
+   ],
+   "bytes": 338,
+   "family": null
+  },
+  "municipais/SP": {
+   "scope": "municipal",
+   "uf": "SP",
+   "count": 1602,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "municipais__SP.1.json"
+   ],
+   "bytes": 335908,
+   "family": null
+  },
+  "municipais/TO": {
+   "scope": "municipal",
+   "uf": "TO",
+   "count": 37,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "municipais__TO.1.json"
+   ],
+   "bytes": 8284,
+   "family": null
+  },
+  "raiz": {
+   "scope": "federal",
+   "uf": null,
+   "count": 1,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "raiz.1.json"
+   ],
+   "bytes": 179,
+   "family": "constituicao"
+  },
+  "reguladores/agu": {
+   "scope": "regulador",
+   "uf": null,
+   "count": 537,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "reguladores__agu.1.json"
+   ],
+   "bytes": 107442,
+   "family": "agu"
+  },
+  "reguladores/ana": {
+   "scope": "regulador",
+   "uf": null,
+   "count": 264,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "reguladores__ana.1.json"
+   ],
+   "bytes": 53215,
+   "family": "ana"
+  },
+  "reguladores/anac": {
+   "scope": "regulador",
+   "uf": null,
+   "count": 9613,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "reguladores__anac.1.json"
+   ],
+   "bytes": 1874111,
+   "family": "anac"
+  },
+  "reguladores/anatel": {
+   "scope": "regulador",
+   "uf": null,
+   "count": 186,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "reguladores__anatel.1.json"
+   ],
+   "bytes": 37996,
+   "family": "anatel"
+  },
+  "reguladores/ancine": {
+   "scope": "regulador",
+   "uf": null,
+   "count": 353,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "reguladores__ancine.1.json"
+   ],
+   "bytes": 72402,
+   "family": "ancine"
+  },
+  "reguladores/aneel": {
+   "scope": "regulador",
+   "uf": null,
+   "count": 1158,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "reguladores__aneel.1.json"
+   ],
+   "bytes": 252990,
+   "family": "aneel"
+  },
+  "reguladores/anm": {
+   "scope": "regulador",
+   "uf": null,
+   "count": 153,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "reguladores__anm.1.json"
+   ],
+   "bytes": 30358,
+   "family": "anm"
+  },
+  "reguladores/anp": {
+   "scope": "regulador",
+   "uf": null,
+   "count": 361,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "reguladores__anp.1.json"
+   ],
+   "bytes": 70816,
+   "family": "anp"
+  },
+  "reguladores/ans": {
+   "scope": "regulador",
+   "uf": null,
+   "count": 835,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "reguladores__ans.1.json"
+   ],
+   "bytes": 188431,
+   "family": "ans"
+  },
+  "reguladores/antaq": {
+   "scope": "regulador",
+   "uf": null,
+   "count": 3088,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "reguladores__antaq.1.json"
+   ],
+   "bytes": 635183,
+   "family": "antaq"
+  },
+  "reguladores/antt": {
+   "scope": "regulador",
+   "uf": null,
+   "count": 7553,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "reguladores__antt.1.json"
+   ],
+   "bytes": 1496691,
+   "family": "antt"
+  },
+  "reguladores/anvisa": {
+   "scope": "regulador",
+   "uf": null,
+   "count": 26244,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "reguladores__anvisa.1.json",
+    "reguladores__anvisa.2.json"
+   ],
+   "bytes": 5408559,
+   "family": "anvisa"
+  },
+  "reguladores/atos-do-poder-executivo": {
+   "scope": "regulador",
+   "uf": null,
+   "count": 9,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "reguladores__atos-do-poder-executivo.1.json"
+   ],
+   "bytes": 2000,
+   "family": "atos-do-poder-executivo"
+  },
+  "reguladores/bcb": {
+   "scope": "regulador",
+   "uf": null,
+   "count": 1838,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "reguladores__bcb.1.json"
+   ],
+   "bytes": 392187,
+   "family": "bcb"
+  },
+  "reguladores/bndes": {
+   "scope": "regulador",
+   "uf": null,
+   "count": 8,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "reguladores__bndes.1.json"
+   ],
+   "bytes": 1853,
+   "family": "bndes"
+  },
+  "reguladores/cade": {
+   "scope": "regulador",
+   "uf": null,
+   "count": 102,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "reguladores__cade.1.json"
+   ],
+   "bytes": 20330,
+   "family": "cade"
+  },
+  "reguladores/capes": {
+   "scope": "regulador",
+   "uf": null,
+   "count": 398,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "reguladores__capes.1.json"
+   ],
+   "bytes": 77197,
+   "family": "capes"
+  },
+  "reguladores/carf": {
+   "scope": "regulador",
+   "uf": null,
+   "count": 76,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "reguladores__carf.1.json"
+   ],
+   "bytes": 15544,
+   "family": "carf"
+  },
+  "reguladores/cfc": {
+   "scope": "regulador",
+   "uf": null,
+   "count": 266,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "reguladores__cfc.1.json"
+   ],
+   "bytes": 54507,
+   "family": "cfc"
+  },
+  "reguladores/cgu": {
+   "scope": "regulador",
+   "uf": null,
+   "count": 454,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "reguladores__cgu.1.json"
+   ],
+   "bytes": 91137,
+   "family": "cgu"
+  },
+  "reguladores/cidades": {
+   "scope": "regulador",
+   "uf": null,
+   "count": 880,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "reguladores__cidades.1.json"
+   ],
+   "bytes": 176074,
+   "family": "cidades"
+  },
+  "reguladores/cne": {
+   "scope": "regulador",
+   "uf": null,
+   "count": 264,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "reguladores__cne.1.json"
+   ],
+   "bytes": 45047,
+   "family": "cne"
+  },
+  "reguladores/cnmp": {
+   "scope": "regulador",
+   "uf": null,
+   "count": 223,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "reguladores__cnmp.1.json"
+   ],
+   "bytes": 45384,
+   "family": "cnmp"
+  },
+  "reguladores/cns": {
+   "scope": "regulador",
+   "uf": null,
+   "count": 211,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "reguladores__cns.1.json"
+   ],
+   "bytes": 41612,
+   "family": "cns"
+  },
+  "reguladores/coaf": {
+   "scope": "regulador",
+   "uf": null,
+   "count": 67,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "reguladores__coaf.1.json"
+   ],
+   "bytes": 13352,
+   "family": "coaf"
+  },
+  "reguladores/comunicacoes": {
+   "scope": "regulador",
+   "uf": null,
+   "count": 8117,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "reguladores__comunicacoes.1.json"
+   ],
+   "bytes": 1663222,
+   "family": "comunicacoes"
+  },
+  "reguladores/conama": {
+   "scope": "regulador",
+   "uf": null,
+   "count": 26,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "reguladores__conama.1.json"
+   ],
+   "bytes": 5341,
+   "family": "conama"
+  },
+  "reguladores/confaz": {
+   "scope": "regulador",
+   "uf": null,
+   "count": 1581,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "reguladores__confaz.1.json"
+   ],
+   "bytes": 325346,
+   "family": "confaz"
+  },
+  "reguladores/conselhos-profissionais": {
+   "scope": "regulador",
+   "uf": null,
+   "count": 8207,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "reguladores__conselhos-profissionais.1.json"
+   ],
+   "bytes": 1658306,
+   "family": "conselhos-profissionais"
+  },
+  "reguladores/contran": {
+   "scope": "regulador",
+   "uf": null,
+   "count": 237,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "reguladores__contran.1.json"
+   ],
+   "bytes": 48777,
+   "family": "contran"
+  },
+  "reguladores/cultura": {
+   "scope": "regulador",
+   "uf": null,
+   "count": 4123,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "reguladores__cultura.1.json"
+   ],
+   "bytes": 840481,
+   "family": "cultura"
+  },
+  "reguladores/cvm": {
+   "scope": "regulador",
+   "uf": null,
+   "count": 393,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "reguladores__cvm.1.json"
+   ],
+   "bytes": 80000,
+   "family": "cvm"
+  },
+  "reguladores/defesa": {
+   "scope": "regulador",
+   "uf": null,
+   "count": 4839,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "reguladores__defesa.1.json"
+   ],
+   "bytes": 1000283,
+   "family": "defesa"
+  },
+  "reguladores/dpu": {
+   "scope": "regulador",
+   "uf": null,
+   "count": 240,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "reguladores__dpu.1.json"
+   ],
+   "bytes": 49169,
+   "family": "dpu"
+  },
+  "reguladores/editais-e-avisos": {
+   "scope": "regulador",
+   "uf": null,
+   "count": 8,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "reguladores__editais-e-avisos.1.json"
+   ],
+   "bytes": 1761,
+   "family": "editais-e-avisos"
+  },
+  "reguladores/empreendedorismo": {
+   "scope": "regulador",
+   "uf": null,
+   "count": 138,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "reguladores__empreendedorismo.1.json"
+   ],
+   "bytes": 26736,
+   "family": "empreendedorismo"
+  },
+  "reguladores/entidades-de-fiscalizacao-dos-profission": {
+   "scope": "regulador",
+   "uf": null,
+   "count": 1,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "reguladores__entidades-de-fiscalizacao-dos-profission.1.json"
+   ],
+   "bytes": 379,
+   "family": "entidades-de-fiscalizacao-dos-profission"
+  },
+  "reguladores/esporte": {
+   "scope": "regulador",
+   "uf": null,
+   "count": 714,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "reguladores__esporte.1.json"
+   ],
+   "bytes": 144403,
+   "family": "esporte"
+  },
+  "reguladores/fazenda": {
+   "scope": "regulador",
+   "uf": null,
+   "count": 847,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "reguladores__fazenda.1.json"
+   ],
+   "bytes": 168604,
+   "family": "fazenda"
+  },
+  "reguladores/gestao": {
+   "scope": "regulador",
+   "uf": null,
+   "count": 1842,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "reguladores__gestao.1.json"
+   ],
+   "bytes": 386378,
+   "family": "gestao"
+  },
+  "reguladores/ibama": {
+   "scope": "regulador",
+   "uf": null,
+   "count": 375,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "reguladores__ibama.1.json"
+   ],
+   "bytes": 76212,
+   "family": "ibama"
+  },
+  "reguladores/icmbio": {
+   "scope": "regulador",
+   "uf": null,
+   "count": 706,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "reguladores__icmbio.1.json"
+   ],
+   "bytes": 141742,
+   "family": "icmbio"
+  },
+  "reguladores/igualdade-racial": {
+   "scope": "regulador",
+   "uf": null,
+   "count": 61,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "reguladores__igualdade-racial.1.json"
+   ],
+   "bytes": 12075,
+   "family": "igualdade-racial"
+  },
+  "reguladores/inep": {
+   "scope": "regulador",
+   "uf": null,
+   "count": 816,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "reguladores__inep.1.json"
+   ],
+   "bytes": 152436,
+   "family": "inep"
+  },
+  "reguladores/inmetro": {
+   "scope": "regulador",
+   "uf": null,
+   "count": 2248,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "reguladores__inmetro.1.json"
+   ],
+   "bytes": 434560,
+   "family": "inmetro"
+  },
+  "reguladores/inss": {
+   "scope": "regulador",
+   "uf": null,
+   "count": 552,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "reguladores__inss.1.json"
+   ],
+   "bytes": 117650,
+   "family": "inss"
+  },
+  "reguladores/integracao": {
+   "scope": "regulador",
+   "uf": null,
+   "count": 7999,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "reguladores__integracao.1.json"
+   ],
+   "bytes": 1536711,
+   "family": "integracao"
+  },
+  "reguladores/iphan": {
+   "scope": "regulador",
+   "uf": null,
+   "count": 534,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "reguladores__iphan.1.json"
+   ],
+   "bytes": 96519,
+   "family": "iphan"
+  },
+  "reguladores/mapa": {
+   "scope": "regulador",
+   "uf": null,
+   "count": 12330,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "reguladores__mapa.1.json"
+   ],
+   "bytes": 2433373,
+   "family": "mapa"
+  },
+  "reguladores/mcti": {
+   "scope": "regulador",
+   "uf": null,
+   "count": 4149,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "reguladores__mcti.1.json"
+   ],
+   "bytes": 848305,
+   "family": "mcti"
+  },
+  "reguladores/mda": {
+   "scope": "regulador",
+   "uf": null,
+   "count": 2411,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "reguladores__mda.1.json"
+   ],
+   "bytes": 470503,
+   "family": "mda"
+  },
+  "reguladores/mdh": {
+   "scope": "regulador",
+   "uf": null,
+   "count": 947,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "reguladores__mdh.1.json"
+   ],
+   "bytes": 178857,
+   "family": "mdh"
+  },
+  "reguladores/mdic": {
+   "scope": "regulador",
+   "uf": null,
+   "count": 1285,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "reguladores__mdic.1.json"
+   ],
+   "bytes": 260884,
+   "family": "mdic"
+  },
+  "reguladores/mds": {
+   "scope": "regulador",
+   "uf": null,
+   "count": 1122,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "reguladores__mds.1.json"
+   ],
+   "bytes": 222906,
+   "family": "mds"
+  },
+  "reguladores/mec": {
+   "scope": "regulador",
+   "uf": null,
+   "count": 9011,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "reguladores__mec.1.json"
+   ],
+   "bytes": 1784676,
+   "family": "mec"
+  },
+  "reguladores/ministerio-da-cidadania": {
+   "scope": "regulador",
+   "uf": null,
+   "count": 2711,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "reguladores__ministerio-da-cidadania.1.json"
+   ],
+   "bytes": 521715,
+   "family": "ministerio-da-cidadania"
+  },
+  "reguladores/ministerio-da-economia": {
+   "scope": "regulador",
+   "uf": null,
+   "count": 5940,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "reguladores__ministerio-da-economia.1.json"
+   ],
+   "bytes": 1190839,
+   "family": "ministerio-da-economia"
+  },
+  "reguladores/ministerio-da-industria-comercio-exterio": {
+   "scope": "regulador",
+   "uf": null,
+   "count": 351,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "reguladores__ministerio-da-industria-comercio-exterio.1.json"
+   ],
+   "bytes": 66907,
+   "family": "ministerio-da-industria-comercio-exterio"
+  },
+  "reguladores/ministerio-da-infraestrutura": {
+   "scope": "regulador",
+   "uf": null,
+   "count": 893,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "reguladores__ministerio-da-infraestrutura.1.json"
+   ],
+   "bytes": 173658,
+   "family": "ministerio-da-infraestrutura"
+  },
+  "reguladores/ministerio-da-mulher-da-familia-e-dos-di": {
+   "scope": "regulador",
+   "uf": null,
+   "count": 516,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "reguladores__ministerio-da-mulher-da-familia-e-dos-di.1.json"
+   ],
+   "bytes": 99023,
+   "family": "ministerio-da-mulher-da-familia-e-dos-di"
+  },
+  "reguladores/ministerio-da-seguranca-publica": {
+   "scope": "regulador",
+   "uf": null,
+   "count": 308,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "reguladores__ministerio-da-seguranca-publica.1.json"
+   ],
+   "bytes": 59479,
+   "family": "ministerio-da-seguranca-publica"
+  },
+  "reguladores/ministerio-do-desenvolvimento-regional": {
+   "scope": "regulador",
+   "uf": null,
+   "count": 5135,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "reguladores__ministerio-do-desenvolvimento-regional.1.json"
+   ],
+   "bytes": 989084,
+   "family": "ministerio-do-desenvolvimento-regional"
+  },
+  "reguladores/ministerio-extraordinario-da-seguranca-p": {
+   "scope": "regulador",
+   "uf": null,
+   "count": 185,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "reguladores__ministerio-extraordinario-da-seguranca-p.1.json"
+   ],
+   "bytes": 35178,
+   "family": "ministerio-extraordinario-da-seguranca-p"
+  },
+  "reguladores/mj": {
+   "scope": "regulador",
+   "uf": null,
+   "count": 5593,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "reguladores__mj.1.json"
+   ],
+   "bytes": 1123511,
+   "family": "mj"
+  },
+  "reguladores/mma": {
+   "scope": "regulador",
+   "uf": null,
+   "count": 599,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "reguladores__mma.1.json"
+   ],
+   "bytes": 119403,
+   "family": "mma"
+  },
+  "reguladores/mme": {
+   "scope": "regulador",
+   "uf": null,
+   "count": 1628,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "reguladores__mme.1.json"
+   ],
+   "bytes": 323154,
+   "family": "mme"
+  },
+  "reguladores/mpi": {
+   "scope": "regulador",
+   "uf": null,
+   "count": 239,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "reguladores__mpi.1.json"
+   ],
+   "bytes": 48951,
+   "family": "mpi"
+  },
+  "reguladores/mpu": {
+   "scope": "regulador",
+   "uf": null,
+   "count": 1780,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "reguladores__mpu.1.json"
+   ],
+   "bytes": 347863,
+   "family": "mpu"
+  },
+  "reguladores/mre": {
+   "scope": "regulador",
+   "uf": null,
+   "count": 381,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "reguladores__mre.1.json"
+   ],
+   "bytes": 71447,
+   "family": "mre"
+  },
+  "reguladores/ms": {
+   "scope": "regulador",
+   "uf": null,
+   "count": 24393,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "reguladores__ms.1.json",
+    "reguladores__ms.2.json"
+   ],
+   "bytes": 4824257,
+   "family": "ms"
+  },
+  "reguladores/mte": {
+   "scope": "regulador",
+   "uf": null,
+   "count": 1038,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "reguladores__mte.1.json"
+   ],
+   "bytes": 211079,
+   "family": "mte"
+  },
+  "reguladores/mulheres": {
+   "scope": "regulador",
+   "uf": null,
+   "count": 65,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "reguladores__mulheres.1.json"
+   ],
+   "bytes": 13724,
+   "family": "mulheres"
+  },
+  "reguladores/pesca": {
+   "scope": "regulador",
+   "uf": null,
+   "count": 920,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "reguladores__pesca.1.json"
+   ],
+   "bytes": 190097,
+   "family": "pesca"
+  },
+  "reguladores/pgfn": {
+   "scope": "regulador",
+   "uf": null,
+   "count": 255,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "reguladores__pgfn.1.json"
+   ],
+   "bytes": 51366,
+   "family": "pgfn"
+  },
+  "reguladores/planejamento": {
+   "scope": "regulador",
+   "uf": null,
+   "count": 1497,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "reguladores__planejamento.1.json"
+   ],
+   "bytes": 297392,
+   "family": "planejamento"
+  },
+  "reguladores/poder-judiciario": {
+   "scope": "regulador",
+   "uf": null,
+   "count": 1884,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "reguladores__poder-judiciario.1.json"
+   ],
+   "bytes": 373864,
+   "family": "poder-judiciario"
+  },
+  "reguladores/poder-legislativo": {
+   "scope": "regulador",
+   "uf": null,
+   "count": 434,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "reguladores__poder-legislativo.1.json"
+   ],
+   "bytes": 80160,
+   "family": "poder-legislativo"
+  },
+  "reguladores/portos-aeroportos": {
+   "scope": "regulador",
+   "uf": null,
+   "count": 300,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "reguladores__portos-aeroportos.1.json"
+   ],
+   "bytes": 57876,
+   "family": "portos-aeroportos"
+  },
+  "reguladores/presidencia": {
+   "scope": "regulador",
+   "uf": null,
+   "count": 2062,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "reguladores__presidencia.1.json"
+   ],
+   "bytes": 412364,
+   "family": "presidencia"
+  },
+  "reguladores/previc": {
+   "scope": "regulador",
+   "uf": null,
+   "count": 1036,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "reguladores__previc.1.json"
+   ],
+   "bytes": 209215,
+   "family": "previc"
+  },
+  "reguladores/rfb": {
+   "scope": "regulador",
+   "uf": null,
+   "count": 75512,
+   "partial": 1,
+   "failures": 0,
+   "parts": [
+    "reguladores__rfb.1.json",
+    "reguladores__rfb.2.json",
+    "reguladores__rfb.3.json",
+    "reguladores__rfb.4.json",
+    "reguladores__rfb.5.json",
+    "reguladores__rfb.6.json"
+   ],
+   "bytes": 14033195,
+   "family": "rfb"
+  },
+  "reguladores/secretaria-especial-da-cultura": {
+   "scope": "regulador",
+   "uf": null,
+   "count": 2,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "reguladores__secretaria-especial-da-cultura.1.json"
+   ],
+   "bytes": 525,
+   "family": "secretaria-especial-da-cultura"
+  },
+  "reguladores/senatran": {
+   "scope": "regulador",
+   "uf": null,
+   "count": 1787,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "reguladores__senatran.1.json"
+   ],
+   "bytes": 360995,
+   "family": "senatran"
+  },
+  "reguladores/sfb": {
+   "scope": "regulador",
+   "uf": null,
+   "count": 42,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "reguladores__sfb.1.json"
+   ],
+   "bytes": 8160,
+   "family": "sfb"
+  },
+  "reguladores/sprev": {
+   "scope": "regulador",
+   "uf": null,
+   "count": 214,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "reguladores__sprev.1.json"
+   ],
+   "bytes": 44059,
+   "family": "sprev"
+  },
+  "reguladores/stn": {
+   "scope": "regulador",
+   "uf": null,
+   "count": 466,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "reguladores__stn.1.json"
+   ],
+   "bytes": 91663,
+   "family": "stn"
+  },
+  "reguladores/susep": {
+   "scope": "regulador",
+   "uf": null,
+   "count": 2336,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "reguladores__susep.1.json"
+   ],
+   "bytes": 500769,
+   "family": "susep"
+  },
+  "reguladores/tcu": {
+   "scope": "regulador",
+   "uf": null,
+   "count": 244,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "reguladores__tcu.1.json"
+   ],
+   "bytes": 47843,
+   "family": "tcu"
+  },
+  "reguladores/transportes": {
+   "scope": "regulador",
+   "uf": null,
+   "count": 919,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "reguladores__transportes.1.json"
+   ],
+   "bytes": 176196,
+   "family": "transportes"
+  },
+  "reguladores/turismo": {
+   "scope": "regulador",
+   "uf": null,
+   "count": 779,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "reguladores__turismo.1.json"
+   ],
+   "bytes": 147852,
+   "family": "turismo"
+  },
+  "tratados": {
+   "scope": "tratado",
+   "uf": null,
+   "count": 161,
+   "partial": 0,
+   "failures": 0,
+   "parts": [
+    "tratados.1.json"
+   ],
+   "bytes": 27507,
+   "family": null
+  }
+ },
+ "total": 1218982,
+ "partial": 14976,
+ "failures": 0
+}

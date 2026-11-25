@@ -62,7 +62,12 @@ window.ROSS_I18N = {
       empty: 'Nenhum trecho encontrado no acervo já importado. Tente menos palavras, o número da norma ou outros filtros.',
       unavailable: 'A busca não está disponível agora. Tente novamente em instantes.', rateLimit: 'Você atingiu o limite de consultas por agora. Tente mais tarde.',
       answerNotice: 'Esta resposta inclui trechos importados do ctresb/leis. Confira a edição, a data de captura e a fonte indicadas em cada referência. A vigência atual desses textos não foi verificada.',
-      noAI: 'Encontrei estes trechos. A explicação por IA ainda não está disponível; você pode consultar o texto e abrir a fonte de cada resultado.'
+      noAI: 'Encontrei estes trechos. A explicação por IA ainda não está disponível; você pode consultar o texto e abrir a fonte de cada resultado.',
+      regulador: 'Órgãos reguladores', organ: 'Órgão', chooseOrgan: 'Escolha o órgão', federalActs: 'Incluir decretos, medidas provisórias e resoluções federais',
+      indexBadge: 'Índice do repositório', indexLoading: 'Carregando o índice completo do repositório…', indexUnavailable: 'O índice completo do repositório não está disponível agora; a pesquisa usa só o acervo já importado.',
+      indexReady: 'Índice completo: {n} textos do ctresb/leis (edição {ref}), pesquisáveis por título, ementa e número; o texto integral é lido sob demanda.',
+      indexNeedsFilter: 'Para pesquisar normas estaduais ou municipais no índice completo, escolha o estado; para órgãos reguladores, escolha o órgão.',
+      noSummary: 'Sem ementa registrada; abra o texto para ler.', textOfNorm: 'Texto da norma', editionUnknown: 'Edição não informada'
     },
     langName: 'Português (Brasil)',
     tagline: 'Informação jurídica, em linguagem simples.',
@@ -539,7 +544,12 @@ window.ROSS_I18N = {
       empty: 'No matching passage in the imported corpus. Try fewer words, a law number or other filters.',
       unavailable: 'Search is unavailable right now. Please try again shortly.', rateLimit: 'The search limit has been reached. Please try again later.',
       answerNotice: 'This answer includes excerpts imported from ctresb/leis. Check the edition, capture date and source of each reference. Their current legal validity has not been verified.',
-      noAI: 'I found these excerpts. The AI explanation is not yet available; you can read the text and open each source.'
+      noAI: 'I found these excerpts. The AI explanation is not yet available; you can read the text and open each source.',
+      regulador: 'Regulatory agencies', organ: 'Agency', chooseOrgan: 'Choose the agency', federalActs: 'Include federal decrees, provisional measures and resolutions',
+      indexBadge: 'Repository index', indexLoading: 'Loading the full repository index…', indexUnavailable: 'The full repository index is unavailable right now; search uses only the imported corpus.',
+      indexReady: 'Full index: {n} texts from ctresb/leis (edition {ref}), searchable by title, summary and number; the full text is read on demand.',
+      indexNeedsFilter: 'To search state or municipal laws in the full index, choose the state; for regulatory agencies, choose the agency.',
+      noSummary: 'No summary recorded; open the text to read it.', textOfNorm: 'Text of the law', editionUnknown: 'Edition not stated'
     },
     langName: 'English',
     tagline: 'Legal information, made clear.',
