@@ -1494,8 +1494,11 @@
   const INDEX_LAW_FAMILIES = ['constituicao', 'leis-ordinarias', 'leis-complementares', 'leis-delegadas', 'decretos-lei', 'emendas-constitucionais', 'constituicoes-historicas', 'leis-constitucionais', 'regimentos', 'medidas-provisorias'];
   const lawIndex = { manifest: null, manifestPromise: null, units: new Map(), unitPromises: new Map(), failed: false };
   const indexRecords = new Map();
-  async function indexJSON(path, signal) {
-    const res = await fetch(INDEX_URL + path, { signal: signal, cache: 'force-cache' });
+  /* O manifesto é sempre revalidado; as partes levam a data de geração do índice no endereço, então ficam em cache
+     até o índice ser publicado de novo e nunca misturam uma edição antiga com o manifesto novo. */
+  async function indexJSON(path, signal, version) {
+    const url = INDEX_URL + path + (version ? '?v=' + encodeURIComponent(version) : '');
+    const res = await fetch(url, { signal: signal, cache: version ? 'force-cache' : 'no-cache' });
     if (!res.ok) throw { code: 'index_unavailable', message: 'HTTP ' + res.status };
     return res.json();
   }
@@ -1510,7 +1513,7 @@
     if (!lawIndex.unitPromises.has(name)) {
       const meta = lawIndex.manifest && lawIndex.manifest.units[name];
       if (!meta) return Promise.resolve([]);
-      lawIndex.unitPromises.set(name, Promise.all(meta.parts.map((part) => indexJSON(part, signal))).then((parts) => {
+      lawIndex.unitPromises.set(name, Promise.all(meta.parts.map((part) => indexJSON(part, signal, lawIndex.manifest.generatedAt || lawIndex.manifest.ref))).then((parts) => {
         const entries = [];
         parts.forEach((part) => (part.entries || []).forEach((e) => { e.unit = name; e._s = norm((e.t || '') + ' ' + (e.e || '')); entries.push(e); }));
         lawIndex.units.set(name, entries); lawIndex.unitPromises.delete(name); return entries;
