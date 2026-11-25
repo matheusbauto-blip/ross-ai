@@ -788,7 +788,8 @@ test('the settings screen shows the version so an update can be confirmed', t =>
 });
 
 const INDEX_REF = 'c9f21b4ab11aa0d7ca6fe861d75028e94219c2d6';
-const indexManifest = { repository: 'ctresb/leis', ref: INDEX_REF, total: 1218984, units: {
+const indexRequests = [];
+const indexManifest = { repository: 'ctresb/leis', ref: INDEX_REF, generatedAt: '2026-11-25T12:28:48.000Z', total: 1218984, units: {
   'raiz': { scope: 'federal', family: 'constituicao', count: 1, parts: ['raiz.1.json'] },
   'federal/leis-ordinarias': { scope: 'federal', family: 'leis-ordinarias', count: 2, parts: ['federal__leis-ordinarias.1.json'] },
   'estaduais/SP': { scope: 'estadual', uf: 'SP', count: 1, parts: ['estaduais__SP.1.json'] },
@@ -807,7 +808,8 @@ function indexFetcher(onApi) {
   return async (url, options) => {
     const address = String(url);
     if (address.startsWith('https://matheusbauto-blip.github.io/ross-ai/index/')) {
-      const file = address.slice('https://matheusbauto-blip.github.io/ross-ai/index/'.length);
+      const file = address.slice('https://matheusbauto-blip.github.io/ross-ai/index/'.length).replace(/\?v=.*$/, '');
+      indexRequests.push({ address, cache: options && options.cache });
       if (file === 'manifest.json') return Response.json(indexManifest);
       return indexShards[file] ? Response.json(indexShards[file]) : new Response('', { status: 404 });
     }
@@ -841,6 +843,11 @@ test('the search page combines the imported corpus with the full repository inde
   for (let i = 0; i < 40 && !reads.length; i++) await tick();
   await tick();
   assert.deepEqual(reads[0], { op: 'repository_read', path: 'federal/leis-ordinarias/2020/lei-99999-2020-02-02.md', ref: INDEX_REF, hash: 'a'.repeat(16) });
+  const manifestRequest = indexRequests.find(r => /manifest\.json$/.test(r.address));
+  assert.equal(manifestRequest.cache, 'no-cache', 'the manifest is always revalidated');
+  const shardRequest = indexRequests.find(r => /federal__leis-ordinarias\.1\.json/.test(r.address));
+  assert.match(shardRequest.address, /\?v=2026-11-25T12%3A28%3A48\.000Z$/, 'shards carry the index version');
+  assert.equal(shardRequest.cache, 'force-cache');
   assert.match(results[0].querySelector('.corpus-fulltext').textContent, /garantia mínima de um ano/);
   // Choosing a state adds its shard; the regulatory scope needs an agency.
   change('#corpus-uf', 'SP');
