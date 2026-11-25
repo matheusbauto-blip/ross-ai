@@ -30,7 +30,8 @@ function setup(t, fetcher = async () => Response.json({ documents: 235, results:
   for (const file of ['config.js', 'i18n.js', 'demo-data.js', 'process-tracker.js']) vm.runInContext(read(file), context);
   const script = read('app.js').replace("if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();",
     'window.__test = {state, providers, render, go, load, onFilesChosen, newConversation, submitMessage, retryMessage, openConversation, deleteConversation, answerToText, isRephraseRequest, conversationContext, historyForModel, normalizeOfficial, activeProvider, turnText, stopAnswer, exportHistory};')
-    .replace('}, CLIENT_TIMEOUT_MS);', '}, window.__clientTimeout || CLIENT_TIMEOUT_MS);');
+    .replace('}, CLIENT_TIMEOUT_MS);', '}, window.__clientTimeout || CLIENT_TIMEOUT_MS);')
+    .replace('resolve(null), INDEX_ANSWER_TIMEOUT_MS)', 'resolve(null), window.__indexTimeout || INDEX_ANSWER_TIMEOUT_MS)');
   vm.runInContext(script, context);
   const api = window.__test;
   api.state.catalog = structuredClone(catalog);
@@ -877,4 +878,25 @@ test('an answer can cite a law found only in the repository index, read on deman
   assert.ok(source, 'the index source is cited'); assert.equal(source.repositoryPath, 'federal/leis-ordinarias/2020/lei-99999-2020-02-02.md');
   assert.equal(source.url, 'https://www.planalto.gov.br/teste');
   assert.ok(message.answer.corpus, 'imported provenance is shown');
+});
+
+test('a slow repository index does not hold the answer back', async t => {
+  let answered = false;
+  const { api, window } = setup(t, async (url, options) => {
+    const address = String(url);
+    if (address.startsWith('https://matheusbauto-blip.github.io/ross-ai/index/')) return new Promise(() => {});
+    const match = address.match(/data\/(laws\/[a-z0-9_-]+\.json)/i);
+    if (match) return Response.json(JSON.parse(read('data/' + match[1])));
+    const body = JSON.parse(options.body);
+    if (body.op === 'search') return Response.json({ results: [] });
+    if (body.op === 'prepare') return Response.json(body.catalog.some(law => /^passage-/.test(law.id)) ? { terms: [], laws: ['passage-1'] } : { terms: ['desistir'], laws: ['l8078'] });
+    answered = true;
+    return Response.json({ answer: { kind: 'answer', summary: 'Você pode desistir em 7 dias.', sourcesSay: [{ title: 'CDC', text: 'Prazo de 7 dias.', ref: 1 }], sources: [{ ref: 1, why: 'arrependimento' }], warnings: [] } });
+  });
+  window.__indexTimeout = 50;
+  api.state.mode = 'oficial';
+  await api.submitMessage('Comprei pela internet e quero desistir. Posso?');
+  const message = api.state.conversations[0].messages.at(-1);
+  assert.equal(message.status, 'done', message.error);
+  assert.ok(answered, 'the answer step ran without the index');
 });

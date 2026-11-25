@@ -54,4 +54,4 @@ A pasta `.law-index/` fica fora do Git. Para publicar, copie seu conteúdo para 
 - `tests/build-index.test.mjs` — campos, exclusão de pastas de trabalho, ementa truncada, retomada e recusa de edição diferente.
 - `tests/law-index.test.mjs` — ordenação (número exato, todos os termos, parciais rebaixados) e escolha das partes por esfera, estado e órgão.
 - `tests/repository-library.test.mjs` e `tests/process-route.test.mjs` — leitura por caminho na edição fixa, conferência de hash, recusa de caminhos e edições inválidos (400/409).
-- `qa/ui.test.mjs` — pesquisa combinada, leitura de um texto do índice e resposta citando uma norma encontrada só no índice.
+- `qa/ui.test.mjs` — pesquisa combinada, leitura de um texto do índice, resposta citando uma norma encontrada só no índice e índice lento que não atrasa a resposta (prazo de 12 s).

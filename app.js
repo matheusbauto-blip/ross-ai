@@ -1490,6 +1490,7 @@
      reguladores/<órgão>…). Ele não contém os textos: cada entrada tem título, ementa, identificação, caminho e
      prefixo de hash; o texto integral é lido sob demanda pela função, sempre na edição fixa e conferindo o hash. */
   const INDEX_URL = (window.ROSS_CONFIG && window.ROSS_CONFIG.indexUrl) || '';
+  const INDEX_ANSWER_TIMEOUT_MS = 12000;
   const INDEX_LAW_FAMILIES = ['constituicao', 'leis-ordinarias', 'leis-complementares', 'leis-delegadas', 'decretos-lei', 'emendas-constitucionais', 'constituicoes-historicas', 'leis-constitucionais', 'regimentos', 'medidas-provisorias'];
   const lawIndex = { manifest: null, manifestPromise: null, units: new Map(), unitPromises: new Map(), failed: false };
   const indexRecords = new Map();
@@ -1585,8 +1586,12 @@
   async function indexCandidatesForAnswer(query, originalQuestion, conv, excludePaths, signal) {
     if (!INDEX_URL || !API_URL) return [];
     let found;
-    try { found = await searchIndex(query, { uf: conv.region || '', limit: 6 }, signal); }
+    // Numa conexão lenta o índice não segura a resposta: passado o prazo, a resposta segue sem ele e o download
+    // continua em segundo plano, ficando pronto (e em cache) para a próxima pergunta.
+    const deadline = new Promise((resolve) => setTimeout(() => resolve(null), INDEX_ANSWER_TIMEOUT_MS));
+    try { found = await Promise.race([searchIndex(query, { uf: conv.region || '', limit: 6 }, signal), deadline]); }
     catch (e) { if (signal && signal.aborted) throw { code: 'cancelled' }; return []; }
+    if (!found) return [];
     // Normas já distribuídas com o app (as 66) não são lidas de novo pelo índice: compara o número, não o ano.
     const catalogNumbers = new Set(state.catalog.laws.map((l) => (String(l.number || '').match(/\d[\d.]*/) || [''])[0].replace(/\./g, '')).filter(Boolean));
     const picked = found.results.filter((r) => r.score >= 3 && !r.is_partial && r.status !== 'repealed' && !excludePaths.has(r.repository_path) && !(r.scope === 'federal' && catalogNumbers.has(r.number))).slice(0, 3);
