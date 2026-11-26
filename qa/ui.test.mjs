@@ -27,11 +27,11 @@ function setup(t, fetcher = async () => Response.json({ documents: 235, results:
     location: { hash: '' }, history: { replaceState() {} },
     localStorage: { getItem: key => storage.get(key) || null, setItem: (key, value) => { if (storage.fail) throw storage.fail; storage.set(key, value); } },
     console, setTimeout: (fn, delay) => { const timer = setTimeout(fn, delay); timers.add(timer); return timer; }, clearTimeout,
-    AbortController, URL, requestAnimationFrame: fn => fn(), fetch: fetcher,
+    AbortController, URL, TextDecoder, requestAnimationFrame: fn => fn(), fetch: fetcher,
   });
   for (const file of ['config.js', 'i18n.js', 'demo-data.js', 'process-tracker.js']) vm.runInContext(read(file), context);
   const script = read('app.js').replace("if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();",
-    'window.__test = {state, providers, render, go, load, onFilesChosen, newConversation, submitMessage, retryMessage, openConversation, deleteConversation, answerToText, isRephraseRequest, conversationContext, historyForModel, normalizeOfficial, activeProvider, turnText, stopAnswer, exportHistory};')
+    'window.__test = {state, providers, render, go, load, onFilesChosen, newConversation, submitMessage, retryMessage, openConversation, deleteConversation, answerToText, isRephraseRequest, conversationContext, historyForModel, normalizeOfficial, activeProvider, turnText, stopAnswer, exportHistory, MODEL_WAIT_MS};')
     .replace('}, CLIENT_TIMEOUT_MS);', '}, window.__clientTimeout || CLIENT_TIMEOUT_MS);')
     .replace('resolve(null), INDEX_ANSWER_TIMEOUT_MS)', 'resolve(null), window.__indexTimeout || INDEX_ANSWER_TIMEOUT_MS)');
   vm.runInContext(script, context);
@@ -934,4 +934,90 @@ test('a recycled server (or a connection dropped by it) is retried once on a fre
   assert.equal(calls.filter(op => op === 'answer').length, 2, 'the dropped answer was retried once');
   assert.ok(calls.filter(op => op === 'prepare').length >= 2, 'the recycled prepare was retried');
   void window;
+});
+
+const ndjson = stream => new Response(stream, { headers: { 'Content-Type': 'application/x-ndjson; charset=utf-8' } });
+const line = event => new TextEncoder().encode(JSON.stringify(event) + '\n');
+const doneAnswer = { t: 'done', answer: { kind: 'answer', summary: 'Você pode desistir em 7 dias.', sourcesSay: [{ title: 'CDC', text: 'Prazo de 7 dias.', ref: 1 }], sources: [{ ref: 1, why: 'arrependimento' }], warnings: [] } };
+function lawFetch(address) {
+  const match = address.match(/data\/(laws\/[a-z0-9_-]+\.json)/i);
+  if (match) return Response.json(JSON.parse(read('data/' + match[1])));
+  if (address.startsWith('https://matheusbauto-blip.github.io/ross-ai/index/')) return new Response('', { status: 404 });
+  return null;
+}
+
+test('the summary appears while the answer is being written and is replaced by the complete answer', async t => {
+  let writer, answerRequested;
+  const answerReady = new Promise(resolve => { answerRequested = resolve; });
+  const { api, document } = setup(t, async (url, options) => {
+    const local = lawFetch(String(url)); if (local) return local;
+    const body = JSON.parse(options.body);
+    if (body.op === 'search') return Response.json({ results: [] });
+    if (body.op === 'prepare') return Response.json(body.catalog.some(law => /^passage-/.test(law.id)) ? { terms: [], laws: ['passage-1'] } : { terms: ['desistir'], laws: ['l8078'] });
+    assert.equal(body.stream, true, 'the app asks for the answer in parts');
+    answerRequested();
+    return ndjson(new ReadableStream({ start(c) { writer = c; } }));
+  });
+  api.state.mode = 'oficial';
+  const pending = api.submitMessage('Comprei pela internet e quero desistir. Posso?');
+  await answerReady;
+  writer.enqueue(line({ t: 'd', x: '{"kind":"answer","summary":"Você pode des' }));
+  for (let i = 0; i < 20 && !document.querySelector('[data-partial]'); i++) await new Promise(resolve => setTimeout(resolve, 5));
+  assert.equal(document.querySelector('[data-partial]').textContent, 'Você pode des');
+  writer.enqueue(line({ t: 'd', x: 'istir em 7 dias.\\u00e' }));
+  for (let i = 0; i < 20 && document.querySelector('[data-partial]').textContent === 'Você pode des'; i++) await new Promise(resolve => setTimeout(resolve, 5));
+  assert.equal(document.querySelector('[data-partial]').textContent, 'Você pode desistir em 7 dias.', 'an escape cut in half is not shown');
+  writer.enqueue(line(doneAnswer)); writer.close();
+  await pending;
+  const message = api.state.conversations[0].messages.at(-1);
+  assert.equal(message.status, 'done', message.error);
+  assert.equal(message.answer.summary, 'Você pode desistir em 7 dias.');
+  assert.equal('partial' in message, false, 'the partial text is not saved with the conversation');
+  assert.equal(document.querySelector('[data-partial]'), null);
+});
+
+test('a stream that breaks before the end is discarded and the answer is requested once more', async t => {
+  let answers = 0;
+  const { api } = setup(t, async (url, options) => {
+    const local = lawFetch(String(url)); if (local) return local;
+    const body = JSON.parse(options.body);
+    if (body.op === 'search') return Response.json({ results: [] });
+    if (body.op === 'prepare') return Response.json(body.catalog.some(law => /^passage-/.test(law.id)) ? { terms: [], laws: ['passage-1'] } : { terms: ['desistir'], laws: ['l8078'] });
+    answers++;
+    if (answers === 1) return ndjson(new ReadableStream({ start(c) { c.enqueue(line({ t: 'd', x: '{"summary":"Texto que ' })); c.close(); } }));
+    return ndjson(new ReadableStream({ start(c) { c.enqueue(line(doneAnswer)); c.close(); } }));
+  });
+  api.state.mode = 'oficial';
+  await api.submitMessage('Comprei pela internet e quero desistir. Posso?');
+  const message = api.state.conversations[0].messages.at(-1);
+  assert.equal(message.status, 'done', message.error);
+  assert.equal(answers, 2);
+  assert.match(message.answer.summary, /7 dias/);
+});
+
+test('a slow search preparation is abandoned after its own deadline, and a recognised subject skips it', async t => {
+  const prepares = [];
+  const { api } = setup(t, async (url, options) => {
+    const local = lawFetch(String(url)); if (local) return local;
+    const body = JSON.parse(options.body);
+    if (body.op === 'search') return Response.json({ results: [] });
+    if (body.op === 'prepare') {
+      const relevance = body.catalog.some(law => /^passage-/.test(law.id));
+      prepares.push(relevance ? 'relevance' : 'terms');
+      if (relevance) return Response.json({ terms: [], laws: ['passage-1'] });
+      return new Promise((resolve, reject) => options.signal.addEventListener('abort', () => reject(new DOMException('aborted', 'AbortError')), { once: true }));
+    }
+    return Response.json(doneAnswer);
+  });
+  api.state.mode = 'oficial';
+  api.MODEL_WAIT_MS.prepare = 30;
+  await api.submitMessage('Comprei pela internet e quero desistir. Posso?');
+  let message = api.state.conversations[0].messages.at(-1);
+  assert.equal(message.status, 'done', message.error);
+  assert.deepEqual(prepares, ['terms', 'relevance'], 'the answer went on without the slow preparation');
+  prepares.length = 0;
+  await api.submitMessage('Comprei um celular e ele deu problema na tela. O que faço?');
+  message = api.state.conversations[0].messages.at(-1);
+  assert.equal(message.status, 'done', message.error);
+  assert.deepEqual(prepares, ['relevance'], 'a recognised subject (defective product) does not wait for the preparation');
 });

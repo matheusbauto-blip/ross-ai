@@ -497,16 +497,18 @@
       (m.status === 'done' ? modeBadge(m.provider) : '') +
       '<span class="msg-time">' + esc(fmtDate(m.createdAt, { hour: '2-digit', minute: '2-digit' })) + '</span></header><div class="answer"></div></article>');
     const body = $('.answer', node);
-    if (m.status === 'loading') body.innerHTML = loadingHTML(m.provider, m.step || 0);
+    if (m.status === 'loading') body.innerHTML = loadingHTML(m.provider, m.step || 0, m.partial);
     else if (m.status === 'error') body.innerHTML = errorHTML(m);
     else body.innerHTML = answerHTML(m.answer, m);
     bindMessageActions(node, m, conv);
     return node;
   }
-  function loadingHTML(provider, step) {
+  /* Enquanto o modelo escreve, o resumo aparece aos poucos no lugar das linhas de espera; a resposta completa
+     (com fontes e avisos) substitui tudo ao final. */
+  function loadingHTML(provider, step, partial) {
     const steps = t('loading.' + (provider === 'ai' ? 'ai' : provider === 'oficial' ? 'oficial' : 'demo'));
     return '<ul class="steps" aria-live="polite">' + steps.map((s, i) => '<li class="' + (i < step ? 'is-done' : i === step ? 'is-active' : '') + '"><span class="dot"></span><span>' + esc(s) + (provider === 'demo' ? ' <span class="badge badge-fict">' + esc(t('chat.modeDemo').toLowerCase()) + '</span>' : '') + '</span></li>').join('') + '</ul>' +
-      '<div class="skeleton" aria-hidden="true"><span></span><span></span><span></span></div>' +
+      (partial ? '<section class="ans-sec summary partial-summary"><h3>' + esc(t('sections.summary')) + '</h3><p data-partial>' + esc(partial) + '</p></section>' : '<div class="skeleton" aria-hidden="true"><span></span><span></span><span></span></div>') +
       '<div class="row loading-actions"><button type="button" class="btn btn-secondary btn-sm" data-stop>' + esc(t('composer.stop')) + '</button></div>';
   }
   /* Interrompe a espera no cliente. Um pedido já enviado ao servidor pode ter sido processado e contado mesmo assim. */
@@ -734,24 +736,36 @@
       if (signal) signal.addEventListener('abort', () => { clearTimeout(timer); reject({ code: 'cancelled' }); }, { once: true });
     });
   }
-  async function apiCall(op, payload, signal, attempt) {
+  /* Com onText, a resposta chega em partes: cada pedaço do texto que o modelo escreve é repassado assim que chega, e
+     onText(null) avisa que o texto parcial deve ser descartado (nova tentativa). */
+  async function apiCall(op, payload, signal, attempt, onText) {
     if (op === 'process_lookup' && !API_URL) throw { code: 'process_not_configured' };
     const retryable = !attempt && MODEL_OPS.includes(op);
+    const streaming = op === 'answer' && typeof onText === 'function';
     let res;
     try {
-      res = await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(Object.assign({ op: op }, payload)), signal: signal });
+      res = await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(Object.assign({ op: op }, payload, streaming ? { stream: true } : {})), signal: signal });
     } catch (e) {
       if (signal && signal.aborted) throw { code: 'cancelled' };
-      if (retryable) return apiCall(op, payload, signal, 1);
+      if (retryable) return apiCall(op, payload, signal, 1, onText);
       throw { code: 'api_error', message: String(e && e.message || e) };
+    }
+    if (streaming && res.ok && /ndjson/.test(res.headers.get('content-type') || '')) {
+      try { return await readAnswerStream(res, onText, signal); }
+      catch (e) {
+        if (!e || e.code !== 'stream_broken') throw e;
+        onText(null);
+        if (retryable) return apiCall(op, payload, signal, 1, onText);
+        throw { code: 'api_error', message: 'stream_broken' };
+      }
     }
     let data = null; try { data = await res.json(); } catch (e) { data = null; }
     if (res.status === 503 && data && data.error === 'worker_recycling') {
       if (!retryable) throw { code: 'worker_recycling' };
       await waitFor(Math.min(30000, Math.max(1000, Number(data.retryAfterMs) || 5000)), signal);
-      return apiCall(op, payload, signal, 1);
+      return apiCall(op, payload, signal, 1, onText);
     }
-    if (res.status === 546 && retryable) return apiCall(op, payload, signal, 1);
+    if (res.status === 546 && retryable) return apiCall(op, payload, signal, 1, onText);
     if (res.status === 429) throw { code: 'rate_limited' };
     if (res.status === 503 && data && data.error === 'api_not_configured') throw { code: 'api_not_configured' };
     if (res.status === 503 && data && data.error === 'quota_unavailable') throw { code: 'quota_unavailable' };
@@ -760,6 +774,56 @@
     if (!res.ok) throw { code: 'api_error', message: data && data.error ? data.error : 'HTTP ' + res.status };
     if (data && data.error) throw { code: data.error === 'refusal' ? 'refusal' : data.error === 'invalid_json' ? 'invalid_json' : 'api_error', message: data.error };
     return data;
+  }
+  /* Lê a resposta em partes (uma linha JSON por evento). Sem o evento final, a conexão caiu no meio (por exemplo,
+     servidor encerrado pelo limite de tempo): conta como falha que pode ser repetida. */
+  async function readAnswerStream(res, onText, signal) {
+    const reader = res.body.getReader(); const decoder = new TextDecoder();
+    let buffer = '', final = null;
+    const handle = (line) => {
+      if (!line.trim()) return;
+      let event; try { event = JSON.parse(line); } catch (e) { return; }
+      if (event && event.t === 'd' && typeof event.x === 'string') onText(event.x);
+      else if (event && (event.t === 'done' || event.t === 'error')) final = event;
+    };
+    try {
+      for (;;) {
+        const part = await reader.read();
+        if (part.done) break;
+        buffer += decoder.decode(part.value, { stream: true });
+        let end;
+        while ((end = buffer.indexOf('\n')) >= 0) { handle(buffer.slice(0, end)); buffer = buffer.slice(end + 1); }
+      }
+      buffer += decoder.decode(); handle(buffer);
+    } catch (e) {
+      if (signal && signal.aborted) throw { code: 'cancelled' };
+      throw { code: 'stream_broken' };
+    }
+    if (!final) throw { code: 'stream_broken' };
+    if (final.t === 'error') throw final.error === 'rate_limited' ? { code: 'rate_limited' } : { code: 'api_error', message: final.error };
+    if (final.error) throw { code: final.error === 'refusal' ? 'refusal' : final.error === 'invalid_json' ? 'invalid_json' : 'api_error', message: final.error };
+    return final;
+  }
+  /* Do JSON ainda incompleto que o modelo escreve, o texto já disponível do campo "summary" (Em resumo). */
+  function partialSummary(raw) {
+    const match = /"summary"\s*:\s*"((?:[^"\\]|\\.)*)/.exec(raw || '');
+    if (!match) return '';
+    const text = match[1].replace(/\\u[0-9a-fA-F]{0,3}$/, '');
+    try { return JSON.parse('"' + text + '"'); } catch (e) { return text; }
+  }
+  function summaryStream(onPartial) {
+    if (typeof onPartial !== 'function') return undefined;
+    let raw = '';
+    return (delta) => { raw = delta === null ? '' : raw + delta; onPartial(partialSummary(raw)); };
+  }
+  /* Prazo próprio para uma etapa opcional: vencido, a etapa é abandonada sem cancelar a pergunta inteira. */
+  const MODEL_WAIT_MS = { prepare: 8000, relevance: 10000 };
+  function deadlineSignal(parent, ms) {
+    const ctl = new AbortController();
+    const abort = () => ctl.abort();
+    const timer = setTimeout(abort, ms);
+    if (parent) { if (parent.aborted) ctl.abort(); else parent.addEventListener('abort', abort, { once: true }); }
+    return { signal: ctl.signal, done() { clearTimeout(timer); if (parent) parent.removeEventListener('abort', abort); } };
   }
   async function apiAttachments(attachments) {
     const out = [];
@@ -785,13 +849,13 @@
   }
   providers.ai = {
     id: 'ai',
-    async respond({ text, attachments, conv, onStep, signal }) {
+    async respond({ text, attachments, conv, onStep, onPartial, signal }) {
       if (!sampleFn && API_URL) {
         onStep(0);
         const history = historyForModel(conv, text || '');
         const files = await apiAttachments(attachments);
         onStep(1);
-        const res = await apiCall('answer', { lang: t('langName'), jurisdiction: jurisdictionLabel(conv.country, conv.region), question: plainAnswerQuestion(text || ''), history: history, excerpts: [], attachments: files }, signal);
+        const res = await apiCall('answer', { lang: t('langName'), jurisdiction: jurisdictionLabel(conv.country, conv.region), question: plainAnswerQuestion(text || ''), history: history, excerpts: [], attachments: files }, signal, 0, summaryStream(onPartial));
         onStep(2);
         const d = res.answer || {};
         if (Array.isArray(d.mentions) && d.mentions.length && !(Array.isArray(d.sources) && d.sources.length)) d.sources = d.mentions.map((m) => ({ name: m.name, article: m.article, status: 'unverified' }));
@@ -1154,7 +1218,7 @@
   }
   providers.oficial = {
     id: 'oficial',
-    async respond({ text, attachments, conv, onStep, signal }) {
+    async respond({ text, attachments, conv, onStep, onPartial, signal }) {
       await ensureCatalog();
       const cap = state.catalog.generatedAt;
       if (conv.country !== 'BR') return { mode: 'oficial', kind: 'nosources', summary: t('oficial.jurisdiction', { country: countryName(conv.country) }), nextSteps: [t('oficial.jurisdictionStep')], capturedAt: cap };
@@ -1167,22 +1231,26 @@
         if (!sampleFn && !API_URL) return retrievalOnly(context.sources);
         onStep(2);
         try {
-          const data = sampleFn ? await askOfficial(context.answerQuestion, context.sources, conv, attachments, signal, question) : await askOfficialAPI(context.answerQuestion, context.sources, conv, attachments, signal, question);
+          const data = sampleFn ? await askOfficial(context.answerQuestion, context.sources, conv, attachments, signal, question) : await askOfficialAPI(context.answerQuestion, context.sources, conv, attachments, signal, question, onPartial);
           const answer = normalizeOfficial(data, context.sources, attachments);
           answer.warnings = Array.from(new Set((context.previous.answer.warnings || []).concat(answer.warnings || [])));
           return answer;
         } catch (e) { if (e && e.code === 'api_not_configured') return retrievalOnly(context.sources); throw e; }
       }
       let aiTerms = '', apiLaws = null, modelUnavailable = false, importedSources = [], references = [];
-      if (sampleFn) aiTerms = await expandQueryAI(context.searchQuestion);
-      else if (API_URL) {
-        try { const p = await apiCall('prepare', { question: context.searchQuestion, jurisdiction: jurisdictionLabel(conv.country, conv.region), catalog: state.catalog.laws.map((l) => ({ id: l.id, name: l.name })) }, signal); aiTerms = (Array.isArray(p.terms) ? p.terms : []).join(' '); references = Array.isArray(p.references) ? p.references : []; apiLaws = (Array.isArray(p.laws) ? p.laws : []).map((id) => state.catalog.laws.find((l) => l.id === id)).filter(Boolean); }
-        catch (e) {
-          if (e && (e.code === 'cancelled' || e.code === 'rate_limited')) throw e;
-          if (e && e.code === 'api_not_configured') modelUnavailable = true;
-        }
-      }
       const intent = searchIntent(context.query);
+      if (sampleFn) aiTerms = await expandQueryAI(context.searchQuestion);
+      /* O preparo só reforça a busca. Com o assunto já reconhecido (ex.: produto com defeito), os termos do assunto bastam;
+         nos demais casos, ele tem prazo próprio e, vencido, a busca segue sem ele. */
+      else if (API_URL && !intent) {
+        const limit = deadlineSignal(signal, MODEL_WAIT_MS.prepare);
+        try { const p = await apiCall('prepare', { question: context.searchQuestion, jurisdiction: jurisdictionLabel(conv.country, conv.region), catalog: state.catalog.laws.map((l) => ({ id: l.id, name: l.name })) }, limit.signal); aiTerms = (Array.isArray(p.terms) ? p.terms : []).join(' '); references = Array.isArray(p.references) ? p.references : []; apiLaws = (Array.isArray(p.laws) ? p.laws : []).map((id) => state.catalog.laws.find((l) => l.id === id)).filter(Boolean); }
+        catch (e) {
+          if (signal.aborted) throw { code: 'cancelled' };
+          if (e && e.code === 'rate_limited') throw e;
+          if (e && e.code === 'api_not_configured') modelUnavailable = true;
+        } finally { limit.done(); }
+      }
       const searchText = expandQuery(context.query) + ' ' + aiTerms + (intent ? ' ' + intent.terms : '');
       if (API_URL) {
         try {
@@ -1225,19 +1293,20 @@
       if (modelUnavailable || (!sampleFn && !API_URL)) return withCoverage(retrievalOnly(sources));
       let relevanceFallback = false;
       if (!sampleFn && API_URL) {
-        try { sources = await selectRelevantSources(context.searchQuestion, searchText, sources, signal); }
+        const limit = deadlineSignal(signal, MODEL_WAIT_MS.relevance);
+        try { sources = await selectRelevantSources(context.searchQuestion, searchText, sources, limit.signal); }
         catch (e) {
           if (signal.aborted) throw { code: 'cancelled' };
           if (e && e.code === 'rate_limited') throw e;
           if (e && e.code === 'api_not_configured') return withCoverage(retrievalOnly(sources));
-          /* O serviço do modelo oscilou: a resposta segue com os trechos de reserva e avisa como foram escolhidos. */
+          /* O serviço do modelo oscilou ou demorou além do prazo: a resposta segue com os trechos de reserva e avisa como foram escolhidos. */
           sources = fallbackSelection(context.searchQuestion, sources); relevanceFallback = true;
-        }
+        } finally { limit.done(); }
         if (!sources.length) return withCoverage(attachments && attachments.length ? await documentWithoutLaw(text, attachments, conv, signal) : emptyOfficial());
       } else sources = sources.slice(0, 8);
       onStep(2);
       try {
-        const data = sampleFn ? await askOfficial(context.answerQuestion, sources, conv, attachments, signal, question) : await askOfficialAPI(context.answerQuestion, sources, conv, attachments, signal, question);
+        const data = sampleFn ? await askOfficial(context.answerQuestion, sources, conv, attachments, signal, question) : await askOfficialAPI(context.answerQuestion, sources, conv, attachments, signal, question, onPartial);
         const answer = normalizeOfficial(data, sources, attachments);
         if (relevanceFallback && answer.kind !== 'nosources') answer.warnings = (answer.warnings || []).concat(t('oficial.relevanceFallback'));
         return withCoverage(answer);
@@ -1286,14 +1355,14 @@
     if (images.length) opts.images = images;
     return sampleFn.json(prompt, opts);
   }
-  async function askOfficialAPI(question, sources, conv, attachments, signal, currentQuestion) {
+  async function askOfficialAPI(question, sources, conv, attachments, signal, currentQuestion, onPartial) {
     const history = historyForModel(conv, currentQuestion || question);
     const files = await apiAttachments(attachments);
     const res = await apiCall('answer', {
       lang: t('langName'), jurisdiction: jurisdictionLabel(conv.country, conv.region), question: plainAnswerQuestion(question), history: history,
       excerpts: sources.map((s) => ({ n: s.n, name: s.name, article: s.article, heading: s.heading, nota: s.nota, excerpt: s.excerpt })),
       attachments: files, capturedAt: fmtDate(state.catalog.generatedAt)
-    }, signal);
+    }, signal, 0, summaryStream(onPartial));
     return Object.assign({}, res.answer || {}, res.fallback === true ? { fallbackModel: true } : {});
   }
   /* Só aparecem afirmações e fontes ligadas a trechos que realmente foram enviados ao modelo.
@@ -1427,12 +1496,18 @@
     let timedOut = false;
     const timer = setTimeout(() => { timedOut = true; ctl.abort(); }, CLIENT_TIMEOUT_MS);
     const composer = $('#composer'); if (composer && composer._refresh) composer._refresh();
-    const onStep = (i) => { botMsg.step = i; const node = $('.msg[data-id="' + botMsg.id + '"] .answer'); if (node) { node.innerHTML = loadingHTML(provider.id, i); const stop = $('[data-stop]', node); if (stop) stop.addEventListener('click', stopAnswer); } };
+    const paint = () => { const node = $('.msg[data-id="' + botMsg.id + '"] .answer'); if (node) { node.innerHTML = loadingHTML(provider.id, botMsg.step || 0, botMsg.partial); const stop = $('[data-stop]', node); if (stop) stop.addEventListener('click', stopAnswer); } };
+    const onStep = (i) => { botMsg.step = i; paint(); };
+    const onPartial = (text) => {
+      const changed = !botMsg.partial !== !text; botMsg.partial = text || '';
+      const slot = !changed && $('.msg[data-id="' + botMsg.id + '"] [data-partial]');
+      if (slot) slot.textContent = botMsg.partial; else paint();
+    };
     const position = conv.messages.indexOf(botMsg);
     if (!botMsg.jurisdiction) botMsg.jurisdiction = { country: conv.country, region: conv.region };
     const requestConv = Object.assign({}, conv, botMsg.jurisdiction, { messages: conv.messages.slice(0, position < 0 ? conv.messages.length : position) });
     try {
-      const answer = await provider.respond({ text: input.text, attachments: input.attachments, conv: requestConv, lang: state.lang, onStep: onStep, signal: ctl.signal });
+      const answer = await provider.respond({ text: input.text, attachments: input.attachments, conv: requestConv, lang: state.lang, onStep: onStep, onPartial: onPartial, signal: ctl.signal });
       retryInputs.delete(botMsg);
       botMsg.status = 'done'; botMsg.answer = answer; botMsg.provider = answer && answer.mode === 'ai' ? 'ai' : provider.id; delete botMsg.error;
     } catch (e) {
@@ -1444,6 +1519,7 @@
       botMsg.lastInput = { text: input.text, attachments: input.attachments.map((f) => ({ name: f.name, size: f.size, type: f.type })) };
     } finally {
       clearTimeout(timer);
+      delete botMsg.partial;
       state.busy = null;
       touch(conv);
       const node = $('.msg[data-id="' + botMsg.id + '"]');

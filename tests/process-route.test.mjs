@@ -10,18 +10,24 @@ const source = readFileSync(new URL('../supabase/functions/ross-ai/index.ts', im
 class MockGeminiError extends Error { constructor(status) { super('google_upstream'); this.status = status; } }
 function server({ token = 'test-provider-value', quotaError = false, processSource = 'escavador', maxBody = '', models = null, writes = false, hedge = false, workerLimit = '', realTimers = false } = {}) {
   let handler, lookups = 0, djenLookups = 0, modelCalls = 0, quotaCalls = 0;
-  const modelsCalled = [], aborted = [];
+  const modelsCalled = [], aborted = [], thinkingLevels = [];
   const schema = new Proxy(function () {}, { get: () => schema, apply: () => schema });
   const env = { SUPABASE_URL: 'https://test.invalid', SUPABASE_SERVICE_ROLE_KEY: 'mock-service-role', ESCAVADOR_API_TOKEN: token, ROSS_PROCESS_SOURCE: processSource, ROSS_MAX_BODY_BYTES: maxBody, GEMINI_API_KEY: models ? 'test-google-key' : '', ROSS_LIBRARY_WRITES_ENABLED: writes ? 'true' : '', ROSS_HEDGE: hedge ? '' : 'off', ROSS_WORKER_LIMIT_MS: workerLimit };
   const context = {
     Deno: { env: { get: key => env[key] }, serve: fn => { handler = fn; } }, z: schema, setTimeout: realTimers ? setTimeout : (fn) => setTimeout(fn, 0), clearTimeout, AbortController,
     createClient: () => ({ rpc: async () => { quotaCalls++; return quotaError ? { error: { message: 'simulated quota outage' } } : { data: { allowed: true } }; } }),
-    generateGemini: async ({ model, timeoutMs, signal }) => {
+    generateGemini: async ({ model, timeoutMs, signal, onText, thinkingLevel }) => {
       modelCalls++;
       if (!models) throw new Error('process requests must not call the model');
-      modelsCalled.push(model);
+      modelsCalled.push(model); thinkingLevels.push(thinkingLevel);
       assert.ok(timeoutMs > 0 && timeoutMs <= 90_000, 'per-call timeout must be bounded');
       const behaviour = models[model];
+      // { stream: [...pieces], data | fail }: writes the pieces through onText, then answers or fails.
+      if (behaviour && typeof behaviour === 'object' && !Array.isArray(behaviour) && 'stream' in behaviour) {
+        for (const piece of behaviour.stream) { await new Promise(resolve => setTimeout(resolve, 0)); if (onText) onText(piece); }
+        if (behaviour.fail) throw new MockGeminiError(behaviour.fail);
+        return { data: behaviour.data, model };
+      }
       // { delay, data }: answers after `delay` ms unless the call is cancelled first.
       if (behaviour && typeof behaviour === 'object' && !Array.isArray(behaviour) && 'delay' in behaviour) {
         return new Promise((resolve, reject) => {
@@ -42,10 +48,10 @@ function server({ token = 'test-provider-value', quotaError = false, processSour
       if (hash === 'bad') throw new Error('document_integrity');
       return { doc: { title: 'Lei de teste', repository_path: path, passages: [{ ordinal: 0 }] }, markdown: '## Art. 1º\nTexto.', localCopy: false };
     },
-    crypto, TextEncoder, TextDecoder, Response, Request, URL, AbortSignal, console: { error() {}, warn() {} },
+    crypto, TextEncoder, TextDecoder, Response, Request, URL, AbortSignal, ReadableStream, console: { error() {}, warn() {} },
   };
   vm.runInNewContext(stripTypeScriptTypes(source), context);
-  return { rawRequest: request => handler(request), raw: body => handler(new Request('https://test.invalid', { method: 'POST', headers: { Origin: 'https://matheusbauto-blip.github.io', 'Content-Type': 'application/json' }, body: JSON.stringify(body) })), request: number => handler(new Request('https://test.invalid', { method: 'POST', headers: { Origin: 'https://matheusbauto-blip.github.io', 'Content-Type': 'application/json' }, body: JSON.stringify({ op: 'process_lookup', number }) })), counts: () => ({ lookups, djenLookups, modelCalls, quotaCalls }), modelsCalled: () => modelsCalled, aborted: () => aborted };
+  return { rawRequest: request => handler(request), raw: body => handler(new Request('https://test.invalid', { method: 'POST', headers: { Origin: 'https://matheusbauto-blip.github.io', 'Content-Type': 'application/json' }, body: JSON.stringify(body) })), request: number => handler(new Request('https://test.invalid', { method: 'POST', headers: { Origin: 'https://matheusbauto-blip.github.io', 'Content-Type': 'application/json' }, body: JSON.stringify({ op: 'process_lookup', number }) })), counts: () => ({ lookups, djenLookups, modelCalls, quotaCalls }), modelsCalled: () => modelsCalled, aborted: () => aborted, thinkingLevels: () => thinkingLevels };
 }
 
 test('the actual process route works independently of Google credentials and never calls the model', async () => {
@@ -182,4 +188,37 @@ test('a worker near the end of its life refuses model calls at once, without spe
   const body = await response.json();
   assert.equal(body.error, 'worker_recycling'); assert.ok(body.retryAfterMs >= 1_500);
   assert.deepEqual(s.counts(), { lookups: 0, djenLookups: 0, modelCalls: 0, quotaCalls: 0 });
+});
+
+const answerRequest = { op: 'answer', stream: true, question: 'pergunta', excerpts: [], history: [], attachments: [] };
+async function streamLines(response) { return (await response.text()).trim().split('\n').map(line => JSON.parse(line)); }
+
+test('an answer requested in parts arrives as it is written and ends with the validated result', async () => {
+  const s = server({ models: { 'gemini-3.5-flash': { stream: ['{"kind":"answer","summary":"Vo', 'cê pode desistir."}'], data: {} } } });
+  const response = await s.raw(answerRequest);
+  assert.equal(response.status, 200);
+  assert.match(response.headers.get('content-type'), /application\/x-ndjson/);
+  assert.equal(response.headers.get('access-control-allow-origin'), 'https://matheusbauto-blip.github.io');
+  const lines = await streamLines(response);
+  assert.deepEqual(lines.filter(l => l.t === 'd').map(l => l.x), ['{"kind":"answer","summary":"Vo', 'cê pode desistir."}']);
+  assert.equal(lines.at(-1).t, 'done'); assert.equal(lines.at(-1).model, 'gemini-3.5-flash');
+  assert.deepEqual(s.thinkingLevels(), ['low'], 'the answer asks for a short reasoning level');
+});
+
+test('a failure before any text keeps the normal HTTP error, and a failure after it ends the stream without a retry', async () => {
+  const before = server({ models: { 'gemini-3.5-flash': 400 } });
+  const refused = await before.raw(answerRequest);
+  assert.equal(refused.status, 502); assert.deepEqual(await refused.json(), { error: 'upstream', status: 400 });
+  const after = server({ models: { 'gemini-3.5-flash': { stream: ['{"summary":"Vo'], fail: 503 }, 'gemini-3.1-flash-lite': { stream: ['{"x":1}'], data: {} } } });
+  const lines = await streamLines(await after.raw(answerRequest));
+  assert.deepEqual(lines.map(l => l.t), ['d', 'error']);
+  assert.equal(lines[1].error, 'upstream');
+  assert.deepEqual(after.modelsCalled(), ['gemini-3.5-flash'], 'text already sent is never mixed with another model');
+});
+
+test('when the primary model fails before writing, the fallback streams the answer', async () => {
+  const s = server({ models: { 'gemini-3.5-flash': 503, 'gemini-3.1-flash-lite': { stream: ['{"summary":"Ok"}'], data: {} } } });
+  const lines = await streamLines(await s.raw(answerRequest));
+  assert.deepEqual(lines.map(l => l.t), ['d', 'done']);
+  assert.equal(lines[1].fallback, true);
 });

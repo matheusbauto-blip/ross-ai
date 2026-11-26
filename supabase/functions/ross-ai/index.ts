@@ -14,6 +14,7 @@
      ROSS_ANSWER_FALLBACK_MODEL / ROSS_HELPER_FALLBACK_MODEL  opcionais (padrão: um usa o outro)
      ROSS_WORKER_LIMIT_MS     opcional, tempo de vida do servidor no plano (padrão 150000; planos pagos: 400000)
      ROSS_HEDGE               opcional, "off" desliga o modelo alternativo em paralelo
+     ROSS_ANSWER_THINKING / ROSS_HELPER_THINKING  opcionais, nível de raciocínio do modelo (padrão "low"; "off" usa o do modelo)
      ROSS_IP_DAILY_LIMIT      opcional (padrão 40 pedidos por IP por dia)
      ROSS_GLOBAL_DAILY_LIMIT  opcional (padrão 1000 pedidos por dia no total)
      ROSS_SALT                opcional, usado para não guardar o IP em claro */
@@ -41,8 +42,12 @@ const WORKER_LIMIT_MS = Number(Deno.env.get("ROSS_WORKER_LIMIT_MS") ?? "") || 15
 const workerRemaining = () => WORKER_LIMIT_MS - (Date.now() - WORKER_STARTED);
 // Quando o modelo principal demora, o alternativo começa em paralelo; vale a primeira resposta válida.
 const HEDGE_ENABLED = Deno.env.get("ROSS_HEDGE") !== "off";
+// Raciocínio interno curto: é o que mais atrasa o início da resposta, e a tarefa (explicar trechos já escolhidos) é simples.
+const thinking = (name: string) => { const value = (Deno.env.get(name) ?? "low").trim().toLowerCase(); return value === "off" ? "" : value; };
+const ANSWER_THINKING = thinking("ROSS_ANSWER_THINKING");
+const HELPER_THINKING = thinking("ROSS_HELPER_THINKING");
 const BUDGET = {
-  prepare: { perCallMs: 15_000, totalMs: 25_000, hedgeAfterMs: 8_000, minRemainingMs: 15_000 },
+  prepare: { perCallMs: 15_000, totalMs: 25_000, hedgeAfterMs: 5_000, minRemainingMs: 15_000 },
   answer: { perCallMs: 90_000, totalMs: 120_000, hedgeAfterMs: 30_000, minRemainingMs: 45_000 },
 };
 const IP_LIMIT = Number(Deno.env.get("ROSS_IP_DAILY_LIMIT") ?? "40");
@@ -273,13 +278,20 @@ function systemPrompt(lang: string, grounded: boolean) {
 /* Tenta os modelos dentro de um prazo total que cabe no tempo de vida restante do servidor: uma nova tentativa por
    modelo em falhas passageiras (não depois de tempo esgotado); o alternativo começa quando o principal falha ou, com
    o paralelo ligado, quando ele passa de hedgeAfterMs. A chamada que perde é cancelada. Só status e tempo vão para o
-   registro, nunca o conteúdo. */
-type GenerateOptions = { system: string; parts: Array<{ text: string } | { inlineData: { mimeType: string; data: string } }>; schema: unknown; maxTokens: number };
+   registro, nunca o conteúdo. Com onText (resposta em partes), vale o primeiro modelo que começar a escrever: os outros
+   são cancelados e, se ele falhar depois disso, não há nova tentativa (o texto já foi enviado). */
+type GenerateOptions = { system: string; parts: Array<{ text: string } | { inlineData: { mimeType: string; data: string } }>; schema: unknown; maxTokens: number; thinkingLevel?: string };
 type Budget = { perCallMs: number; totalMs: number; hedgeAfterMs: number; minRemainingMs: number };
-async function generate(models: string[], options: GenerateOptions, apiKey: string, budget: Budget) {
+async function generate(models: string[], options: GenerateOptions, apiKey: string, budget: Budget, onText?: (text: string) => void) {
   const deadline = Date.now() + Math.min(budget.totalMs, workerRemaining() - 5_000);
   const list = models.filter((model, index) => model && models.indexOf(model) === index);
   const controllers = list.map(() => new AbortController());
+  let committed = -1, timer: ReturnType<typeof setTimeout> | null = null;
+  const commit = (index: number) => {
+    committed = index; if (timer) clearTimeout(timer);
+    controllers.forEach((c, i) => { if (i !== index) c.abort(); });
+  };
+  const textFor = (index: number) => onText ? { onText: (text: string) => { if (committed === -1) commit(index); if (committed === index) onText(text); } } : {};
   async function attemptModel(index: number) {
     const model = list[index]; let last: unknown = null;
     for (let attempt = 0; attempt < 2; attempt++) {
@@ -287,25 +299,27 @@ async function generate(models: string[], options: GenerateOptions, apiKey: stri
       if (remaining < 3_000) break;
       const started = Date.now();
       try {
-        const result = await generateGemini({ apiKey, model, timeoutMs: Math.min(budget.perCallMs, remaining), signal: controllers[index].signal, ...options });
+        const result = await generateGemini({ apiKey, model, timeoutMs: Math.min(budget.perCallMs, remaining), signal: controllers[index].signal, ...options, ...textFor(index) });
         return index > 0 ? { ...result, fallback: true } : result;
       } catch (e) {
         last = e;
         if (!controllers[index].signal.aborted) console.warn("gemini", model, e instanceof GeminiError ? e.status : "erro", Date.now() - started);
-        if (!(e instanceof GeminiError) || !TRANSIENT_STATUS.has(e.status) || e.status === 504) throw e;
+        if (committed === index || !(e instanceof GeminiError) || !TRANSIENT_STATUS.has(e.status) || e.status === 504) throw e;
         await new Promise((resolve) => setTimeout(resolve, 1_000));
       }
     }
     throw last ?? new GeminiError(504);
   }
   return await new Promise<Record<string, unknown>>((resolve, reject) => {
-    let finished = false, pending = 0, next = 0, lastError: unknown = null, timer: ReturnType<typeof setTimeout> | null = null;
+    let finished = false, pending = 0, next = 0, lastError: unknown = null;
     const finish = (fn: () => void) => { if (finished) return; finished = true; if (timer) clearTimeout(timer); controllers.forEach((c) => c.abort()); fn(); };
     const startNext = () => {
-      if (finished || next >= list.length) return;
+      if (finished || committed !== -1 || next >= list.length) return;
       const index = next++; pending++;
       attemptModel(index).then((result) => finish(() => resolve(result)), (e) => {
         pending--;
+        if (committed === index) return finish(() => reject(e));
+        if (committed !== -1) return; // cancelado porque outro modelo já começou a escrever
         if (index === 0 || !lastError) lastError = e;
         const transient = e instanceof GeminiError && TRANSIENT_STATUS.has(e.status);
         if (!transient && next === 1) return finish(() => reject(e));
@@ -324,6 +338,7 @@ async function opPrepare(apiKey: string, body: Record<string, unknown>) {
   const catalog = arr(body.catalog).slice(0, 200).map((l: Record<string, unknown>) => `${str(l.id, 40)}: ${str(l.name, 400)}`).join("\n");
   const response = await generate([HELPER_MODEL, HELPER_FALLBACK_MODEL], {
     maxTokens: 1200,
+    thinkingLevel: HELPER_THINKING,
     schema: z.toJSONSchema(PrepareSchema),
     system: "You prepare searches of Brazilian law. The bundled catalog is only a starting collection; the searchable library is broader. Suggestions are search clues, never verified citations. Reply only with the JSON requested.",
     parts: [{ text: `Question (Portuguese): ${question}\nJurisdiction: ${str(body.jurisdiction,120) || 'Brasil'}\n\nBundled laws (id: name):\n${catalog}\n\nReturn: "terms" = 4 to 8 Portuguese legal search terms (single words or short phrases as used in statutes); "laws" = up to 3 relevant bundled catalog ids; "references" = up to 4 additional or explicitly requested Brazilian legislative references, including laws OUTSIDE the bundled catalog, ONLY when confident about their identity. Each reference has type (lei, lei complementar, decreto-lei, decreto, medida provisoria, emenda constitucional, resolucao or portaria), number (digits as string), year (four-digit year or null). Empty arrays when uncertain. Do not confuse a bill with an enacted law, an article number with a law number, or invent a number to fill the list.` }],
@@ -335,7 +350,7 @@ async function opPrepare(apiKey: string, body: Record<string, unknown>) {
   return { terms: parsed.data.terms.slice(0, 8), laws: parsed.data.laws.filter(id => ids.has(id)).slice(0, 3), references: libraryReferences(parsed.data.references, question), fallback: response.fallback === true };
 }
 
-async function opAnswer(apiKey: string, body: Record<string, unknown>) {
+async function opAnswer(apiKey: string, body: Record<string, unknown>, onText?: (text: string) => void) {
   const lang = str(body.lang, 40) || "Português (Brasil)";
   const question = str(body.question, 6000);
   const jurisdiction = str(body.jurisdiction, 80);
@@ -365,14 +380,37 @@ async function opAnswer(apiKey: string, body: Record<string, unknown>) {
 
   const response = await generate([ANSWER_MODEL, ANSWER_FALLBACK_MODEL], {
     maxTokens: 8000,
+    thinkingLevel: ANSWER_THINKING,
     schema: z.toJSONSchema(AnswerSchema),
     system: systemPrompt(lang, grounded),
     parts: content,
-  }, apiKey, BUDGET.answer);
+  }, apiKey, BUDGET.answer, onText);
   if (response.error) return response;
   const parsed = AnswerSchema.safeParse(response.data);
   if (!parsed.success) return { error: "invalid_json" };
   return { answer: parsed.data, model: response.model, usage: response.usage, fallback: response.fallback === true };
+}
+
+/* Resposta em partes (NDJSON). Cada linha {"t":"d","x":...} traz um pedaço do JSON que o modelo está escrevendo; a
+   última é {"t":"done",...} com a resposta já validada ou {"t":"error","error":...}. Falhas antes do primeiro pedaço
+   seguem o caminho normal (status HTTP), e o app as trata como sempre. */
+function upstreamError(e: unknown) {
+  if (e instanceof GeminiError) return e.status === 429 ? { error: "rate_limited" } : e.status === 504 ? { error: "upstream_timeout" } : { error: "upstream", status: e.status };
+  return { error: "internal" };
+}
+async function streamAnswer(apiKey: string, body: Record<string, unknown>, origin: string | null) {
+  const encoder = new TextEncoder();
+  let controller: ReadableStreamDefaultController<Uint8Array> | null = null, open = true;
+  const stream = new ReadableStream<Uint8Array>({ start(c) { controller = c; }, cancel() { open = false; } });
+  const send = (line: unknown) => { if (!open || !controller) return; try { controller.enqueue(encoder.encode(JSON.stringify(line) + "\n")); } catch { open = false; } };
+  let started: () => void = () => {};
+  const firstText = new Promise<"text">((resolve) => { started = () => resolve("text"); });
+  const work = opAnswer(apiKey, body, (text) => { started(); send({ t: "d", x: text }); });
+  const first = await Promise.race([firstText, work.then(() => "settled" as const, () => "settled" as const)]);
+  if (first === "settled") { open = false; return json(200, await work, origin); }
+  work.then((result) => send({ t: "done", ...result }), (e) => { if (!(e instanceof GeminiError)) console.error("unexpected backend error"); send({ t: "error", ...upstreamError(e) }); })
+    .finally(() => { if (open && controller) { open = false; try { controller.close(); } catch { /* conexão já encerrada */ } } });
+  return new Response(stream, { status: 200, headers: { "Content-Type": "application/x-ndjson; charset=utf-8", "Cache-Control": "no-store", ...corsHeaders(origin) } });
 }
 
 /* ---------- servidor ---------- */
@@ -474,6 +512,7 @@ Deno.serve(async (req: Request) => {
   try {
     const apiKey = await googleApiKey();
     if (!apiKey) return json(503, { error: "api_not_configured" }, origin);
+    if (op === "answer" && body.stream === true) return await streamAnswer(apiKey, body, origin);
     const result = op === "prepare" ? await opPrepare(apiKey, body) : await opAnswer(apiKey, body);
     return json(200, result, origin);
   } catch (e) {
