@@ -43,7 +43,7 @@ const workerRemaining = () => WORKER_LIMIT_MS - (Date.now() - WORKER_STARTED);
 const HEDGE_ENABLED = Deno.env.get("ROSS_HEDGE") !== "off";
 const BUDGET = {
   prepare: { perCallMs: 15_000, totalMs: 25_000, hedgeAfterMs: 8_000, minRemainingMs: 15_000 },
-  answer: { perCallMs: 60_000, totalMs: 85_000, hedgeAfterMs: 35_000, minRemainingMs: 40_000 },
+  answer: { perCallMs: 90_000, totalMs: 120_000, hedgeAfterMs: 30_000, minRemainingMs: 45_000 },
 };
 const IP_LIMIT = Number(Deno.env.get("ROSS_IP_DAILY_LIMIT") ?? "40");
 const GLOBAL_LIMIT = Number(Deno.env.get("ROSS_GLOBAL_DAILY_LIMIT") ?? "1000");
