@@ -465,7 +465,7 @@ Deno.serve(async (req: Request) => {
 
   // Sem tempo de vida suficiente neste servidor, recusa já (sem gastar cota) para o app tentar em um servidor novo.
   const remaining = workerRemaining();
-  if (remaining < BUDGET[op].minRemainingMs) return json(503, { error: "worker_recycling", retryAfterMs: Math.max(0, remaining) + 1_500 }, origin);
+  if (remaining < BUDGET[op as "prepare" | "answer"].minRemainingMs) return json(503, { error: "worker_recycling", retryAfterMs: Math.max(0, remaining) + 1_500 }, origin);
 
   // Chamadas pagas ao modelo exigem o controle de uso: se ele não puder ser verificado, nada é enviado.
   const quota = await checkQuota(req, false, true);
