@@ -1,10 +1,10 @@
 {
-  "version": "3949972e8b1c",
+  "version": "417f0a16a889",
   "files": [
     {
       "path": "index.html",
       "bytes": 1941,
-      "sha256": "dab9d3fef15374ba52b1dbadbaaf166f2095fbfca8d3ccd8d6f35b491f691b2a"
+      "sha256": "3ca5d1f54f8737bdcd810a5f97efd257edd3e80d23a177230c3d5ef2e1936f2e"
     },
     {
       "path": "styles.css",
@@ -34,7 +34,7 @@
     {
       "path": "app.js",
       "bytes": 161464,
-      "sha256": "12ba4294dd50a2604280a274612091be0921c48af4e924f6a73f97b0586ca033"
+      "sha256": "fd5e1c3fc9907a5ded3bc117731f38f808f9709dbcca30c16bcbbc3cc0fbe8ab"
     },
     {
       "path": "data/catalog.json",

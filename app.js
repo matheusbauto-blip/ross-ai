@@ -1420,7 +1420,7 @@
     await runProvider(provider, conv, botMsg, { text: text, attachments: attachments });
   }
   const retryInputs = new WeakMap();
-  const CLIENT_TIMEOUT_MS = 240000;
+  const CLIENT_TIMEOUT_MS = 300000;
   async function runProvider(provider, conv, botMsg, input) {
     const ctl = new AbortController();
     state.busy = { ctl: ctl, id: botMsg.id };
