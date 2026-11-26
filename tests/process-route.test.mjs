@@ -8,20 +8,28 @@ import { libraryReferences } from '../supabase/functions/ross-ai/repository-libr
 
 const source = readFileSync(new URL('../supabase/functions/ross-ai/index.ts', import.meta.url), 'utf8').replace(/^import .*;\s*$/gm, '');
 class MockGeminiError extends Error { constructor(status) { super('google_upstream'); this.status = status; } }
-function server({ token = 'test-provider-value', quotaError = false, processSource = 'escavador', maxBody = '', models = null, writes = false } = {}) {
+function server({ token = 'test-provider-value', quotaError = false, processSource = 'escavador', maxBody = '', models = null, writes = false, hedge = false, workerLimit = '', realTimers = false } = {}) {
   let handler, lookups = 0, djenLookups = 0, modelCalls = 0, quotaCalls = 0;
-  const modelsCalled = [];
+  const modelsCalled = [], aborted = [];
   const schema = new Proxy(function () {}, { get: () => schema, apply: () => schema });
-  const env = { SUPABASE_URL: 'https://test.invalid', SUPABASE_SERVICE_ROLE_KEY: 'mock-service-role', ESCAVADOR_API_TOKEN: token, ROSS_PROCESS_SOURCE: processSource, ROSS_MAX_BODY_BYTES: maxBody, GEMINI_API_KEY: models ? 'test-google-key' : '', ROSS_LIBRARY_WRITES_ENABLED: writes ? 'true' : '' };
+  const env = { SUPABASE_URL: 'https://test.invalid', SUPABASE_SERVICE_ROLE_KEY: 'mock-service-role', ESCAVADOR_API_TOKEN: token, ROSS_PROCESS_SOURCE: processSource, ROSS_MAX_BODY_BYTES: maxBody, GEMINI_API_KEY: models ? 'test-google-key' : '', ROSS_LIBRARY_WRITES_ENABLED: writes ? 'true' : '', ROSS_HEDGE: hedge ? '' : 'off', ROSS_WORKER_LIMIT_MS: workerLimit };
   const context = {
-    Deno: { env: { get: key => env[key] }, serve: fn => { handler = fn; } }, z: schema, setTimeout: (fn) => setTimeout(fn, 0),
+    Deno: { env: { get: key => env[key] }, serve: fn => { handler = fn; } }, z: schema, setTimeout: realTimers ? setTimeout : (fn) => setTimeout(fn, 0), clearTimeout, AbortController,
     createClient: () => ({ rpc: async () => { quotaCalls++; return quotaError ? { error: { message: 'simulated quota outage' } } : { data: { allowed: true } }; } }),
-    generateGemini: async ({ model, timeoutMs }) => {
+    generateGemini: async ({ model, timeoutMs, signal }) => {
       modelCalls++;
       if (!models) throw new Error('process requests must not call the model');
       modelsCalled.push(model);
       assert.ok(timeoutMs > 0 && timeoutMs <= 90_000, 'per-call timeout must be bounded');
       const behaviour = models[model];
+      // { delay, data }: answers after `delay` ms unless the call is cancelled first.
+      if (behaviour && typeof behaviour === 'object' && !Array.isArray(behaviour) && 'delay' in behaviour) {
+        return new Promise((resolve, reject) => {
+          let settled = false;
+          const timer = setTimeout(() => { settled = true; resolve({ data: behaviour.data, model }); }, behaviour.delay);
+          signal && signal.addEventListener('abort', () => { if (settled) return; clearTimeout(timer); aborted.push(model); reject(new MockGeminiError(504)); }, { once: true });
+        });
+      }
       if (typeof behaviour === 'number') throw new MockGeminiError(behaviour);
       if (Array.isArray(behaviour)) { const next = behaviour.shift(); if (typeof next === 'number') throw new MockGeminiError(next); return { data: next, model }; }
       return { data: behaviour, model };
@@ -34,10 +42,10 @@ function server({ token = 'test-provider-value', quotaError = false, processSour
       if (hash === 'bad') throw new Error('document_integrity');
       return { doc: { title: 'Lei de teste', repository_path: path, passages: [{ ordinal: 0 }] }, markdown: '## Art. 1º\nTexto.', localCopy: false };
     },
-    crypto, TextEncoder, TextDecoder, Response, Request, URL, AbortSignal, console: { error() {} },
+    crypto, TextEncoder, TextDecoder, Response, Request, URL, AbortSignal, console: { error() {}, warn() {} },
   };
   vm.runInNewContext(stripTypeScriptTypes(source), context);
-  return { rawRequest: request => handler(request), raw: body => handler(new Request('https://test.invalid', { method: 'POST', headers: { Origin: 'https://matheusbauto-blip.github.io', 'Content-Type': 'application/json' }, body: JSON.stringify(body) })), request: number => handler(new Request('https://test.invalid', { method: 'POST', headers: { Origin: 'https://matheusbauto-blip.github.io', 'Content-Type': 'application/json' }, body: JSON.stringify({ op: 'process_lookup', number }) })), counts: () => ({ lookups, djenLookups, modelCalls, quotaCalls }), modelsCalled: () => modelsCalled };
+  return { rawRequest: request => handler(request), raw: body => handler(new Request('https://test.invalid', { method: 'POST', headers: { Origin: 'https://matheusbauto-blip.github.io', 'Content-Type': 'application/json' }, body: JSON.stringify(body) })), request: number => handler(new Request('https://test.invalid', { method: 'POST', headers: { Origin: 'https://matheusbauto-blip.github.io', 'Content-Type': 'application/json' }, body: JSON.stringify({ op: 'process_lookup', number }) })), counts: () => ({ lookups, djenLookups, modelCalls, quotaCalls }), modelsCalled: () => modelsCalled, aborted: () => aborted };
 }
 
 test('the actual process route works independently of Google credentials and never calls the model', async () => {
@@ -153,4 +161,25 @@ test('reading an index entry by path returns the matching articles and never the
   const tampered = await s.raw({ op: 'repository_read', path: 'federal/x.md', ref: 'c'.repeat(40), hash: 'bad' });
   assert.equal(tampered.status, 409); assert.deepEqual(await tampered.json(), { error: 'document_integrity' });
   assert.equal(s.counts().modelCalls, 0);
+});
+
+test('a slow primary model is overtaken by the fallback started in parallel, and the slow call is cancelled', async () => {
+  const s = server({ hedge: true, realTimers: true, models: { 'gemini-3.1-flash-lite': { delay: 20_000, data: { terms: ['lento'], laws: [] } }, 'gemini-3.5-flash': { delay: 10, data: { terms: ['rápido'], laws: [] } } } });
+  const started = Date.now();
+  const response = await s.raw({ op: 'prepare', question: 'pergunta', catalog: [] });
+  const body = await response.json();
+  assert.equal(response.status, 200);
+  assert.equal(body.fallback, true, 'the answer came from the fallback model');
+  assert.ok(Date.now() - started < 12_000, 'the answer arrives soon after the parallel start (8 s), not after the slow model');
+  assert.deepEqual(s.modelsCalled(), ['gemini-3.1-flash-lite', 'gemini-3.5-flash']);
+  assert.deepEqual(s.aborted(), ['gemini-3.1-flash-lite']);
+});
+
+test('a worker near the end of its life refuses model calls at once, without spending quota, so the app retries elsewhere', async () => {
+  const s = server({ workerLimit: '1', models: { 'gemini-3.1-flash-lite': { terms: [], laws: [] } } });
+  const response = await s.raw({ op: 'answer', question: 'pergunta', excerpts: [], history: [], attachments: [] });
+  assert.equal(response.status, 503);
+  const body = await response.json();
+  assert.equal(body.error, 'worker_recycling'); assert.ok(body.retryAfterMs >= 1_500);
+  assert.deepEqual(s.counts(), { lookups: 0, djenLookups: 0, modelCalls: 0, quotaCalls: 0 });
 });

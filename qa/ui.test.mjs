@@ -13,6 +13,8 @@ const catalog = JSON.parse(read('data/catalog.json'));
 const tick = () => new Promise(resolve => setImmediate(resolve));
 function setup(t, fetcher = async () => Response.json({ documents: 235, results: [] })) {
   const { window, document } = parseHTML(read('index.html'));
+  // Prazos encurtados por um teste não podem vazar para os seguintes.
+  delete window.__clientTimeout; delete window.__indexTimeout;
   const storage = new Map();
   const clipboard = [];
   const timers = new Set();
@@ -906,4 +908,30 @@ test('a slow repository index does not hold the answer back', async t => {
   const message = api.state.conversations[0].messages.at(-1);
   assert.equal(message.status, 'done', message.error);
   assert.ok(answered, 'the answer step ran without the index');
+});
+
+test('a recycled server (or a connection dropped by it) is retried once on a fresh server', async t => {
+  const calls = [];
+  const { api, window } = setup(t, async (url, options) => {
+    const address = String(url);
+    const match = address.match(/data\/(laws\/[a-z0-9_-]+\.json)/i);
+    if (match) return Response.json(JSON.parse(read('data/' + match[1])));
+    if (address.startsWith('https://matheusbauto-blip.github.io/ross-ai/index/')) return new Response('', { status: 404 });
+    const body = JSON.parse(options.body); calls.push(body.op);
+    if (body.op === 'search') return Response.json({ results: [] });
+    if (body.op === 'prepare') {
+      if (calls.filter(op => op === 'prepare').length === 1) return Response.json({ error: 'worker_recycling', retryAfterMs: 10 }, { status: 503 });
+      return Response.json(body.catalog.some(law => /^passage-/.test(law.id)) ? { terms: [], laws: ['passage-1'] } : { terms: ['desistir'], laws: ['l8078'] });
+    }
+    if (calls.filter(op => op === 'answer').length === 1) throw new TypeError('Failed to fetch');
+    return Response.json({ answer: { kind: 'answer', summary: 'Você pode desistir em 7 dias.', sourcesSay: [{ title: 'CDC', text: 'Prazo de 7 dias.', ref: 1 }], sources: [{ ref: 1, why: 'arrependimento' }], warnings: [] } });
+  });
+  api.state.mode = 'oficial';
+  await api.submitMessage('Comprei pela internet e quero desistir. Posso?');
+  const message = api.state.conversations[0].messages.at(-1);
+  assert.equal(message.status, 'done', message.error);
+  assert.match(message.answer.summary, /7 dias/);
+  assert.equal(calls.filter(op => op === 'answer').length, 2, 'the dropped answer was retried once');
+  assert.ok(calls.filter(op => op === 'prepare').length >= 2, 'the recycled prepare was retried');
+  void window;
 });

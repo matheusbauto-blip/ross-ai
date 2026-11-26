@@ -29,7 +29,7 @@ export function decodeGemini(response, requestedModel) {
   };
 }
 
-export async function generateGemini({ apiKey, model, system, parts, schema, maxTokens, timeoutMs = 90_000, fetchImpl = fetch }) {
+export async function generateGemini({ apiKey, model, system, parts, schema, maxTokens, timeoutMs = 90_000, signal = null, fetchImpl = fetch }) {
   if (!/^[a-zA-Z0-9._-]+$/.test(model)) throw new GeminiError(400);
   let response;
   try {
@@ -45,7 +45,7 @@ export async function generateGemini({ apiKey, model, system, parts, schema, max
           maxOutputTokens: maxTokens,
         },
       }),
-      signal: AbortSignal.timeout(timeoutMs),
+      signal: signal ? AbortSignal.any([AbortSignal.timeout(timeoutMs), signal]) : AbortSignal.timeout(timeoutMs),
     });
   } catch {
     throw new GeminiError(504);

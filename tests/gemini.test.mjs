@@ -50,3 +50,13 @@ test('sanitizes upstream errors and prevents endpoint injection', async () => {
   });
   await assert.rejects(generateGemini({ ...options, model: '../another-host' }), GeminiError);
 });
+
+test('an external signal cancels the provider call (the slower of two parallel models)', async () => {
+  const controller = new AbortController();
+  const pending = generateGemini({
+    apiKey: 'private-test-value', model: 'gemini-test', parts: [], schema: {}, system: '', maxTokens: 10, timeoutMs: 60_000, signal: controller.signal,
+    fetchImpl: (url, init) => new Promise((resolve, reject) => init.signal.addEventListener('abort', () => reject(new Error('aborted')), { once: true })),
+  });
+  controller.abort();
+  await assert.rejects(pending, error => error instanceof GeminiError && error.status === 504);
+});

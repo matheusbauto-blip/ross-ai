@@ -723,13 +723,35 @@
   function fileToBase64(file) {
     return new Promise((resolve, reject) => { const r = new FileReader(); r.onload = () => resolve(String(r.result).split(',')[1] || ''); r.onerror = () => reject(r.error); r.readAsDataURL(file); });
   }
-  async function apiCall(op, payload, signal) {
+  /* O Supabase encerra cada servidor depois de 150 s de vida, mesmo no meio de uma resposta (546, que chega ao navegador
+     como falha de rede por não trazer CORS), e o servidor recusa na hora quando está perto disso (worker_recycling).
+     Nos dois casos as chamadas ao modelo tentam mais uma vez, já em um servidor novo. */
+  const MODEL_OPS = ['prepare', 'answer'];
+  function waitFor(ms, signal) {
+    return new Promise((resolve, reject) => {
+      if (signal && signal.aborted) return reject({ code: 'cancelled' });
+      const timer = setTimeout(resolve, ms);
+      if (signal) signal.addEventListener('abort', () => { clearTimeout(timer); reject({ code: 'cancelled' }); }, { once: true });
+    });
+  }
+  async function apiCall(op, payload, signal, attempt) {
     if (op === 'process_lookup' && !API_URL) throw { code: 'process_not_configured' };
+    const retryable = !attempt && MODEL_OPS.includes(op);
     let res;
     try {
       res = await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(Object.assign({ op: op }, payload)), signal: signal });
-    } catch (e) { if (signal && signal.aborted) throw { code: 'cancelled' }; throw { code: 'api_error', message: String(e && e.message || e) }; }
+    } catch (e) {
+      if (signal && signal.aborted) throw { code: 'cancelled' };
+      if (retryable) return apiCall(op, payload, signal, 1);
+      throw { code: 'api_error', message: String(e && e.message || e) };
+    }
     let data = null; try { data = await res.json(); } catch (e) { data = null; }
+    if (res.status === 503 && data && data.error === 'worker_recycling') {
+      if (!retryable) throw { code: 'worker_recycling' };
+      await waitFor(Math.min(30000, Math.max(1000, Number(data.retryAfterMs) || 5000)), signal);
+      return apiCall(op, payload, signal, 1);
+    }
+    if (res.status === 546 && retryable) return apiCall(op, payload, signal, 1);
     if (res.status === 429) throw { code: 'rate_limited' };
     if (res.status === 503 && data && data.error === 'api_not_configured') throw { code: 'api_not_configured' };
     if (res.status === 503 && data && data.error === 'quota_unavailable') throw { code: 'quota_unavailable' };
@@ -1222,7 +1244,7 @@
       } catch (e) {
         if (e && e.code === 'api_not_configured') return withCoverage(retrievalOnly(sources));
         /* Modelo indisponível no momento: mostra os trechos encontrados com um aviso honesto, em vez de só um erro. */
-        if (e && ['upstream', 'upstream_timeout', 'api_error', 'internal'].includes(e.code)) return withCoverage(retrievalOnly(relevanceFallback ? sources : fallbackSelection(context.searchQuestion, sources), 'oficial.modelUnavailable'));
+        if (e && ['upstream', 'upstream_timeout', 'api_error', 'internal', 'worker_recycling'].includes(e.code)) return withCoverage(retrievalOnly(relevanceFallback ? sources : fallbackSelection(context.searchQuestion, sources), 'oficial.modelUnavailable'));
         throw e;
       }
     }

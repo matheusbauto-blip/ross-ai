@@ -12,6 +12,8 @@
      ROSS_ANSWER_MODEL        opcional (padrão gemini-3.5-flash)
      ROSS_HELPER_MODEL        opcional (padrão gemini-3.1-flash-lite)
      ROSS_ANSWER_FALLBACK_MODEL / ROSS_HELPER_FALLBACK_MODEL  opcionais (padrão: um usa o outro)
+     ROSS_WORKER_LIMIT_MS     opcional, tempo de vida do servidor no plano (padrão 150000; planos pagos: 400000)
+     ROSS_HEDGE               opcional, "off" desliga o modelo alternativo em paralelo
      ROSS_IP_DAILY_LIMIT      opcional (padrão 40 pedidos por IP por dia)
      ROSS_GLOBAL_DAILY_LIMIT  opcional (padrão 1000 pedidos por dia no total)
      ROSS_SALT                opcional, usado para não guardar o IP em claro */
@@ -31,6 +33,18 @@ const HELPER_MODEL = Deno.env.get("ROSS_HELPER_MODEL") ?? "gemini-3.1-flash-lite
 const ANSWER_FALLBACK_MODEL = Deno.env.get("ROSS_ANSWER_FALLBACK_MODEL") ?? HELPER_MODEL;
 const HELPER_FALLBACK_MODEL = Deno.env.get("ROSS_HELPER_FALLBACK_MODEL") ?? ANSWER_MODEL;
 const TRANSIENT_STATUS = new Set([408, 429, 500, 502, 503, 504]);
+/* O Supabase encerra cada servidor (worker) depois de 150 s de vida no plano gratuito (400 s nos pagos), mesmo no meio
+   de um pedido, e um mesmo servidor atende vários pedidos em sequência. Os prazos das chamadas ao modelo respeitam o
+   tempo que resta; sem tempo suficiente, o pedido é recusado na hora para o app tentar de novo em um servidor novo. */
+const WORKER_STARTED = Date.now();
+const WORKER_LIMIT_MS = Number(Deno.env.get("ROSS_WORKER_LIMIT_MS") ?? "") || 150_000;
+const workerRemaining = () => WORKER_LIMIT_MS - (Date.now() - WORKER_STARTED);
+// Quando o modelo principal demora, o alternativo começa em paralelo; vale a primeira resposta válida.
+const HEDGE_ENABLED = Deno.env.get("ROSS_HEDGE") !== "off";
+const BUDGET = {
+  prepare: { perCallMs: 15_000, totalMs: 25_000, hedgeAfterMs: 8_000, minRemainingMs: 15_000 },
+  answer: { perCallMs: 60_000, totalMs: 85_000, hedgeAfterMs: 35_000, minRemainingMs: 40_000 },
+};
 const IP_LIMIT = Number(Deno.env.get("ROSS_IP_DAILY_LIMIT") ?? "40");
 const GLOBAL_LIMIT = Number(Deno.env.get("ROSS_GLOBAL_DAILY_LIMIT") ?? "1000");
 const ALLOWED_ORIGINS = (Deno.env.get("ROSS_ALLOWED_ORIGINS") ?? "https://matheusbauto-blip.github.io,https://ross-ai-leis.swirlingcurl2.chatgpt.site,http://localhost:8766,http://localhost:8765")
@@ -256,29 +270,52 @@ function systemPrompt(lang: string, grounded: boolean) {
   ].join("\n\n");
 }
 
-/* Tenta os modelos em ordem, com uma nova tentativa por modelo em falhas passageiras, dentro de um prazo total.
-   Uma chamada que já esgotou o tempo não é repetida no mesmo modelo. */
+/* Tenta os modelos dentro de um prazo total que cabe no tempo de vida restante do servidor: uma nova tentativa por
+   modelo em falhas passageiras (não depois de tempo esgotado); o alternativo começa quando o principal falha ou, com
+   o paralelo ligado, quando ele passa de hedgeAfterMs. A chamada que perde é cancelada. Só status e tempo vão para o
+   registro, nunca o conteúdo. */
 type GenerateOptions = { system: string; parts: Array<{ text: string } | { inlineData: { mimeType: string; data: string } }>; schema: unknown; maxTokens: number };
-async function generate(models: string[], options: GenerateOptions, apiKey: string, perCallMs: number, budgetMs: number) {
-  const deadline = Date.now() + budgetMs;
-  let last: unknown = null;
+type Budget = { perCallMs: number; totalMs: number; hedgeAfterMs: number; minRemainingMs: number };
+async function generate(models: string[], options: GenerateOptions, apiKey: string, budget: Budget) {
+  const deadline = Date.now() + Math.min(budget.totalMs, workerRemaining() - 5_000);
   const list = models.filter((model, index) => model && models.indexOf(model) === index);
-  for (const [index, model] of list.entries()) {
+  const controllers = list.map(() => new AbortController());
+  async function attemptModel(index: number) {
+    const model = list[index]; let last: unknown = null;
     for (let attempt = 0; attempt < 2; attempt++) {
       const remaining = deadline - Date.now();
-      if (remaining < 5_000) break;
+      if (remaining < 3_000) break;
+      const started = Date.now();
       try {
-        const result = await generateGemini({ apiKey, model, timeoutMs: Math.min(perCallMs, remaining), ...options });
+        const result = await generateGemini({ apiKey, model, timeoutMs: Math.min(budget.perCallMs, remaining), signal: controllers[index].signal, ...options });
         return index > 0 ? { ...result, fallback: true } : result;
       } catch (e) {
         last = e;
-        if (!(e instanceof GeminiError) || !TRANSIENT_STATUS.has(e.status)) throw e;
-        if (e.status === 504) break;
+        if (!controllers[index].signal.aborted) console.warn("gemini", model, e instanceof GeminiError ? e.status : "erro", Date.now() - started);
+        if (!(e instanceof GeminiError) || !TRANSIENT_STATUS.has(e.status) || e.status === 504) throw e;
         await new Promise((resolve) => setTimeout(resolve, 1_000));
       }
     }
+    throw last ?? new GeminiError(504);
   }
-  throw last ?? new GeminiError(503);
+  return await new Promise<Record<string, unknown>>((resolve, reject) => {
+    let finished = false, pending = 0, next = 0, lastError: unknown = null, timer: ReturnType<typeof setTimeout> | null = null;
+    const finish = (fn: () => void) => { if (finished) return; finished = true; if (timer) clearTimeout(timer); controllers.forEach((c) => c.abort()); fn(); };
+    const startNext = () => {
+      if (finished || next >= list.length) return;
+      const index = next++; pending++;
+      attemptModel(index).then((result) => finish(() => resolve(result)), (e) => {
+        pending--;
+        if (index === 0 || !lastError) lastError = e;
+        const transient = e instanceof GeminiError && TRANSIENT_STATUS.has(e.status);
+        if (!transient && next === 1) return finish(() => reject(e));
+        if (next < list.length) startNext();
+        else if (pending === 0) finish(() => reject(lastError ?? new GeminiError(504)));
+      });
+    };
+    startNext();
+    if (HEDGE_ENABLED && list.length > 1) timer = setTimeout(startNext, budget.hedgeAfterMs);
+  });
 }
 
 /* ---------- operações ---------- */
@@ -290,7 +327,7 @@ async function opPrepare(apiKey: string, body: Record<string, unknown>) {
     schema: z.toJSONSchema(PrepareSchema),
     system: "You prepare searches of Brazilian law. The bundled catalog is only a starting collection; the searchable library is broader. Suggestions are search clues, never verified citations. Reply only with the JSON requested.",
     parts: [{ text: `Question (Portuguese): ${question}\nJurisdiction: ${str(body.jurisdiction,120) || 'Brasil'}\n\nBundled laws (id: name):\n${catalog}\n\nReturn: "terms" = 4 to 8 Portuguese legal search terms (single words or short phrases as used in statutes); "laws" = up to 3 relevant bundled catalog ids; "references" = up to 4 additional or explicitly requested Brazilian legislative references, including laws OUTSIDE the bundled catalog, ONLY when confident about their identity. Each reference has type (lei, lei complementar, decreto-lei, decreto, medida provisoria, emenda constitucional, resolucao or portaria), number (digits as string), year (four-digit year or null). Empty arrays when uncertain. Do not confuse a bill with an enacted law, an article number with a law number, or invent a number to fill the list.` }],
-  }, apiKey, 25_000, 45_000);
+  }, apiKey, BUDGET.prepare);
   if (response.error) return response;
   const parsed = PrepareSchema.safeParse(response.data);
   if (!parsed.success) return { error: "invalid_json" };
@@ -331,7 +368,7 @@ async function opAnswer(apiKey: string, body: Record<string, unknown>) {
     schema: z.toJSONSchema(AnswerSchema),
     system: systemPrompt(lang, grounded),
     parts: content,
-  }, apiKey, 70_000, 110_000);
+  }, apiKey, BUDGET.answer);
   if (response.error) return response;
   const parsed = AnswerSchema.safeParse(response.data);
   if (!parsed.success) return { error: "invalid_json" };
@@ -425,6 +462,10 @@ Deno.serve(async (req: Request) => {
     }
   }
   if (op !== "prepare" && op !== "answer") return json(400, { error: "unknown_op" }, origin);
+
+  // Sem tempo de vida suficiente neste servidor, recusa já (sem gastar cota) para o app tentar em um servidor novo.
+  const remaining = workerRemaining();
+  if (remaining < BUDGET[op].minRemainingMs) return json(503, { error: "worker_recycling", retryAfterMs: Math.max(0, remaining) + 1_500 }, origin);
 
   // Chamadas pagas ao modelo exigem o controle de uso: se ele não puder ser verificado, nada é enviado.
   const quota = await checkQuota(req, false, true);
