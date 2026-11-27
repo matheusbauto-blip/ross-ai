@@ -1160,7 +1160,88 @@
      (references) e artigos superados que não devem ser usados naquele assunto (exclude). A ordem importa: a primeira
      rota que reconhece a pergunta vale. Os trechos foram conferidos nos textos oficiais de data/laws. */
   const RENT = /\b(?:alug\w*|locac\w*|inquilin\w*|locador\w*|locatari\w*)\b/;
+  // Pergunta sobre a lei de outro país: nenhuma rota de lei brasileira se aplica.
+  const FOREIGN = /\b(?:portugal|estados unidos|eua|exterior|estrangeir\w*|outro pais|italia|espanha|franca|alemanha|argentina|japao|inglaterra|canada)\b/;
   const TOPICS = [
+    /* Ofensa por raça ou cor: injúria racial da Lei 7.716 (2 a 5 anos); o art. 140 do Código Penal ficou para as outras
+       injúrias. Vem primeiro: "fui xingado no trabalho" com ofensa racista é crime, não só motivo de rescisão. */
+    { id: 'injuria-racial', test: (q) => /\b(?:racis\w*|racial|raca|cor da pele|macaco|etnia)\b/.test(q),
+      laws: ['l7716'],
+      terms: 'injuriar alguém ofendendo-lhe a dignidade ou o decoro em razão de raça cor etnia ou procedência nacional reclusão de dois a cinco anos',
+      focus: { l7716: [/injuriar alguem, ofendendo-lhe a dignidade ou o decoro, em razao de raca/] },
+      exclude: { del2848: ['140'] } },
+    /* Acidente de trabalho e humilhação no emprego vêm antes da demissão: "posso ser demitido?" não é sobre verbas. */
+    { id: 'acidente-trabalho', test: (q) => /\bacidente (?:de|do|no) trabalho\b|\bacidente de trajeto\b/.test(q),
+      laws: ['l8213', 'del5452'],
+      terms: 'acidente do trabalho estabilidade doze meses manutenção do contrato de trabalho cessação do auxílio-doença acidentário',
+      focus: { l8213: [/tem garantida, pelo prazo minimo de doze meses, a manutencao do seu contrato de trabalho/] } },
+    { id: 'rescisao-indireta', test: (q) => /\b(?:humilh\w*|assedi\w*|rescisao indireta|rigor excessivo|xing\w*|grita\w*|ofend\w*)\b/.test(q) && /\b(?:chefe|patrao|patroa|empresa|gerente|supervisor\w*|encarregad\w*|emprego|trabalho|superior)\b/.test(q),
+      laws: ['del5452'],
+      terms: 'rescisão indireta considerar rescindido o contrato pleitear a devida indenização rigor excessivo ato lesivo da honra e boa fama',
+      focus: { del5452: [/o empregado podera considerar rescindido o contrato e pleitear a devida indenizacao/] } },
+    { id: 'intervalo', test: (q) => /\b(?:intervalo|almoco|refeicao)\b/.test(q) && /\b(?:trabalh\w*|empresa|jornada|horas?|expediente)\b/.test(q),
+      laws: ['del5452'],
+      terms: 'intervalo para repouso ou alimentação no mínimo uma hora não poderá exceder duas horas trabalho contínuo seis horas',
+      focus: { del5452: [/e obrigatoria a concessao de um intervalo para repouso ou alimentacao/] } },
+    { id: 'divorcio', test: (q) => /\bdivorci\w*/.test(q),
+      laws: ['cf88', 'l13105', 'l10406'],
+      terms: 'divórcio casamento civil dissolvido escritura pública divórcio consensual filhos incapazes',
+      focus: { cf88: [/o casamento civil pode ser dissolvido pelo divorcio/], l13105: [/o divorcio consensual, a separacao consensual e a extincao consensual de uniao estavel/] } },
+    { id: 'uniao-estavel', test: (q) => /\buniao estavel\b|\b(?:moro|moramos|vivo|vivemos|morando)\b.{0,20}\b(?:junto|juntos|com (?:o |a )?(?:meu|minha) (?:namorad|companheir)\w*)/.test(q),
+      laws: ['l10406', 'l9278'],
+      terms: 'união estável convivência pública contínua duradoura constituição de família comunhão parcial de bens contrato escrito companheiros',
+      focus: { l10406: [/configurada na convivencia publica, continua e duradoura/, /salvo contrato escrito entre os companheiros/] } },
+    { id: 'inventario', test: (q) => /\binventario\b|\bpartilha\b/.test(q),
+      laws: ['l13105', 'l10406'],
+      terms: 'inventário partilha instaurado dentro de dois meses abertura da sucessão doze meses escritura pública todos capazes e concordes',
+      focus: { l13105: [/deve ser instaurado dentro de 2 \(dois\) meses/, /se todos forem capazes e concordes, o inventario e a partilha poderao ser feitos por escritura publica/] } },
+    { id: 'heranca', test: (q) => /\b(?:heranca|herdeir\w*|herdar|herda|testamento|deixar (?:os |meus )?bens)\b/.test(q) && !FOREIGN.test(q),
+      laws: ['l10406'],
+      terms: 'sucessão legítima descendentes em concorrência com o cônjuge ascendentes herdeiros necessários metade da herança legítima testador',
+      focus: { l10406: [/a sucessao legitima defere-se na ordem seguinte/, /o testador so podera dispor da metade da heranca/, /sao herdeiros necessarios os descendentes, os ascendentes e o conjuge/, /pertence aos herdeiros necessarios, de pleno direito, a metade dos bens/] },
+      focusLimit: 3 },
+    { id: 'prescricao-divida', test: (q) => /\b(?:divida|debito|cobranc\w*|nome sujo|negativad\w*)\b/.test(q) && /\b(?:prescri\w*|caduc\w*|(?:\d+|cinco|seis|sete|oito|nove|dez) anos(?: atras)?|antiga|velha)\b/.test(q),
+      laws: ['l8078', 'l10406'],
+      terms: 'prescrição cinco anos dívidas líquidas cobrança cadastros informações negativas período superior a cinco anos proteção ao crédito',
+      focus: { l8078: [/nao podendo conter informacoes negativas referentes a periodo superior a cinco anos/, /consumada a prescricao relativa a cobranca de debitos do consumidor/], l10406: [/a pretensao de cobranca de dividas liquidas constantes de instrumento publico ou particular/] } },
+    { id: 'venda-casada', test: (q) => /\bvenda casada\b|\bso (?:libera|aprova|vende|faz|empresta|instala)\b.{0,60}\bse (?:eu )?(?:contratar|comprar|fizer|assinar|levar)\b|\bobrigad[oa] a (?:contratar|comprar|levar)\b/.test(q),
+      laws: ['l8078'],
+      terms: 'prática abusiva condicionar o fornecimento de produto ou de serviço ao fornecimento de outro produto ou serviço venda casada',
+      focus: { l8078: [/condicionar o fornecimento de produto ou de servico ao fornecimento de outro produto ou servico/] } },
+    { id: 'superendividamento', test: (q) => /\bsuperendivid\w*|\b(?:muitas|tantas|varias) dividas\b|\bnao consigo pagar\b.{0,50}\bdividas?\b|\bdividas?\b.{0,60}\bnao (?:consigo|da para|da pra) pagar\b/.test(q),
+      laws: ['l8078'],
+      terms: 'superendividamento mínimo existencial repactuação de dívidas plano de pagamento prazo máximo de cinco anos audiência conciliatória credores',
+      focus: { l8078: [/entende-se por superendividamento a impossibilidade manifesta/, /o juiz podera instaurar processo de repactuacao de dividas/] } },
+    { id: 'cobranca-vexatoria', test: (q) => /\bcobran\w*|\bcobra(?:r|m|ndo)?\b/.test(q) && /\b(?:trabalho|colegas|vizinhos|parentes|familia|expo\w*|constrang\w*|ameac\w*|humilh\w*|vergonha|ridiculo|madrugada)\b/.test(q),
+      laws: ['l8078'],
+      terms: 'cobrança de débitos consumidor inadimplente exposto a ridículo constrangimento ameaça interfira com seu trabalho descanso ou lazer',
+      focus: { l8078: [/o consumidor inadimplente nao sera exposto a ridiculo/, /que exponha o consumidor, injustificadamente, a ridiculo ou interfira com seu trabalho/] } },
+    { id: 'condominio-taxa', test: (q) => /\bcondominio\b/.test(q) && /\b(?:atras\w*|multa|juros|devendo|nao paguei|inadimpl\w*|taxa)\b/.test(q),
+      laws: ['l10406', 'l4591'],
+      terms: 'condômino que não pagar a sua contribuição multa de até dois por cento juros moratórios correção monetária',
+      focus: { l10406: [/o condomino que nao pagar a sua contribuicao ficara sujeito/] } },
+    { id: 'idoso-transporte', test: (q) => /\b(?:idos[oa]s?|terceira idade|(?:6\d|7\d|8\d|9\d) anos)\b/.test(q) && /\b(?:onibus|transporte|passagem|metro|trem|lotacao)\b/.test(q),
+      laws: ['l10741'],
+      terms: 'gratuidade dos transportes coletivos públicos urbanos e semiurbanos maiores de sessenta e cinco anos documento pessoal prova de sua idade',
+      focus: { l10741: [/aos maiores de 65 \(sessenta e cinco\) anos fica assegurada a gratuidade dos transportes coletivos/] } },
+    { id: 'idoso-abandono', test: (q) => /\b(?:idos[oa]s?|terceira idade)\b/.test(q) && /\b(?:abandon\w*|maus[ -]tratos|neglig\w*|largad[oa]s?)\b/.test(q),
+      laws: ['l10741'],
+      terms: 'abandonar a pessoa idosa em hospitais casas de saúde entidades de longa permanência não prover suas necessidades básicas detenção',
+      focus: { l10741: [/abandonar a pessoa idosa em hospitais, casas de saude/] } },
+    /* O art. 60 do ECA (14 anos) é anterior à Emenda 20/1998: a idade mínima hoje é a da Constituição, 16 anos. */
+    { id: 'trabalho-infantil', test: (q) => /\b(?:filh[oa]s?|adolescentes?|menor(?:es)?|criancas?|jove(?:m|ns)|garot[oa]s?)\b/.test(q) && /\b(?:trabalh\w*|emprego|aprendiz\w*)\b/.test(q) && /\b(?:1[0-7]|quatorze|catorze|quinze|dezesseis|dezessete) anos\b|\bmenor de idade\b|\bidade (?:minima|para trabalhar)\b/.test(q),
+      laws: ['cf88', 'l8069', 'del5452'],
+      terms: 'proibição de trabalho noturno perigoso ou insalubre a menores de dezoito qualquer trabalho a menores de dezesseis anos aprendiz a partir de quatorze anos',
+      focus: { cf88: [/qualquer trabalho a menores de dezesseis anos, salvo na condicao de aprendiz, a partir de quatorze anos/] },
+      exclude: { l8069: ['60'] } },
+    { id: 'castigo-fisico', test: (q) => /\b(?:bater|bate|palmadas?|chinelad\w*|surra|castigo fisico|castigar|apanhar)\b/.test(q) && /\b(?:filh\w*|criancas?|entead\w*|net[oa]s?|adolescentes?)\b/.test(q) && !/\b(?:marido|esposo|companheiro|namorado|ex)\b/.test(q),
+      laws: ['l8069', 'l14344'],
+      terms: 'castigo físico tratamento cruel ou degradante educados e cuidados conselho tutelar advertência encaminhamento programa de proteção à família',
+      focus: { l8069: [/tem o direito de ser educados e cuidados sem o uso de castigo fisico/, /estarao sujeitos, sem prejuizo de outras sancoes cabiveis, as seguintes medidas/] } },
+    { id: 'usucapiao', test: (q) => /\busucapi\w*/.test(q) || /\b(?:moro|morando|vivo|ocupo|ocupando)\b.{0,80}\b(?:nao e (?:minha|meu)|sem escritura|sem documento|de outra pessoa|abandonad\w*|ninguem reclam\w*)\b/.test(q),
+      laws: ['cf88', 'l10406', 'l6015'],
+      terms: 'usucapião área urbana de até duzentos e cinquenta metros quadrados cinco anos ininterruptamente sem oposição moradia não seja proprietário de outro imóvel',
+      focus: { cf88: [/aquele que possuir como sua area urbana de ate duzentos e cinquenta metros quadrados/], l10406: [/aquele que possuir, como sua, area urbana de ate duzentos e cinquenta metros quadrados/] } },
     { id: 'gestante', test: (q) => /\b(?:gravid[ao]s?|gestante|gravidez)\b/.test(q) && /\b(?:trabalh\w*|emprego|empresa|demit\w*|demissao|dispens\w*|mandad[oa]|mandaram|despedid\w*|estabilidade|patrao|chefe|contrat\w*)\b/.test(q),
       laws: ['del5452', 'cf88'],
       terms: 'gestante gravidez confirmação estado de gravidez estabilidade provisória cinco meses após o parto aviso prévio',
@@ -1304,17 +1385,50 @@
   /* Trecho de um artigo longo: a primeira linha, as linhas que a rota do assunto aponta (sempre) e as linhas com termos
      da pergunta, até o limite de tamanho. Sem isso, num artigo como o 5º da Constituição as linhas certas (ex.: "permanecer
      calado") podiam ficar de fora do trecho enviado. */
+  /* Nível de cada linha de um artigo: caput ou texto solto (0), parágrafo (1), inciso (2), alínea (3). */
+  const lineLevel = (ln) => /^\s*(?:§|par[aá]grafo [uú]nico)/i.test(ln) ? 1 : /^\s*[IVXLC]+\s*[-–—]/.test(ln) ? 2 : /^\s*[a-z]\)/.test(ln) ? 3 : 0;
+  /* Trecho de um artigo longo: o caput; as linhas de foco da rota, com o parágrafo a que pertencem e as alíneas que
+     elas anunciam; e, até o limite, as linhas com as palavras mais raras da pergunta, da mais pertinente para a menos.
+     Com foco, o limite é menor: o modelo recebe o que decide a pergunta, não os incisos vizinhos (no art. 59 da Lei do
+     Inquilinato, os outros oito casos de liminar escondiam o da falta de pagamento). */
+  const FOCUSED_EXCERPT_CHARS = 1600;
   function excerptFor(article, qTokens, maxChars, focus) {
     if (article.text.length <= maxChars) return article.text;
     const lines = article.text.split('\n');
     const normed = lines.map((ln) => norm(ln).replace(/\s+/g, ' '));
-    const keep = [0];
-    if (focus) normed.forEach((ln, i) => { if (i && focus.some((pattern) => pattern.test(ln))) keep.push(i); });
-    let size = keep.reduce((n, i) => n + lines[i].length + 1, 0);
-    lines.forEach((ln, i) => { if (i && !keep.includes(i) && qTokens.some((tk) => normed[i].includes(tk)) && size + ln.length < maxChars) { keep.push(i); size += ln.length + 1; } });
-    keep.sort((x, y) => x - y);
+    // Palavras de cada linha: um radical da pergunta conta só no começo da palavra ("hora" não está em "penhora").
+    const words = normed.map((ln) => ' ' + ln.replace(/[^a-z0-9]+/g, ' '));
+    const has = (i, tk) => words[i].includes(' ' + tk);
+    const levels = lines.map(lineLevel);
+    const parentOf = (i) => { if (!levels[i]) return 0; for (let j = i - 1; j > 0; j--) if (levels[j] && levels[j] < levels[i]) return j; return 0; };
+    const keep = new Set([0]);
+    let size = lines[0].length + 1;
+    const add = (i) => { for (let j = i; j > 0 && !keep.has(j); j = parentOf(j)) { keep.add(j); size += lines[j].length + 1; } };
+    const focused = (focus || []).length ? normed.map((ln, i) => i > 0 && focus.some((pattern) => pattern.test(ln))) : [];
+    focused.forEach((hit, i) => {
+      if (!hit) return;
+      add(i);
+      // A linha que anuncia uma lista ("incluídos:"), mesmo seguida de nota de redação, leva junto as alíneas.
+      if (/:\s*(?:\([^)]*\)\s*)*$/.test(lines[i])) for (let j = i + 1; j < lines.length && levels[j] > levels[i]; j++) add(j);
+    });
+    const hasFocus = focused.some(Boolean);
+    const limit = hasFocus ? Math.min(maxChars, FOCUSED_EXCERPT_CHARS) : maxChars;
+    const weight = new Map(qTokens.map((tk) => { const df = lines.filter((ln, i) => has(i, tk)).length; return [tk, df ? Math.log(1 + lines.length / df) : 0]; }));
+    // Perto de uma linha de foco (até 3 linhas), o peso dobra: os incisos vizinhos costumam tratar do mesmo assunto.
+    const near = (i) => focused.some((hit, j) => hit && Math.abs(i - j) <= 3);
+    const scores = lines.map((ln, i) => (i ? qTokens.reduce((n, tk) => n + (has(i, tk) ? weight.get(tk) : 0), 0) * (!focused[i] && near(i) ? 2 : 1) : 0));
+    /* Com foco, só entram as linhas quase tão pertinentes quanto a melhor das outras e com ao menos um terço da força da
+       linha de foco; as que só repetem "trabalho", "locação" ou "ação" ficam de fora. */
+    const best = (pick) => Math.max.apply(null, scores.filter((score, i) => pick(i)).concat(0));
+    const floor = hasFocus ? Math.max(best((i) => !focused[i]) / 2, best((i) => focused[i]) / 3) : 0;
+    const ranked = scores.map((score, i) => ({ i, score })).filter((x) => x.i > 0 && x.score > 0 && x.score >= floor && !keep.has(x.i)).sort((a, b) => b.score - a.score || a.i - b.i);
+    for (const { i } of ranked) {
+      let extra = 0; for (let j = i; j > 0 && !keep.has(j); j = parentOf(j)) extra += lines[j].length + 1;
+      if (size + extra <= limit) add(i);
+    }
+    const order = Array.from(keep).sort((x, y) => x - y);
     let out = '', last = -1;
-    for (const i of keep) { if (out && i - last > 1) out += '\n[…]'; out += (out ? '\n' : '') + lines[i]; last = i; }
+    for (const i of order) { if (out && i - last > 1) out += '\n[…]'; out += (out ? '\n' : '') + lines[i]; last = i; }
     if (last < lines.length - 1) out += '\n[…]';
     return out.length > maxChars + 800 ? out.slice(0, maxChars + 800) + '…' : out;
   }
