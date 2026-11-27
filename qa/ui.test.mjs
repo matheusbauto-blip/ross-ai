@@ -1087,3 +1087,10 @@ test('the letter is offered only when the next step is a written complaint, and 
   failing.document.querySelector('[data-letter-panel] [data-letter]').click(); await settle();
   assert.match(failing.document.querySelector('[data-letter-body]').value, /SEU NOME/);
 });
+
+test('a letter returned as one block of text gets its own lines for subject, greeting and closing', async t => {
+  const { api, document } = letterApp(t, { answer: complaintAnswer, letter: { suitable: true, body: 'Recife, [DATA]. Assunto: Desistência. Prezados senhores, desisto da compra. Atenciosamente, [SEU NOME]', citations: [], notes: [] } });
+  await api.submitMessage('Comprei pela internet e quero desistir. Posso?');
+  document.querySelector('[data-letter]').click(); await settle();
+  assert.equal(document.querySelector('[data-letter-body]').value, 'Recife, [DATA].\n\nAssunto: Desistência.\n\nPrezados senhores,\n\ndesisto da compra.\n\nAtenciosamente,\n\n[SEU NOME]');
+});

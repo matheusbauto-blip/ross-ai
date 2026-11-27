@@ -330,8 +330,8 @@ img { max-width: 100%; }
 .letter-meta dt { color: var(--muted); font-weight: 600; }
 .letter-meta dd { margin: 0; color: var(--fg); overflow-wrap: anywhere; }
 .letter-fill-title { font-size: var(--fs-sm); font-weight: 600; color: var(--fg); }
-.letter-chips { display: flex; flex-wrap: wrap; gap: 6px; padding: 0; list-style: none; }
-.letter-chips li { padding: 2px 10px; border-radius: 999px; background: var(--accent-soft); color: var(--accent-ink); font-size: var(--fs-xs); font-weight: 600; line-height: 1.6; }
+.ans-sec .letter-chips { display: flex; flex-direction: row; flex-wrap: wrap; gap: 6px; padding: 0; list-style: none; }
+.ans-sec .letter-chips li { padding: 2px 10px; border-radius: 999px; background: var(--accent-soft); color: var(--accent-ink); font-size: var(--fs-xs); font-weight: 600; line-height: 1.6; }
 .letter-label { font-size: var(--fs-sm); font-weight: 600; color: var(--fg); margin-top: 4px; }
 .letter-text { width: 100%; box-sizing: border-box; padding: 10px 12px; border: 1px solid var(--border-strong); border-radius: var(--radius-xs); background: var(--bg); color: var(--fg); font: inherit; font-size: var(--fs-sm); line-height: 1.55; resize: vertical; }
 .letter-text:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
