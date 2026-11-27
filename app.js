@@ -719,9 +719,18 @@
       'Reply with ONLY one JSON object: {"suitable":boolean,"reason":string,"recipient":string,"subject":string,"body":string,"shortText":string (at most 900 characters, for a Procon form),"citations":[{"ref":number,"article":string}],"notes":[string] (up to 4 tips on sending and keeping proof)}.'
     ].join('\n\n'), { modelTier: 'default' });
   }
+  /* Uma carta que chegue num bloco só ganha as quebras mínimas: assunto, saudação e despedida em linhas próprias. */
+  function letterLayout(body) {
+    if (/\n/.test(body)) return body;
+    return body
+      .replace(/\s*\b(Assunto|Ref(?:er[eê]ncia)?)\s*:/, '\n\n$1:')
+      .replace(/\s*\b((?:Prezad[oa]s?|Car[oa]s?|Ilustr[ií]ssim[oa]s?)(?:\s+[^\s,.:]+){0,3}\s*[,:])\s*/, '\n\n$1\n\n')
+      .replace(/\s*\b(Atenciosamente|Cordialmente|Respeitosamente)\b[,.]?\s*/, '\n\n$1,\n\n')
+      .replace(/^\s+/, '');
+  }
   function normalizeLetter(data, excerpts) {
     const text = (v, max) => (typeof v === 'string' ? v : '').slice(0, max);
-    const body = text(data && data.body, 8000).trim();
+    const body = letterLayout(text(data && data.body, 8000).trim());
     if (!body) throw { code: 'invalid_json' };
     const refs = new Set(excerpts.map((e) => e.n));
     return {
