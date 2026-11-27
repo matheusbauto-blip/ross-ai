@@ -1154,11 +1154,23 @@
     const escaped = value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     return new RegExp('(^|[^a-z0-9])' + escaped + '($|[^a-z0-9])').test(norm(text).replace(/\s+/g, ' '));
   }
-  function searchIntent(question) {
-    const q = norm(question);
-    /* Demissão: as verbas estão espalhadas em quatro leis (CLT, FGTS, seguro-desemprego e 13º); sem esta regra a busca
-       fica só na CLT e a resposta sai incompleta. */
-    if (/\b(?:demitid[oa]s?|demissao|demitiram|demitir|dispensad[oa]s?|despedid[oa]s?|mandad[oa]s? embora|mandaram embora|mandou embora|desligad[oa]s? da empresa|verbas rescisorias|rescisao do (?:meu )?contrato de trabalho|acerto (?:trabalhista|da rescisao))\b/.test(q)) return {
+  /* Rotas por assunto: para perguntas comuns, garantem que os artigos que decidem o caso cheguem à explicação, mesmo
+     quando o preparo por IA falha. Cada rota diz quais leis carregar (laws), termos extras de busca (terms), trechos
+     que acompanham a seleção (focus, expressões sobre o texto sem acentos), referências do acervo completo
+     (references) e artigos superados que não devem ser usados naquele assunto (exclude). A ordem importa: a primeira
+     rota que reconhece a pergunta vale. Os trechos foram conferidos nos textos oficiais de data/laws. */
+  const RENT = /\b(?:alug\w*|locac\w*|inquilin\w*|locador\w*|locatari\w*)\b/;
+  const TOPICS = [
+    { id: 'gestante', test: (q) => /\b(?:gravid[ao]s?|gestante|gravidez)\b/.test(q) && /\b(?:trabalh\w*|emprego|empresa|demit\w*|demissao|dispens\w*|mandad[oa]|mandaram|despedid\w*|estabilidade|patrao|chefe|contrat\w*)\b/.test(q),
+      laws: ['del5452', 'cf88'],
+      terms: 'gestante gravidez confirmação estado de gravidez estabilidade provisória cinco meses após o parto aviso prévio',
+      focus: { del5452: [/confirmacao do estado de gravidez advindo no curso do contrato/], cf88: [/da empregada gestante, desde a confirmacao da gravidez/] } },
+    { id: 'domestica', test: (q) => /\b(?:domestic[oa]s?|diarista|baba|caseir[oa])\b/.test(q) && !/violencia domestica/.test(q),
+      laws: ['lcp150'],
+      terms: 'empregado doméstico duração do trabalho horas diárias semanais hora extraordinária FGTS fundo de garantia',
+      focus: { lcp150: [/duracao normal do trabalho domestico/, /inclusao do empregado domestico no fundo de garantia/] } },
+    { id: 'demissao', test: (q) => /\b(?:demitid[oa]s?|demissao|demitiram|demitir|dispensad[oa]s?|despedid[oa]s?|mandad[oa]s? embora|mandaram embora|mandou embora|desligad[oa]s? da empresa|verbas rescisorias|rescisao do (?:meu )?contrato de trabalho|acerto (?:trabalhista|da rescisao))\b/.test(q),
+      /* As verbas estão espalhadas em quatro leis (CLT, FGTS, seguro-desemprego e 13º). */
       laws: ['del5452', 'l8036', 'l7998', 'l4090'],
       terms: 'rescisão contrato de trabalho verbas rescisórias aviso prévio férias proporcionais gratificação décimo terceiro FGTS quarenta por cento despedida sem justa causa seguro-desemprego',
       focus: {
@@ -1167,28 +1179,97 @@
         l7998: [/tera direito a percepcao do seguro-desemprego/],
         l4090: [/ocorrendo rescisao, sem justa causa/],
       },
-      focusLimit: 7,
-    };
-    const collision = /\b(?:batida|batidas|bateram|bateu|bati|bater|colisao|colisoes|abalroamento|engavetamento)\b/.test(q);
-    const vehicle = /\b(?:carro|carros|veiculo|veiculos|moto|motocicleta|caminhao|traseira|para-choque)\b/.test(q);
-    if (!(collision && vehicle) && !/\bengavetamento\b|\bacidente de transito\b/.test(q)) {
-      const purchase = /\b(?:comprei|compramos|adquiri|compra|loja|produto|fabricante|garantia|celular|smartphone|telefone|notebook|computador|tablet|aparelho|eletrodomestico|geladeira|fogao|televisao|tv|maquina de lavar)\b/.test(q);
-      const defect = /\b(?:defeito|defeitos|defeituos[oa]|vicio|vicios|quebrou|quebrado|estragou|estragado|pifou|falha|falhou|falhando|manchas?)\b|\b(?:deu|dando|com|apresent(?:ou|a|ando)|tem|teve) (?:um |uns |algum |varios )?probl\w{0,3}mas?\b|\bprobl\w{0,3}mas? (?:n[ao]s?|com)\b|\bparou de (?:funcionar|carregar|ligar)\b|\bnao (?:liga|funciona|carrega|pega)\b|\bpontos? (?:pretos|mortos)\b/.test(q);
-      if (purchase && defect) return {
-        laws: ['l8078'],
-        terms: 'vício qualidade produto durável fornecedor conserto reparação garantia sanar vício reclamar decadência',
-        focus: { l8078: [/vicios de qualidade ou quantidade/, /nao sendo o vicio sanado/, /reclamar pelos vicios aparentes/] },
-      };
-      return null;
-    }
-    return {
+      focusLimit: 7 },
+    { id: 'despejo', test: (q) => /\bdespej\w*/.test(q) || (RENT.test(q) && /\b(?:atras\w*|nao pag\w*|nao paga|devendo|inadimpl\w*)\b/.test(q)),
+      laws: ['l8245'],
+      terms: 'ação de despejo falta de pagamento aluguel encargos liminar desocupação evitar a rescisão pagamento do débito',
+      focus: { l8245: [/em decorrencia da falta de pagamento do aluguel e demais encargos/, /falta de pagamento de aluguel e acessorios da locacao no vencimento, estando o contrato desprovido/, /poderao evitar a rescisao da locacao efetuando/] },
+      focusLimit: 3 },
+    { id: 'caucao', test: (q) => /\bcaucao\b|\bdeposito (?:de|como|em) garantia\b|\bgarantia (?:do|de) aluguel\b/.test(q),
+      laws: ['l8245'],
+      terms: 'caução garantia locação depósito três meses de aluguel caderneta de poupança',
+      focus: { l8245: [/modalidades de garantia/, /caucao em dinheiro, que nao podera exceder/] } },
+    { id: 'saida-antecipada', test: (q) => (RENT.test(q) || /\b(?:apartamento|imovel|casa)\b/.test(q)) && /\b(?:sair|devolver|entregar|desocupar|rescindir|encerrar)\b.{0,60}\b(?:antes|fim do contrato|termino|prazo)\b|\bmulta (?:rescisoria|por sair|para sair)\b/.test(q),
+      laws: ['l8245'],
+      terms: 'devolver o imóvel antes do prazo multa pactuada proporcional transferência empregador notificação trinta dias',
+      focus: { l8245: [/pagando a multa pactuada, proporcional/, /ficara dispensado da multa se a devolucao do imovel decorrer de transferencia/] } },
+    { id: 'aumento-aluguel', test: (q) => RENT.test(q) && /\b(?:aument\w*|reajust\w*|revis\w*|subir|subiu)\b/.test(q),
+      laws: ['l8245'],
+      terms: 'novo valor do aluguel comum acordo cláusula de reajuste revisão judicial três anos preço de mercado',
+      focus: { l8245: [/e licito as partes fixar, de comum acordo, novo valor/, /apos tres anos de vigencia do contrato/] } },
+    { id: 'pensao-atrasada', test: (q) => /\b(?:pensao|alimentos|alimenticia)\b/.test(q) && /\b(?:nao (?:pag\w*|deposit\w*)|atras\w*|devendo|deve|cobrar|execu\w*|prender|pres[oa]|prisao)\b/.test(q),
+      /* A prisão por pensão segue o CPC (1 a 3 meses, art. 528); o prazo de 60 dias da Lei 5.478 (art. 19) foi superado. */
+      laws: ['l13105', 'del2848'],
+      terms: 'cumprimento de sentença prestação alimentícia intimar pagar débito três dias protestar prisão regime fechado abandono material',
+      focus: { l13105: [/mandara intimar o executado pessoalmente para, em 3 \(tres\) dias, pagar o debito/], del2848: [/deixar, sem justa causa, de prover a subsistencia/] },
+      exclude: { l5478: ['19'] } },
+    { id: 'cnh-pontos', test: (q) => /\b(?:cnh|carteira de motorista|carteira de habilitacao|habilitacao)\b/.test(q) && /\b(?:pontos?|suspen\w*|cassa\w*|perder|perco)\b/.test(q),
+      laws: ['l9503'],
+      terms: 'suspensão do direito de dirigir contagem de pontos doze meses infrações gravíssimas pontuação',
+      focus: { l9503: [/atingir, no periodo de 12 \(doze\) meses, a seguinte contagem de pontos/, /sao computados os seguintes numeros de pontos/] } },
+    { id: 'alcool-direcao', test: (q) => /\b(?:beb\w*|bebida\w*|bebad\w*|alcool\w*|embriag\w*|lei seca|bafometro|cerveja\w*)\b/.test(q) && /\b(?:dirig\w*|volante|motorista|conduz\w*|carro|moto|transito|blitz)\b/.test(q),
+      laws: ['l9503'],
+      terms: 'álcool influência dirigir embriaguez infração gravíssima suspensão do direito de dirigir capacidade psicomotora alterada',
+      focus: { l9503: [/dirigir sob a influencia de alcool/, /capacidade psicomotora alterada em razao da influencia de alcool/] } },
+    { id: 'prisao-divida', test: (q) => /\b(?:pres[oa]s?|prisao|prender|cadeia)\b/.test(q) && /\b(?:divida\w*|devendo|banco|cartao|emprestimo|financiamento|cheque|boleto|nome sujo)\b/.test(q) && !/\b(?:pensao|alimentos|alimenticia)\b/.test(q),
+      laws: ['cf88'],
+      terms: 'prisão civil por dívida obrigação alimentícia inadimplemento',
+      focus: { cf88: [/nao havera prisao civil por divida/] } },
+    { id: 'preso-flagrante', test: (q) => /\b(?:fui pres[oa]|foi pres[oa]|estou pres[oa]|fui detid[oa]|foi detid[oa]|algemad[oa])\b/.test(q) || (/\bflagrante\b/.test(q) && /\b(?:meus direitos|direitos do preso|advogad\w*|famil\w*|calad[oa]|o que (?:fazer|faco))\b/.test(q)),
+      laws: ['cf88', 'del3689'],
+      terms: 'preso informado permanecer calado assistência família advogado prisão comunicada juiz vinte e quatro horas flagrante',
+      focus: { cf88: [/o preso sera informado de seus direitos, entre os quais o de permanecer calado/, /a prisao de qualquer pessoa e o local onde se encontre serao comunicados imediatamente/], del3689: [/em ate 24 \(vinte e quatro\) horas apos a realizacao da prisao/] } },
+    { id: 'furto-roubo', test: (q) => /\bfurto\b/.test(q) && /\broubo\b/.test(q),
+      laws: ['del2848'],
+      terms: 'subtrair coisa alheia móvel grave ameaça violência pessoa reclusão',
+      focus: { del2848: [/subtrair, para si ou para outrem, coisa alheia movel/, /mediante grave ameaca ou violencia a pessoa/] } },
+    { id: 'violencia-domestica', test: (q) => /\b(?:agred\w*|agressao|apanh\w*|me bate|bate em mim|violencia domestica|medidas? protetivas?)\b/.test(q),
+      laws: ['l11340'],
+      terms: 'medidas protetivas de urgência juiz quarenta e oito horas afastamento do lar risco à vida da mulher',
+      focus: { l11340: [/cabera ao juiz, no prazo de 48 \(quarenta e oito\) horas/, /verificada a existencia de risco atual ou iminente a vida/] } },
+    { id: 'plano-saude', test: (q) => /\bplanos? de saude\b|\bconvenio medico\b|\boperadora de saude\b/.test(q) && /\b(?:urgen\w*|emergen\w*|negou|negad\w*|recus\w*|cobertura|carencia|cirurgia|internac\w*)\b/.test(q),
+      laws: ['l9656'],
+      terms: 'cobertura obrigatória urgência emergência carência vinte e quatro horas',
+      focus: { l9656: [/e obrigatoria a cobertura do atendimento nos casos/, /prazo maximo de vinte e quatro horas para a cobertura dos casos de urgencia e emergencia/] } },
+    { id: 'atraso-construtora', test: (q) => /\b(?:na planta|construtora|incorporadora|entrega das chaves|lancamento imobiliario)\b/.test(q) && /\b(?:atras\w*|nao entreg\w*|demor\w*|prazo)\b/.test(q),
+      laws: ['l4591'],
+      terms: 'entrega do imóvel prazo cento e oitenta dias resolução do contrato restituição indenização um por cento incorporadora',
+      focus: { l4591: [/entrega do imovel em ate 180 \(cento e oitenta\) dias corridos/, /indenizacao de 1% \(um por cento\) do valor efetivamente pago/] } },
+    { id: 'aposentadoria', test: (q) => /\baposent\w*/.test(q) && !/\bservidor\w*\b/.test(q),
+      /* Depois da reforma (EC 103/2019): idade mínima na Constituição (art. 201, § 7º) e tempo de contribuição na própria
+         emenda (art. 19). As regras de aposentadoria por tempo de serviço e de idade da Lei 8.213 (arts. 48 e 52 a 56)
+         ficaram superadas e levariam a uma resposta desatualizada; a pontuação do art. 29-C (95/85) também mudou com a emenda. */
+      laws: ['cf88', 'l8213'],
+      /* Os termos também escolhem os artigos da emenda no acervo: com estas palavras vêm o art. 19 (regra atual: 15 anos de
+         contribuição para mulheres e 20 para homens) e os arts. 17 e 18 (transição para quem já contribuía). */
+      terms: 'aposentadoria segurado filiado ao regime geral após a data de entrada em vigor aposentado aos 62 anos de idade se mulher 65 anos se homem 15 quinze anos 20 vinte anos de tempo de contribuição transição',
+      references: [{ type: 'emenda constitucional', number: '103', year: 2019 }],
+      focus: { cf88: [/65 \(sessenta e cinco\) anos de idade, se homem, e 62 \(sessenta e dois\) anos de idade, se mulher/],
+        acervo: [/15 \(quinze\) anos de tempo de contribuicao, se mulher, e 20 \(vinte\) anos de tempo de contribuicao, se homem/] },
+      exclude: { l8213: ['29-C', '48', '52', '53', '54', '55', '56'] } },
+    { id: 'colisao', test: (q) => (/\b(?:batida|batidas|bateram|bateu|bati|bater|colisao|colisoes|abalroamento)\b/.test(q) && /\b(?:carro|carros|veiculo|veiculos|moto|motocicleta|caminhao|traseira|para-choque)\b/.test(q)) || /\bengavetamento\b|\bacidente de transito\b/.test(q),
       laws: ['l9503', 'l10406'],
       terms: 'acidente de trânsito colisão veículo condutor distância de segurança lateral frontal negligência imprudência causar dano reparação indenização ato ilícito',
       focus: {
         l9503: [/distancia de seguranca lateral e frontal/, /dominio de .*veiculo.*atencao e cuidados/],
         l10406: [/negligencia ou imprudencia/, /por ato ilicito.*causar dano/, /fica obrigado a repara/],
-      },
-    };
+      } },
+    { id: 'defeito-produto', test: (q) => /\b(?:comprei|compramos|adquiri|compra|loja|produto|fabricante|garantia|celular|smartphone|telefone|notebook|computador|tablet|aparelho|eletrodomestico|geladeira|fogao|televisao|tv|maquina de lavar)\b/.test(q) &&
+        /\b(?:defeito|defeitos|defeituos[oa]|vicio|vicios|quebrou|quebrado|estragou|estragado|pifou|falha|falhou|falhando|manchas?)\b|\b(?:deu|dando|com|apresent(?:ou|a|ando)|tem|teve) (?:um |uns |algum |varios )?probl\w{0,3}mas?\b|\bprobl\w{0,3}mas? (?:n[ao]s?|com)\b|\bparou de (?:funcionar|carregar|ligar)\b|\bnao (?:liga|funciona|carrega|pega)\b|\bpontos? (?:pretos|mortos)\b/.test(q),
+      laws: ['l8078'],
+      terms: 'vício qualidade produto durável fornecedor conserto reparação garantia sanar vício reclamar decadência',
+      focus: { l8078: [/vicios de qualidade ou quantidade/, /nao sendo o vicio sanado/, /reclamar pelos vicios aparentes/] } },
+  ];
+  function searchIntent(question) {
+    const q = norm(question);
+    const topic = TOPICS.find((item) => item.test(q));
+    return topic ? Object.assign({ focus: {} }, topic) : null;
+  }
+  // Pergunta que cita uma norma pelo número: o preparo roda mesmo com rota de assunto, para trazer a referência citada.
+  const NAMES_LAW = /\b(?:lei|decreto|lc|lcp|emenda|ec|medida provisoria|mp|resolucao|portaria)\b(?:\s+(?:complementar|constitucional|lei))?\s*(?:n[.ºo°]*\s*)?\d/;
+  function excludedByIntent(intent, source) {
+    const list = intent && intent.exclude && intent.exclude[source.lawId];
+    return !!list && list.includes(String(source.article || '').replace(/^Art\.?\s*/, ''));
   }
   /* Com IA disponível, pede termos jurídicos para reforçar a busca (modelo rápido, resposta em cache). */
   async function expandQueryAI(question) {
@@ -1220,14 +1301,22 @@
       return ids.map((id) => state.catalog.laws.find((l) => l.id === id)).filter(Boolean).slice(0, 3);
     } catch (e) { return null; }
   }
-  function excerptFor(article, qTokens, maxChars) {
+  /* Trecho de um artigo longo: a primeira linha, as linhas que a rota do assunto aponta (sempre) e as linhas com termos
+     da pergunta, até o limite de tamanho. Sem isso, num artigo como o 5º da Constituição as linhas certas (ex.: "permanecer
+     calado") podiam ficar de fora do trecho enviado. */
+  function excerptFor(article, qTokens, maxChars, focus) {
     if (article.text.length <= maxChars) return article.text;
     const lines = article.text.split('\n');
-    const keep = [0]; lines.forEach((ln, i) => { if (i && qTokens.some((tk) => norm(ln).includes(tk))) keep.push(i); });
+    const normed = lines.map((ln) => norm(ln).replace(/\s+/g, ' '));
+    const keep = [0];
+    if (focus) normed.forEach((ln, i) => { if (i && focus.some((pattern) => pattern.test(ln))) keep.push(i); });
+    let size = keep.reduce((n, i) => n + lines[i].length + 1, 0);
+    lines.forEach((ln, i) => { if (i && !keep.includes(i) && qTokens.some((tk) => normed[i].includes(tk)) && size + ln.length < maxChars) { keep.push(i); size += ln.length + 1; } });
+    keep.sort((x, y) => x - y);
     let out = '', last = -1;
-    for (const i of keep) { if (out.length > maxChars) break; if (out && i - last > 1) out += '\n[…]'; out += (out ? '\n' : '') + lines[i]; last = i; }
+    for (const i of keep) { if (out && i - last > 1) out += '\n[…]'; out += (out ? '\n' : '') + lines[i]; last = i; }
     if (last < lines.length - 1) out += '\n[…]';
-    return out.length > maxChars ? out.slice(0, maxChars) + '…' : out;
+    return out.length > maxChars + 800 ? out.slice(0, maxChars + 800) + '…' : out;
   }
   function searchArticles(laws, question, limit, originalQuestion, characterBudget) {
     const intent = searchIntent(originalQuestion || question);
@@ -1261,7 +1350,7 @@
     });
     hits.sort((x, y) => y.score - x.score);
     const out = []; let chars = 0;
-    for (const h of hits) { if (out.length >= limit) break; const ex = excerptFor(h.a, qTokens, 2200); if (chars + ex.length > (characterBudget || 15000)) continue; chars += ex.length; out.push({ law: h.law, article: h.a, excerpt: repairEncoding(ex), score: h.score }); }
+    for (const h of hits) { if (out.length >= limit) break; const ex = excerptFor(h.a, qTokens, 2200, intent && intent.focus[h.law.id]); if (chars + ex.length > (characterBudget || 15000)) continue; chars += ex.length; out.push({ law: h.law, article: h.a, excerpt: repairEncoding(ex), score: h.score }); }
     return out;
   }
   /* Artigos que completam outros: no Código de Trânsito, o artigo da infração diz só a categoria (gravíssima, grave,
@@ -1314,11 +1403,14 @@
       .map((id) => sources[Number(id.slice(8)) - 1]).filter(Boolean).slice(0, 3)
       .map((source, index) => Object.assign({}, source, { n: index + 1 }));
   }
-  function focusSources(question, sources) {
-    const intent = searchIntent(question);
+  /* Trechos que a rota do assunto manda incluir. Recebe a rota já decidida pela pergunta atual (ou a pergunta): o
+     histórico da conversa não pode trocar de assunto (ex.: uma pergunta anterior sobre gravidez). */
+  function focusSources(questionOrIntent, sources) {
+    const intent = typeof questionOrIntent === 'string' ? searchIntent(questionOrIntent) : questionOrIntent;
     if (!intent || !intent.focus) return [];
     return sources.filter((source) => {
-      const patterns = intent.focus[source.lawId];
+      // "acervo": linhas procuradas nos trechos importados do acervo (normas fora do catálogo, como a EC 103).
+      const patterns = intent.focus[source.lawId] || (source.imported && intent.focus.acervo);
       if (!patterns || !source.excerpt) return false;
       const text = norm(source.excerpt).replace(/\s+/g, ' ');
       return patterns.some((pattern) => pattern.test(text));
@@ -1326,14 +1418,16 @@
   }
   /* Sem a verificação automática: os trechos que a intenção aponta e os mais bem pontuados pela busca de palavras. */
   // Quantos trechos de uma intenção reconhecida acompanham a seleção (a demissão precisa de mais que o padrão).
-  function focusLimit(question) { const intent = searchIntent(question); return (intent && intent.focusLimit) || 2; }
-  function fallbackSelection(question, sources) {
-    const limit = focusLimit(question);
-    const focus = focusSources(question, sources).slice(0, limit);
+  function focusLimit(intent) { return (intent && intent.focusLimit) || 2; }
+  function fallbackSelection(question, sources, intent) {
+    if (intent === undefined) intent = searchIntent(question);
+    const limit = focusLimit(intent);
+    const focus = focusSources(intent, sources).slice(0, limit);
     const rest = sources.filter((source) => !focus.includes(source)).sort((a, b) => (b.score || 0) - (a.score || 0));
     return focus.concat(rest).slice(0, Math.max(5, limit + 2)).map((source, index) => Object.assign({}, source, { n: index + 1 }));
   }
-  async function selectRelevantSources(question, query, sources, signal) {
+  async function selectRelevantSources(question, query, sources, signal, intent) {
+    if (intent === undefined) intent = searchIntent(question);
     const candidates = sources.slice(0, 200);
     const catalog = relevanceCatalog(candidates, query);
     const result = await apiCall('prepare', {
@@ -1343,7 +1437,7 @@
     const selected = validatedSelection(candidates, result.laws);
     // Quando a pergunta tem uma intenção reconhecida (ex.: produto com defeito), os artigos que a regulam
     // acompanham a seleção automática em vez de depender dela. A resposta só cita o que usar de fato.
-    const focus = focusSources(question, candidates).filter((source) => !selected.some((s) => s.lawId === source.lawId && s.article === source.article)).slice(0, focusLimit(question));
+    const focus = focusSources(intent, candidates).filter((source) => !selected.some((s) => s.lawId === source.lawId && s.article === source.article)).slice(0, focusLimit(intent));
     return selected.concat(focus).map((source, index) => Object.assign({}, source, { n: index + 1 }));
   }
   function priorTurns(conv, currentQuestion) {
@@ -1429,7 +1523,7 @@
       if (sampleFn) aiTerms = await expandQueryAI(context.searchQuestion);
       /* O preparo só reforça a busca. Com o assunto já reconhecido (ex.: produto com defeito), os termos do assunto bastam;
          nos demais casos, ele tem prazo próprio e, vencido, a busca segue sem ele. */
-      else if (API_URL && !intent) {
+      else if (API_URL && (!intent || NAMES_LAW.test(norm(context.query)))) {
         const limit = deadlineSignal(signal, MODEL_WAIT_MS.prepare);
         try { const p = await apiCall('prepare', { question: context.searchQuestion, jurisdiction: jurisdictionLabel(conv.country, conv.region), catalog: state.catalog.laws.map((l) => ({ id: l.id, name: l.name })) }, limit.signal); aiTerms = (Array.isArray(p.terms) ? p.terms : []).join(' '); references = Array.isArray(p.references) ? p.references : []; apiLaws = (Array.isArray(p.laws) ? p.laws : []).map((id) => state.catalog.laws.find((l) => l.id === id)).filter(Boolean); }
         catch (e) {
@@ -1439,6 +1533,7 @@
         } finally { limit.done(); }
       }
       const searchText = expandQuery(context.query) + ' ' + aiTerms + (intent ? ' ' + intent.terms : '');
+      if (intent && intent.references) references = references.concat(intent.references);
       if (API_URL) {
         try {
           const result = await apiCall('search', { query: searchText.slice(0, 500), originalQuery: context.query.slice(0,500), references, scope: conv.region ? '' : 'federal', uf: conv.region || '', forAnswer: true }, signal);
@@ -1475,19 +1570,19 @@
       let sources = localSources.concat(importedSources.filter((s) => {
         const key = s.url.replace(/#.*$/, '') + '|' + s.article;
         if (seen.has(key)) return false; seen.add(key); return true;
-      })).slice(0, 200).map((s, i) => Object.assign({}, s, { n: i + 1 }));
+      })).filter((s) => !excludedByIntent(intent, s)).slice(0, 200).map((s, i) => Object.assign({}, s, { n: i + 1 }));
       if (!sources.length) return withCoverage(attachments && attachments.length ? await documentWithoutLaw(text, attachments, conv, signal) : emptyOfficial());
       if (modelUnavailable || (!sampleFn && !API_URL)) return withCoverage(retrievalOnly(sources));
       let relevanceFallback = false;
       if (!sampleFn && API_URL) {
         const limit = deadlineSignal(signal, MODEL_WAIT_MS.relevance);
-        try { sources = await selectRelevantSources(context.searchQuestion, searchText, sources, limit.signal); }
+        try { sources = await selectRelevantSources(context.searchQuestion, searchText, sources, limit.signal, intent); }
         catch (e) {
           if (signal.aborted) throw { code: 'cancelled' };
           if (e && e.code === 'rate_limited') throw e;
           if (e && e.code === 'api_not_configured') return withCoverage(retrievalOnly(sources));
           /* O serviço do modelo oscilou ou demorou além do prazo: a resposta segue com os trechos de reserva e avisa como foram escolhidos. */
-          sources = fallbackSelection(context.searchQuestion, sources); relevanceFallback = true;
+          sources = fallbackSelection(context.searchQuestion, sources, intent); relevanceFallback = true;
         } finally { limit.done(); }
         if (!sources.length) return withCoverage(attachments && attachments.length ? await documentWithoutLaw(text, attachments, conv, signal) : emptyOfficial());
       } else sources = sources.slice(0, 8);
@@ -1501,7 +1596,7 @@
       } catch (e) {
         if (e && e.code === 'api_not_configured') return withCoverage(retrievalOnly(sources));
         /* Modelo indisponível no momento: mostra os trechos encontrados com um aviso honesto, em vez de só um erro. */
-        if (e && ['upstream', 'upstream_timeout', 'api_error', 'internal', 'worker_recycling'].includes(e.code)) return withCoverage(retrievalOnly(relevanceFallback ? sources : fallbackSelection(context.searchQuestion, sources), 'oficial.modelUnavailable'));
+        if (e && ['upstream', 'upstream_timeout', 'api_error', 'internal', 'worker_recycling'].includes(e.code)) return withCoverage(retrievalOnly(relevanceFallback ? sources : fallbackSelection(context.searchQuestion, sources, intent), 'oficial.modelUnavailable'));
         throw e;
       }
     }

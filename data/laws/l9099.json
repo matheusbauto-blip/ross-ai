@@ -14,8 +14,8 @@
  "sha256": "9fece9298c65cefafa49028097ef739edc9c942d5914aa73f21afb55aecf9225",
  "bytes": 89220,
  "articleCount": 99,
- "vigentes": 91,
- "revogados": 8,
+ "vigentes": 98,
+ "revogados": 1,
  "articles": [
   {
    "id": "1",
@@ -209,10 +209,10 @@
    "id": "23",
    "label": "Art. 23",
    "heading": "CAPÍTULO I › Seção VIII",
-   "text": "Art. 23. Não comparecendo o demandado, o Juiz togado proferirá sentença.\nArt. 23. Se o demandado não comparecer ou recusar-se a participar da tentativa de conciliação não presencial, o Juiz togado proferirá sentença. (Redação dada pela Lei nº 13.994, de 2020)",
-   "status": "revogado",
+   "text": "Art. 23. Se o demandado não comparecer ou recusar-se a participar da tentativa de conciliação não presencial, o Juiz togado proferirá sentença. (Redação dada pela Lei nº 13.994, de 2020)",
+   "status": "vigente",
    "nota": "Redação dada pela Lei nº 13.994, de 2020",
-   "hasHistory": false
+   "hasHistory": true
   },
   {
    "id": "24",
@@ -410,10 +410,10 @@
    "id": "48",
    "label": "Art. 48",
    "heading": "CAPÍTULO I › Seção XIII",
-   "text": "Art. 48. Caberão embargos de declaração quando, na sentença ou acórdão, houver obscuridade, contradição, omissão ou dúvida.\nArt. 48. Caberão embargos de declaração contra sentença ou acórdão nos casos previstos no Código de Processo Civil. (Redação dada pela Lei nº 13.105, de 2015) (Vigência)\nParágrafo único. Os erros materiais podem ser corrigidos de ofício.",
-   "status": "revogado",
+   "text": "Art. 48. Caberão embargos de declaração contra sentença ou acórdão nos casos previstos no Código de Processo Civil. (Redação dada pela Lei nº 13.105, de 2015) (Vigência)\nParágrafo único. Os erros materiais podem ser corrigidos de ofício.",
+   "status": "vigente",
    "nota": "Redação dada pela Lei nº 13.105, de 2015",
-   "hasHistory": false
+   "hasHistory": true
   },
   {
    "id": "49",
@@ -427,10 +427,10 @@
    "id": "50",
    "label": "Art. 50",
    "heading": "CAPÍTULO I › Seção XIII",
-   "text": "Art. 50. Quando interpostos contra sentença, os embargos de declaração suspenderão o prazo para recurso.\nArt. 50. Os embargos de declaração interrompem o prazo para a interposição de recurso. (Redação dada pela Lei nº 13.105, de 2015) (Vigência)\nDa Extinção do Processo Sem Julgamento do Mérito",
-   "status": "revogado",
+   "text": "Art. 50. Os embargos de declaração interrompem o prazo para a interposição de recurso. (Redação dada pela Lei nº 13.105, de 2015) (Vigência)\nDa Extinção do Processo Sem Julgamento do Mérito",
+   "status": "vigente",
    "nota": "Redação dada pela Lei nº 13.105, de 2015",
-   "hasHistory": false
+   "hasHistory": true
   },
   {
    "id": "51",
@@ -508,28 +508,28 @@
    "id": "60",
    "label": "Art. 60",
    "heading": "CAPÍTULO I › Seção XVII",
-   "text": "Art. 60. O Juizado Especial Criminal, provido por Juízes togados ou togados e leigos, tem competência para a conciliação, o julgamento e a execução das infrações penais de menor potencial ofensivo. (Vide Lei nº 10.259, de 2001)\nArt. 60. O Juizado Especial Criminal, provido por juízes togados ou togados e leigos, tem competência para a conciliação, o julgamento e a execução das infrações penais de menor potencial ofensivo, respeitadas as regras de conexão e continência. (Redação dada pela Lei nº 11.313, de 2006)\nParágrafo único. Na reunião de processos, perante o juízo comum ou o tribunal do júri, decorrentes da aplicação das regras de conexão e continência, observar-se-ão os institutos da transação penal e da composição dos danos civis. (Incluído pela Lei nº 11.313, de 2006)",
-   "status": "revogado",
+   "text": "Art. 60. O Juizado Especial Criminal, provido por juízes togados ou togados e leigos, tem competência para a conciliação, o julgamento e a execução das infrações penais de menor potencial ofensivo, respeitadas as regras de conexão e continência. (Redação dada pela Lei nº 11.313, de 2006)\nParágrafo único. Na reunião de processos, perante o juízo comum ou o tribunal do júri, decorrentes da aplicação das regras de conexão e continência, observar-se-ão os institutos da transação penal e da composição dos danos civis. (Incluído pela Lei nº 11.313, de 2006)",
+   "status": "vigente",
    "nota": "Redação dada pela Lei nº 11.313, de 2006",
-   "hasHistory": false
+   "hasHistory": true
   },
   {
    "id": "61",
    "label": "Art. 61",
    "heading": "CAPÍTULO I › Seção XVII",
-   "text": "Art. 61. Consideram-se infrações penais de menor potencial ofensivo, para os efeitos desta Lei, as contravenções penais e os crimes a que a lei comine pena máxima não superior a um ano, excetuados os casos em que a lei preveja procedimento especial. (Vide Lei nº 10.259, de 2001)\nArt. 61. Consideram-se infrações penais de menor potencial ofensivo, para os efeitos desta Lei, as contravenções penais e os crimes a que a lei comine pena máxima não superior a 2 (dois) anos, cumulada ou não com multa. (Redação dada pela Lei nº 11.313, de 2006)",
-   "status": "revogado",
+   "text": "Art. 61. Consideram-se infrações penais de menor potencial ofensivo, para os efeitos desta Lei, as contravenções penais e os crimes a que a lei comine pena máxima não superior a 2 (dois) anos, cumulada ou não com multa. (Redação dada pela Lei nº 11.313, de 2006)",
+   "status": "vigente",
    "nota": "Redação dada pela Lei nº 11.313, de 2006",
-   "hasHistory": false
+   "hasHistory": true
   },
   {
    "id": "62",
    "label": "Art. 62",
    "heading": "CAPÍTULO I › Seção XVII",
-   "text": "Art. 62. O processo perante o Juizado Especial orientar-se-á pelos critérios da oralidade, informalidade, economia processual e celeridade, objetivando, sempre que possível, a reparação dos danos sofridos pela vítima e a aplicação de pena não privativa de liberdade.\nArt. 62. O processo perante o Juizado Especial orientar-se-á pelos critérios da oralidade, simplicidade, informalidade, economia processual e celeridade, objetivando, sempre que possível, a reparação dos danos sofridos pela vítima e a aplicação de pena não privativa de liberdade. (Redação dada pela Lei nº 13.603, de 2018)\nDa Competência e dos Atos Processuais",
-   "status": "revogado",
+   "text": "Art. 62. O processo perante o Juizado Especial orientar-se-á pelos critérios da oralidade, simplicidade, informalidade, economia processual e celeridade, objetivando, sempre que possível, a reparação dos danos sofridos pela vítima e a aplicação de pena não privativa de liberdade. (Redação dada pela Lei nº 13.603, de 2018)\nDa Competência e dos Atos Processuais",
+   "status": "vigente",
    "nota": "Redação dada pela Lei nº 13.603, de 2018",
-   "hasHistory": false
+   "hasHistory": true
   },
   {
    "id": "63",
@@ -697,8 +697,8 @@
    "id": "83",
    "label": "Art. 83",
    "heading": "CAPÍTULO I › Seção III",
-   "text": "Art. 83. Caberão embargos de declaração quando, em sentença ou acórdão, houver obscuridade, contradição, omissão ou dúvida.\nArt. 83. Cabem embargos de declaração quando, em sentença ou acórdão, houver obscuridade, contradição ou omissão. (Redação dada pela Lei nº 13.105, de 2015) (Vigência)\n§ 1º Os embargos de declaração serão opostos por escrito ou oralmente, no prazo de cinco dias, contados da ciência da decisão.\n§ 2 o Os embargos de declaração interrompem o prazo para a interposição de recurso. (Redação dada pela Lei nº 13.105, de 2015) (Vigência)\n§ 3º Os erros materiais podem ser corrigidos de ofício.\nDa Execução",
-   "status": "revogado",
+   "text": "Art. 83. Cabem embargos de declaração quando, em sentença ou acórdão, houver obscuridade, contradição ou omissão. (Redação dada pela Lei nº 13.105, de 2015) (Vigência)\n§ 1º Os embargos de declaração serão opostos por escrito ou oralmente, no prazo de cinco dias, contados da ciência da decisão.\n§ 2 o Os embargos de declaração interrompem o prazo para a interposição de recurso. (Redação dada pela Lei nº 13.105, de 2015) (Vigência)\n§ 3º Os erros materiais podem ser corrigidos de ofício.\nDa Execução",
+   "status": "vigente",
    "nota": "Redação dada pela Lei nº 13.105, de 2015",
    "hasHistory": true
   },

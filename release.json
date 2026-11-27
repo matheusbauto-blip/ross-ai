@@ -1,10 +1,10 @@
 {
-  "version": "f6e5096241f2",
+  "version": "c5834378946a",
   "files": [
     {
       "path": "index.html",
       "bytes": 1941,
-      "sha256": "c9f0a397d7a6aca7edeae20f4e2fb53a8657268f04cd37600104712f00152711"
+      "sha256": "5ed500d245f4527e8979237f48c4ac774299131e483c85adfa65578d8281f975"
     },
     {
       "path": "styles.css",
@@ -33,18 +33,18 @@
     },
     {
       "path": "app.js",
-      "bytes": 182266,
-      "sha256": "1f1c10095083a64442179122db14f19016a99ab66ce18f6f90ca474af4571fca"
+      "bytes": 193678,
+      "sha256": "94624c784efda7314007fe41ca675760114087103b61fd33fb3e368d106d39d8"
     },
     {
       "path": "data/catalog.json",
       "bytes": 90468,
-      "sha256": "0ed4afe3d345a3bbd0caffe8230e04b9adf65407df7dce910d972830af39c2fa"
+      "sha256": "631ee02a3365a8ca40b9ca352d848257374e229174477f0d29526ba0b688aedf"
     },
     {
       "path": "data/laws/cf88.json",
-      "bytes": 797258,
-      "sha256": "d4b21d797d3f41296b4d96bdb1fb6b67c5e382f0d97752ecab0d76c23150a649"
+      "bytes": 779464,
+      "sha256": "7d0455f43fb1fb14457a6a5b067629c6e52e2947b89dfe9b472d44cd78a9640a"
     },
     {
       "path": "data/laws/l10406.json",
@@ -73,13 +73,13 @@
     },
     {
       "path": "data/laws/l9099.json",
-      "bytes": 58319,
-      "sha256": "e01f3da9849e34908d836d9361079068ec2921da8e3faededc04b07eeae28ec3"
+      "bytes": 57046,
+      "sha256": "d0acc4e61eac968eb1d728cf55faa3e87784833833438ca6fa20f745b3ebf383"
     },
     {
       "path": "data/laws/l12965.json",
-      "bytes": 39397,
-      "sha256": "42485e3b77c66c931750c2a6a37de66c6aa42399df184705247c2977583aae6c"
+      "bytes": 38757,
+      "sha256": "fce61bbc3ce2013a49f18d2b2fe013d3fb2214b8d8e63211117459a21d28f6de"
     },
     {
       "path": "data/laws/d7962.json",
@@ -88,8 +88,8 @@
     },
     {
       "path": "data/laws/l11340.json",
-      "bytes": 56195,
-      "sha256": "3309c3891c531d44d7afd818b4ef73d738a13f084d07e5370c8626a33a8edfe1"
+      "bytes": 55491,
+      "sha256": "f8748d72488ce5208a53e2b07e11cc4f4f838348acfbefabfb8aab0092fd2f5e"
     },
     {
       "path": "data/laws/del2848.json",
