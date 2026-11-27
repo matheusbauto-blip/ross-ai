@@ -28,6 +28,10 @@ Configure `GEMINI_API_KEY` (ou `GOOGLE_API_KEY`) em Supabase → Edge Functions 
 
 Tempo de resposta: o pedido de resposta chega ao app em partes (NDJSON), e o resumo aparece enquanto o modelo escreve; a resposta completa, já validada, substitui o texto parcial ao final. O raciocínio interno do modelo fica em nível baixo (`ROSS_ANSWER_THINKING` e `ROSS_HELPER_THINKING`, padrão `low`; `off` usa o padrão do modelo), porque é o que mais atrasa o início da resposta. As etapas que só reforçam a busca têm prazo próprio no app (8 s para o preparo, 10 s para a escolha dos trechos) e, vencido o prazo, a resposta segue sem elas; quando o assunto já é reconhecido (por exemplo, produto com defeito), o preparo nem é pedido. O servidor respeita o limite de 150 s de vida do plano gratuito do Supabase (`ROSS_WORKER_LIMIT_MS`) e começa o modelo alternativo em paralelo quando o principal demora (`ROSS_HEDGE=off` desliga).
 
+## Carta de reclamação
+
+Quando o próximo passo de uma resposta é reclamar por escrito (notificar a loja, registrar no Procon), o app oferece “Montar carta de reclamação”. A função (`op: "letter"`) escreve a carta só com os artigos já citados na resposta; nomes, datas, números e contatos que a pessoa não informou viram campos entre colchetes, como `[SEU NOME COMPLETO]`, preenchidos no próprio app. O texto editado fica salvo com a conversa neste navegador e não volta ao modelo. Há também uma versão curta para formulários do Procon e do consumidor.gov.br, além de copiar e baixar em `.txt`.
+
 ## Índice completo do repositório de leis
 
 Além das 66 normas distribuídas com o app e dos textos importados no banco, o site publica um índice estático de todas as normas do [ctresb/leis](https://github.com/ctresb/leis) (edição fixa): federais, estaduais, municipais, órgãos reguladores, jurisprudência e tratados. A pesquisa e as respostas usam esse índice para encontrar a norma pelo título, ementa ou número; o texto integral é lido sob demanda, com conferência de hash. Detalhes, limites e como gerar de novo: `docs/indice-repositorio.md`.
