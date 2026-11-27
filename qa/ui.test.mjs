@@ -1162,3 +1162,43 @@ test('a traffic offence brings the articles with the value of the fine and the p
   assert.ok(excerpts.some(e => e.article === 'Art. 258' && /293,47/.test(e.excerpt)), 'value of the fine');
   assert.ok(excerpts.some(e => e.article === 'Art. 259' && /gravíssima - sete pontos/.test(e.excerpt)), 'points');
 });
+
+function routeApp(t) {
+  const searches = [], answers = [];
+  const env = setup(t, async (url, options) => {
+    const local = lawFetch(String(url)); if (local) return local;
+    const body = JSON.parse(options.body);
+    if (body.op === 'search') { searches.push(body); return Response.json({ results: [] }); }
+    if (body.op === 'prepare') return Response.json({ terms: [], laws: body.catalog.some(law => /^passage-/.test(law.id)) ? ['passage-1'] : [] });
+    answers.push(body);
+    return Response.json({ answer: { kind: 'answer', summary: 'Resposta.', sourcesSay: [{ title: 'Lei', text: 'Texto.', ref: 1 }], sources: [{ ref: 1, why: 'x' }], warnings: [] } });
+  });
+  env.api.state.mode = 'oficial';
+  return Object.assign(env, { searches, answers });
+}
+const sent = body => body.excerpts.map(e => e.name + ' | ' + e.article + ' | ' + e.excerpt);
+
+test('subject routes bring the deciding articles: pregnant employee, arrest in the act and late child support', async t => {
+  const { api, answers } = routeApp(t);
+  await api.submitMessage('Estou grávida e fui demitida. A empresa pode fazer isso?');
+  let texts = sent(answers.at(-1));
+  assert.ok(texts.some(x => /Art\. 391-A/.test(x)), texts.map(x => x.slice(0, 50)).join(' / '));
+  assert.ok(texts.some(x => /gestante, desde a confirmação da gravidez até cinco meses após o parto/.test(x)));
+  await api.submitMessage('Fui preso em flagrante. Quais são os meus direitos?');
+  texts = sent(answers.at(-1));
+  assert.ok(texts.some(x => /Constituição[\s\S]*permanecer calado/.test(x)), 'the long art. 5 excerpt keeps the right line');
+  assert.ok(texts.some(x => /24 \(vinte e quatro\) horas/.test(x)));
+  await api.submitMessage('Meu ex não paga a pensão do nosso filho há 3 meses. O que posso fazer?');
+  texts = sent(answers.at(-1));
+  assert.ok(texts.some(x => /Art\. 528 \|[\s\S]*3 \(três\) dias/.test(x)));
+  assert.ok(!texts.some(x => /Lei de Alimentos \| Art\. 19 \|/.test(x) || /5\.478[^|]*\| Art\. 19 \|/.test(x)), 'the superseded 60-day rule is not sent');
+});
+
+test('a retirement question looks up the 2019 reform and never sends the superseded retirement rules', async t => {
+  const { api, searches, answers } = routeApp(t);
+  await api.submitMessage('Quanto tempo de contribuição preciso para me aposentar pelo INSS?');
+  assert.ok(searches.at(-1).references.some(r => r.number === '103' && /emenda/.test(r.type)), 'EC 103/2019 is requested from the full collection');
+  const texts = sent(answers.at(-1));
+  assert.ok(texts.some(x => /Art\. 201 \|[\s\S]*62 \(sessenta e dois\) anos de idade, se mulher/.test(x)), texts.map(x => x.slice(0, 60)).join(' / '));
+  assert.ok(!texts.some(x => /8\.213[^|]*\| Art\. (?:48|52|53|54|55|56) \|/.test(x)), 'pre-reform retirement articles are excluded');
+});

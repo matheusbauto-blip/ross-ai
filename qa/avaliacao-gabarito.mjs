@@ -1,5 +1,9 @@
 /* Conferência de uma resposta do ROSS AI com o gabarito de qa/perguntas-avaliacao.json (usada por
    qa/avaliar-respostas.mjs e pelos testes). */
+import { readFileSync } from 'node:fs';
+const catalog = JSON.parse(readFileSync(new URL('../data/catalog.json', import.meta.url), 'utf8'));
+// Número de cada norma do catálogo (ex.: l8245 → 8245; cf88 → constituicao): a mesma lei pode chegar pelo acervo importado.
+const lawNumber = Object.fromEntries(catalog.laws.map((l) => [l.id, l.type === 'constituicao' ? 'constituicao' : (String(l.number).replace(/\./g, '').match(/\d{2,}/) || [''])[0]]));
 export const norm = (text) => String(text || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
 export const artKey = (label) => norm(label).replace(/^.*?art\.?\s*/, '').replace(/[º°]/g, '').replace(/(\d)o\b/g, '$1').replace(/[.\s]/g, '');
 export function answerText(a) {
@@ -10,8 +14,9 @@ export function answerText(a) {
 export function grade(question, message, seconds) {
   if (message.status !== 'done') return { id: question.id, nota: 'erro', erro: message.error || 'sem resposta', segundos: seconds };
   const a = message.answer, text = norm(answerText(a));
-  const cited = (a.sources || []).map((s) => ({ lawId: s.lawId, name: norm(s.name), art: artKey(s.article) }));
-  const expected = question.artigos.map((e) => ({ e, ok: cited.some((c) => e.lei ? c.lawId === e.lei && c.art === artKey(e.art) : new RegExp(e.nome).test(c.name)) }));
+  const cited = (a.sources || []).map((s) => ({ lawId: s.lawId, name: norm(s.name), digits: norm(s.name).replace(/\./g, ''), art: artKey(s.article) }));
+  const sameLaw = (c, lei) => c.lawId === lei || (lawNumber[lei] && new RegExp('(^|\\D)' + lawNumber[lei] + '(\\D|$)').test(c.digits));
+  const expected = question.artigos.map((e) => ({ e, ok: cited.some((c) => e.lei ? sameLaw(c, e.lei) && c.art === artKey(e.art) : new RegExp(e.nome).test(c.name)) }));
   const points = question.pontos.map(([desc, rx]) => ({ desc, ok: new RegExp(rx).test(text) }));
   const avoided = question.evitar.filter(([, rx]) => new RegExp(rx).test(text)).map(([desc]) => desc);
   const kindOk = question.tipo.includes(a.kind);

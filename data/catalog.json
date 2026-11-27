@@ -40,8 +40,8 @@
    "retrievedAt": "2026-11-12T23:45:36.495Z",
    "sha256": "66d27ba2ad3f95238d2b36efe4f23a7c1210a6118b1c7be9a762f35d783aef1e",
    "articleCount": 422,
-   "vigentes": 346,
-   "revogados": 76,
+   "vigentes": 408,
+   "revogados": 14,
    "file": "laws/cf88.json",
    "status": "vigente",
    "versions": [
@@ -414,8 +414,8 @@
    "retrievedAt": "2026-11-12T23:45:36.664Z",
    "sha256": "9fece9298c65cefafa49028097ef739edc9c942d5914aa73f21afb55aecf9225",
    "articleCount": 99,
-   "vigentes": 91,
-   "revogados": 8,
+   "vigentes": 98,
+   "revogados": 1,
    "file": "laws/l9099.json",
    "status": "vigente",
    "versions": [
@@ -457,8 +457,8 @@
    "retrievedAt": "2026-11-12T23:45:36.667Z",
    "sha256": "936e958fb958f3c0052f2e3f2e067146edb4755c22b229a88f0c85ef9e0c78d3",
    "articleCount": 37,
-   "vigentes": 32,
-   "revogados": 5,
+   "vigentes": 33,
+   "revogados": 4,
    "file": "laws/l12965.json",
    "status": "vigente",
    "versions": [
@@ -539,8 +539,8 @@
    "retrievedAt": "2026-11-12T23:45:36.671Z",
    "sha256": "488268242fbb9247107248cd2fca73b00e7084fd6d296d193558ce1236907587",
    "articleCount": 57,
-   "vigentes": 54,
-   "revogados": 3,
+   "vigentes": 56,
+   "revogados": 1,
    "file": "laws/l11340.json",
    "status": "vigente",
    "versions": [

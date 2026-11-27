@@ -55,3 +55,19 @@ test('a forbidden statement or a wrong kind of answer is wrong, and the quoted l
   assert.equal(grade(urgent, { status: 'done', answer: { kind: 'answer', summary: 'Procure um advogado o quanto antes.', sources: [] } }, 1).nota, 'errado', 'an eviction tomorrow needs an urgent answer');
   assert.equal(grade(question, { status: 'error', error: 'limite' }, 1).nota, 'erro');
 });
+
+import { repairArticle } from '../scripts/repair-struck-headers.mjs';
+test('articles whose current wording follows the struck old one are in force (Constitution arts. 6 and 201, Maria da Penha art. 12-C)', () => {
+  const read = file => JSON.parse(readFileSync(new URL('../data/' + file, import.meta.url), 'utf8'));
+  const cf = read('laws/cf88.json'), lmp = read('laws/l11340.json');
+  for (const [law, label, start] of [[cf, 'Art. 6', 'Art. 6º São direitos sociais'], [cf, 'Art. 201', 'Art. 201. A previdência social será organizada'], [lmp, 'Art. 12-C', 'Art. 12-C. Verificada a existência de risco']]) {
+    const article = law.articles.find(a => a.label === label);
+    assert.equal(article.status, 'vigente', label);
+    assert.ok(article.text.startsWith(start), label + ' keeps only the current wording');
+  }
+  for (const entry of catalog.laws) {
+    const law = read(entry.file);
+    assert.deepEqual(law.articles.filter(a => repairArticle(structuredClone(a))).map(a => a.label), [], entry.id + ' has nothing left to repair');
+    assert.equal(entry.vigentes, law.articles.filter(a => a.status === 'vigente').length, entry.id + ' catalog count');
+  }
+});

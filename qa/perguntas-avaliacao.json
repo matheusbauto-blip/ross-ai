@@ -1,224 +1,1391 @@
 {
  "sobre": "Bateria de perguntas para avaliar as respostas do ROSS AI com o modelo e o acervo reais. Cada pergunta traz o gabarito (o que a resposta certa precisa dizer), os artigos que deveriam ser citados e o que a resposta não pode afirmar. Os números do gabarito foram conferidos nos textos oficiais guardados em data/laws (capturas de 13/11/2026; a Lei 4.090 em 27/11/2026). As expressões em 'pontos' e 'evitar' são aplicadas ao texto da resposta em minúsculas e sem acentos. 'artigos' aceita {lei, art} para normas do catálogo ou {nome} (expressão sobre o nome da norma) para normas do índice. Rodar: node qa/avaliar-respostas.mjs (ver o cabeçalho do script).",
  "perguntas": [
-  {"id": "consumidor-arrependimento", "area": "Consumidor", "pergunta": "Comprei um tênis pela internet há 5 dias e não gostei. Posso devolver e receber o dinheiro de volta?", "tipo": ["answer"],
-   "artigos": [{"lei": "l8078", "art": "49"}],
-   "pontos": [["prazo de 7 dias", "\\b(7|sete) dias"], ["contado do recebimento", "receb"], ["devolução do que foi pago", "devolv|devolu|restitu|reembols|dinheiro de volta"]],
-   "evitar": [["prazo errado de 30 dias para desistir", "(30|trinta) dias para (desistir|se arrepender|devolver)"]],
-   "gabarito": "Sim. Compra fora da loja física dá 7 dias, contados do recebimento, para desistir sem justificar; a loja devolve de imediato tudo o que foi pago, corrigido (CDC, art. 49)."},
-  {"id": "consumidor-defeito-geladeira", "area": "Consumidor", "pergunta": "Comprei uma geladeira que parou de funcionar em 20 dias. O que posso fazer?", "tipo": ["answer"],
-   "artigos": [{"lei": "l8078", "art": "18"}, {"lei": "l8078", "art": "26"}],
-   "pontos": [["30 dias para consertar", "\\b(30|trinta) dias"], ["troca", "troca|substitui"], ["dinheiro de volta", "dinheiro de volta|restitui|devolu"], ["abatimento", "abatimento|desconto|reducao (proporcional )?do preco"], ["90 dias para reclamar", "\\b(90|noventa) dias"]],
+  {
+   "id": "consumidor-arrependimento",
+   "area": "Consumidor",
+   "pergunta": "Comprei um tênis pela internet há 5 dias e não gostei. Posso devolver e receber o dinheiro de volta?",
+   "tipo": [
+    "answer"
+   ],
+   "artigos": [
+    {
+     "lei": "l8078",
+     "art": "49"
+    }
+   ],
+   "pontos": [
+    [
+     "prazo de 7 dias",
+     "\\b(7|sete) dias"
+    ],
+    [
+     "contado do recebimento",
+     "receb"
+    ],
+    [
+     "devolução do que foi pago",
+     "devolv|devolu|restitu|reembols|dinheiro de volta"
+    ]
+   ],
+   "evitar": [
+    [
+     "prazo errado de 30 dias para desistir",
+     "(30|trinta) dias para (desistir|se arrepender|devolver)"
+    ]
+   ],
+   "gabarito": "Sim. Compra fora da loja física dá 7 dias, contados do recebimento, para desistir sem justificar; a loja devolve de imediato tudo o que foi pago, corrigido (CDC, art. 49)."
+  },
+  {
+   "id": "consumidor-defeito-geladeira",
+   "area": "Consumidor",
+   "pergunta": "Comprei uma geladeira que parou de funcionar em 20 dias. O que posso fazer?",
+   "tipo": [
+    "answer"
+   ],
+   "artigos": [
+    {
+     "lei": "l8078",
+     "art": "18"
+    },
+    {
+     "lei": "l8078",
+     "art": "26"
+    }
+   ],
+   "pontos": [
+    [
+     "30 dias para consertar",
+     "\\b(30|trinta) dias"
+    ],
+    [
+     "troca",
+     "troca|substitui"
+    ],
+    [
+     "dinheiro de volta",
+     "dinheiro de volta|restitui|devolu"
+    ],
+    [
+     "abatimento",
+     "abatimento|desconto|reducao (proporcional )?do preco"
+    ],
+    [
+     "90 dias para reclamar",
+     "\\b(90|noventa) dias"
+    ]
+   ],
    "evitar": [],
-   "gabarito": "A loja/fabricante tem até 30 dias para consertar; se não resolver, a pessoa escolhe troca, dinheiro de volta ou abatimento (art. 18). Produto essencial pode permitir isso de imediato (art. 18, § 3º). Prazo para reclamar: 90 dias para bens duráveis (art. 26)."},
-  {"id": "consumidor-cobranca-em-dobro", "area": "Consumidor", "pergunta": "Paguei uma cobrança que eu não devia. Tenho direito a receber em dobro?", "tipo": ["answer"],
-   "artigos": [{"lei": "l8078", "art": "42"}],
-   "pontos": [["em dobro", "dobro"], ["correção e juros", "correcao|juros"], ["exceção do engano justificável", "engano justificavel|erro justificavel"]],
+   "gabarito": "A loja/fabricante tem até 30 dias para consertar; se não resolver, a pessoa escolhe troca, dinheiro de volta ou abatimento (art. 18). Produto essencial pode permitir isso de imediato (art. 18, § 3º). Prazo para reclamar: 90 dias para bens duráveis (art. 26)."
+  },
+  {
+   "id": "consumidor-cobranca-em-dobro",
+   "area": "Consumidor",
+   "pergunta": "Paguei uma cobrança que eu não devia. Tenho direito a receber em dobro?",
+   "tipo": [
+    "answer"
+   ],
+   "artigos": [
+    {
+     "lei": "l8078",
+     "art": "42"
+    }
+   ],
+   "pontos": [
+    [
+     "em dobro",
+     "dobro"
+    ],
+    [
+     "correção e juros",
+     "correcao|juros"
+    ],
+    [
+     "exceção do engano justificável",
+     "engano justificavel|erro justificavel"
+    ]
+   ],
    "evitar": [],
-   "gabarito": "Sim: quem foi cobrado indevidamente e pagou recebe o dobro do que pagou a mais, com correção e juros, salvo engano justificável (CDC, art. 42, parágrafo único)."},
-  {"id": "consumidor-nome-negativado", "area": "Consumidor", "pergunta": "Meu nome continua no SPC mesmo depois de eu pagar a dívida. O que posso fazer?", "tipo": ["answer"],
-   "artigos": [{"lei": "l8078", "art": "43"}],
-   "pontos": [["exigir a correção", "corrig|correcao|retirad|exclu"], ["prazo de 5 dias úteis", "\\b(5|cinco) dias uteis"]],
+   "gabarito": "Sim: quem foi cobrado indevidamente e pagou recebe o dobro do que pagou a mais, com correção e juros, salvo engano justificável (CDC, art. 42, parágrafo único)."
+  },
+  {
+   "id": "consumidor-nome-negativado",
+   "area": "Consumidor",
+   "pergunta": "Meu nome continua no SPC mesmo depois de eu pagar a dívida. O que posso fazer?",
+   "tipo": [
+    "answer"
+   ],
+   "artigos": [
+    {
+     "lei": "l8078",
+     "art": "43"
+    }
+   ],
+   "pontos": [
+    [
+     "exigir a correção",
+     "corrig|correcao|retirad|exclu"
+    ],
+    [
+     "prazo de 5 dias úteis",
+     "\\b(5|cinco) dias uteis"
+    ]
+   ],
    "evitar": [],
-   "gabarito": "Pode exigir a correção imediata do cadastro; o órgão tem 5 dias úteis para comunicar a alteração a quem recebeu a informação errada (CDC, art. 43, § 3º)."},
-  {"id": "consumidor-produto-nao-entregue", "area": "Consumidor", "pergunta": "Comprei um produto pela internet e ele nunca foi entregue. Quais são os meus direitos?", "tipo": ["answer"],
-   "artigos": [{"lei": "l8078", "art": "35"}],
-   "pontos": [["exigir a entrega", "cumprimento|exigir a entrega|entregue|entrega"], ["aceitar outro equivalente", "equivalente|outro produto"], ["cancelar com dinheiro de volta", "cancel|rescindir|rescisao|desfazer|dinheiro de volta|restitu"]],
+   "gabarito": "Pode exigir a correção imediata do cadastro; o órgão tem 5 dias úteis para comunicar a alteração a quem recebeu a informação errada (CDC, art. 43, § 3º)."
+  },
+  {
+   "id": "consumidor-produto-nao-entregue",
+   "area": "Consumidor",
+   "pergunta": "Comprei um produto pela internet e ele nunca foi entregue. Quais são os meus direitos?",
+   "tipo": [
+    "answer"
+   ],
+   "artigos": [
+    {
+     "lei": "l8078",
+     "art": "35"
+    }
+   ],
+   "pontos": [
+    [
+     "exigir a entrega",
+     "cumprimento|exigir a entrega|entregue|entrega"
+    ],
+    [
+     "aceitar outro equivalente",
+     "equivalente|outro produto"
+    ],
+    [
+     "cancelar com dinheiro de volta",
+     "cancel|rescindir|rescisao|desfazer|dinheiro de volta|restitu"
+    ]
+   ],
    "evitar": [],
-   "gabarito": "Se a loja não cumpre a oferta, a pessoa escolhe: exigir a entrega, aceitar outro produto equivalente ou cancelar e receber o dinheiro de volta, corrigido, com perdas e danos (CDC, art. 35)."},
-  {"id": "consumidor-servico-internet", "area": "Consumidor", "pergunta": "A internet que eu contratei está sem funcionar há uma semana. O que posso exigir da operadora?", "tipo": ["answer"],
-   "artigos": [{"lei": "l8078", "art": "20"}],
-   "pontos": [["refazer o serviço", "reexecu|refazer|restabelec|consert|corrig|normaliz"], ["dinheiro de volta", "restitui|dinheiro de volta|devolu|reembols"], ["abatimento", "abatimento|desconto|reducao"]],
+   "gabarito": "Se a loja não cumpre a oferta, a pessoa escolhe: exigir a entrega, aceitar outro produto equivalente ou cancelar e receber o dinheiro de volta, corrigido, com perdas e danos (CDC, art. 35)."
+  },
+  {
+   "id": "consumidor-servico-internet",
+   "area": "Consumidor",
+   "pergunta": "A internet que eu contratei está sem funcionar há uma semana. O que posso exigir da operadora?",
+   "tipo": [
+    "answer"
+   ],
+   "artigos": [
+    {
+     "lei": "l8078",
+     "art": "20"
+    }
+   ],
+   "pontos": [
+    [
+     "refazer o serviço",
+     "reexecu|refazer|restabelec|consert|corrig|normaliz"
+    ],
+    [
+     "dinheiro de volta",
+     "restitui|dinheiro de volta|devolu|reembols"
+    ],
+    [
+     "abatimento",
+     "abatimento|desconto|reducao"
+    ]
+   ],
    "evitar": [],
-   "gabarito": "Serviço com defeito: a pessoa escolhe entre refazer o serviço sem custo, devolução do que pagou ou abatimento proporcional do preço (CDC, art. 20)."},
-
-  {"id": "trabalho-demissao-sem-justa-causa", "area": "Trabalho", "pergunta": "Fui demitido sem justa causa. Quais verbas eu tenho direito de receber?", "tipo": ["answer"],
-   "artigos": [{"lei": "del5452", "art": "477"}, {"lei": "del5452", "art": "487"}, {"lei": "l8036", "art": "18"}, {"lei": "l7998", "art": "3"}, {"lei": "l4090", "art": "3"}],
-   "pontos": [["aviso prévio", "aviso previo"], ["férias", "ferias"], ["13º proporcional", "13|decimo terceiro|gratificacao natalina"], ["multa de 40% do FGTS", "40 ?%|quarenta por cento"], ["saque do FGTS", "fgts"], ["seguro-desemprego", "seguro.desemprego"], ["prazo de 10 dias para pagar", "\\b(10|dez) dias"]],
+   "gabarito": "Serviço com defeito: a pessoa escolhe entre refazer o serviço sem custo, devolução do que pagou ou abatimento proporcional do preço (CDC, art. 20)."
+  },
+  {
+   "id": "trabalho-demissao-sem-justa-causa",
+   "area": "Trabalho",
+   "pergunta": "Fui demitido sem justa causa. Quais verbas eu tenho direito de receber?",
+   "tipo": [
+    "answer"
+   ],
+   "artigos": [
+    {
+     "lei": "del5452",
+     "art": "477"
+    },
+    {
+     "lei": "del5452",
+     "art": "487"
+    },
+    {
+     "lei": "l8036",
+     "art": "18"
+    },
+    {
+     "lei": "l7998",
+     "art": "3"
+    },
+    {
+     "lei": "l4090",
+     "art": "3"
+    }
+   ],
+   "pontos": [
+    [
+     "aviso prévio",
+     "aviso previo"
+    ],
+    [
+     "férias",
+     "ferias"
+    ],
+    [
+     "13º proporcional",
+     "13|decimo terceiro|gratificacao natalina"
+    ],
+    [
+     "multa de 40% do FGTS",
+     "40 ?%|quarenta por cento"
+    ],
+    [
+     "saque do FGTS",
+     "fgts"
+    ],
+    [
+     "seguro-desemprego",
+     "seguro.desemprego"
+    ],
+    [
+     "prazo de 10 dias para pagar",
+     "\\b(10|dez) dias"
+    ]
+   ],
    "evitar": [],
-   "gabarito": "Aviso prévio (CLT, art. 487), férias vencidas e proporcionais (art. 146), 13º proporcional (Lei 4.090, art. 3º), multa de 40% sobre o FGTS e saque da conta (Lei 8.036, arts. 18 e 20), seguro-desemprego se cumprir os requisitos (Lei 7.998, art. 3º); pagamento em até 10 dias do fim do contrato (CLT, art. 477, § 6º)."},
-  {"id": "trabalho-pedido-de-demissao", "area": "Trabalho", "pergunta": "Pedi demissão. Tenho direito ao FGTS e ao seguro-desemprego?", "tipo": ["answer", "clarify"],
-   "artigos": [{"lei": "l7998", "art": "3"}],
-   "pontos": [["sem seguro-desemprego", "(nao|sem direito|nao tem).{0,80}seguro.desemprego|seguro.desemprego.{0,80}(nao|apenas|so) "], ["sem a multa de 40%", "(nao|sem).{0,60}(multa|40 ?%|quarenta)|multa.{0,60}(apenas|so|somente) (quando|na|em caso de) (demissao|despedida|dispensa)"]],
-   "evitar": [["dizer que recebe a multa de 40%", "(tem direito|recebe|recebera|vai receber)( a| ao)? (multa de 40|40 ?%|quarenta por cento)"]],
-   "gabarito": "Quem pede demissão não recebe a multa de 40% nem saca o FGTS (a lei prevê isso para dispensa pelo empregador sem justa causa) e não tem seguro-desemprego, que é para o trabalhador dispensado sem justa causa (Lei 7.998, art. 3º). Deve dar aviso prévio (CLT, art. 487)."},
-  {"id": "trabalho-jornada-hora-extra", "area": "Trabalho", "pergunta": "Quantas horas por dia posso trabalhar e quanto vale a hora extra?", "tipo": ["answer"],
-   "artigos": [{"lei": "del5452", "art": "58"}, {"lei": "del5452", "art": "59"}],
-   "pontos": [["8 horas por dia", "\\b(8|oito) horas"], ["no máximo 2 horas extras", "\\b(2|duas) horas"], ["adicional de 50%", "50 ?%|cinquenta por cento"]],
+   "gabarito": "Aviso prévio (CLT, art. 487), férias vencidas e proporcionais (art. 146), 13º proporcional (Lei 4.090, art. 3º), multa de 40% sobre o FGTS e saque da conta (Lei 8.036, arts. 18 e 20), seguro-desemprego se cumprir os requisitos (Lei 7.998, art. 3º); pagamento em até 10 dias do fim do contrato (CLT, art. 477, § 6º)."
+  },
+  {
+   "id": "trabalho-pedido-de-demissao",
+   "area": "Trabalho",
+   "pergunta": "Pedi demissão. Tenho direito ao FGTS e ao seguro-desemprego?",
+   "tipo": [
+    "answer",
+    "clarify"
+   ],
+   "artigos": [
+    {
+     "lei": "l7998",
+     "art": "3"
+    }
+   ],
+   "pontos": [
+    [
+     "sem seguro-desemprego",
+     "(nao|sem direito|nao tem).{0,80}seguro.desemprego|seguro.desemprego.{0,80}(nao|apenas|so) "
+    ],
+    [
+     "sem multa de 40% nem saque do FGTS",
+     "(nao|sem).{0,80}(multa|40 ?%|quarenta|saque|sacar|fgts)"
+    ]
+   ],
+   "evitar": [
+    [
+     "dizer que recebe a multa de 40%",
+     "(tem direito|recebe|recebera|vai receber)( a| ao)? (multa de 40|40 ?%|quarenta por cento)"
+    ]
+   ],
+   "gabarito": "Quem pede demissão não recebe a multa de 40% nem saca o FGTS (a lei prevê isso para dispensa pelo empregador sem justa causa) e não tem seguro-desemprego, que é para o trabalhador dispensado sem justa causa (Lei 7.998, art. 3º). Deve dar aviso prévio (CLT, art. 487)."
+  },
+  {
+   "id": "trabalho-jornada-hora-extra",
+   "area": "Trabalho",
+   "pergunta": "Quantas horas por dia posso trabalhar e quanto vale a hora extra?",
+   "tipo": [
+    "answer"
+   ],
+   "artigos": [
+    {
+     "lei": "del5452",
+     "art": "58"
+    },
+    {
+     "lei": "del5452",
+     "art": "59"
+    }
+   ],
+   "pontos": [
+    [
+     "8 horas por dia",
+     "\\b(8|oito) horas"
+    ],
+    [
+     "no máximo 2 horas extras",
+     "\\b(2|duas) horas"
+    ],
+    [
+     "adicional de 50%",
+     "50 ?%|cinquenta por cento"
+    ]
+   ],
    "evitar": [],
-   "gabarito": "Jornada normal de até 8 horas diárias (CLT, art. 58), com até 2 horas extras por dia, pagas com pelo menos 50% a mais (art. 59 e § 1º)."},
-  {"id": "trabalho-gestante-demitida", "area": "Trabalho", "pergunta": "Estou grávida e fui demitida. A empresa pode fazer isso?", "tipo": ["answer", "urgent"],
-   "artigos": [{"lei": "del5452", "art": "391-A"}, {"lei": "cf88", "art": "10"}],
-   "pontos": [["estabilidade", "estabilidade"], ["até 5 meses após o parto", "\\b(5|cinco) meses"], ["vale mesmo no aviso prévio", "aviso previo"]],
-   "evitar": [["dizer que a demissão é permitida", "(empresa|empregador) pode (sim )?(te )?demitir"]],
-   "gabarito": "Não, sem justa causa: a gestante tem estabilidade desde a confirmação da gravidez até 5 meses após o parto (ADCT, art. 10, II, b), inclusive se a gravidez for confirmada durante o aviso prévio (CLT, art. 391-A)."},
-  {"id": "trabalho-domestica-direitos", "area": "Trabalho", "pergunta": "Empregada doméstica tem direito a FGTS e a hora extra?", "tipo": ["answer"],
-   "artigos": [{"lei": "lcp150", "art": "21"}, {"lei": "lcp150", "art": "2"}],
-   "pontos": [["tem FGTS", "fgts"], ["hora extra com 50%", "50 ?%|cinquenta por cento"], ["jornada de 8 horas / 44 semanais", "\\b(8|oito) horas|\\b44\\b|quarenta e quatro"]],
+   "gabarito": "Jornada normal de até 8 horas diárias (CLT, art. 58), com até 2 horas extras por dia, pagas com pelo menos 50% a mais (art. 59 e § 1º)."
+  },
+  {
+   "id": "trabalho-gestante-demitida",
+   "area": "Trabalho",
+   "pergunta": "Estou grávida e fui demitida. A empresa pode fazer isso?",
+   "tipo": [
+    "answer",
+    "urgent"
+   ],
+   "artigos": [
+    {
+     "lei": "del5452",
+     "art": "391-A"
+    },
+    {
+     "lei": "cf88",
+     "art": "10"
+    }
+   ],
+   "pontos": [
+    [
+     "estabilidade",
+     "estabilidade"
+    ],
+    [
+     "até 5 meses após o parto",
+     "\\b(5|cinco) meses"
+    ],
+    [
+     "vale mesmo no aviso prévio",
+     "aviso previo"
+    ]
+   ],
+   "evitar": [
+    [
+     "dizer que a demissão é permitida",
+     "(empresa|empregador) pode (sim )?(te )?demitir"
+    ]
+   ],
+   "gabarito": "Não, sem justa causa: a gestante tem estabilidade desde a confirmação da gravidez até 5 meses após o parto (ADCT, art. 10, II, b), inclusive se a gravidez for confirmada durante o aviso prévio (CLT, art. 391-A)."
+  },
+  {
+   "id": "trabalho-domestica-direitos",
+   "area": "Trabalho",
+   "pergunta": "Empregada doméstica tem direito a FGTS e a hora extra?",
+   "tipo": [
+    "answer"
+   ],
+   "artigos": [
+    {
+     "lei": "lcp150",
+     "art": "21"
+    },
+    {
+     "lei": "lcp150",
+     "art": "2"
+    }
+   ],
+   "pontos": [
+    [
+     "tem FGTS",
+     "fgts"
+    ],
+    [
+     "hora extra com 50%",
+     "50 ?%|cinquenta por cento"
+    ],
+    [
+     "jornada de 8 horas / 44 semanais",
+     "\\b(8|oito) horas|\\b44\\b|quarenta e quatro"
+    ]
+   ],
    "evitar": [],
-   "gabarito": "Sim. O FGTS é obrigatório para doméstica (LC 150, art. 21); a jornada é de 8 horas diárias e 44 semanais, com hora extra paga com pelo menos 50% a mais (art. 2º e § 1º)."},
-  {"id": "trabalho-ferias", "area": "Trabalho", "pergunta": "Quantos dias de férias eu tenho por ano?", "tipo": ["answer"],
-   "artigos": [{"lei": "del5452", "art": "130"}],
-   "pontos": [["30 dias", "\\b(30|trinta) dias"], ["faltas reduzem", "falta"]],
+   "gabarito": "Sim. O FGTS é obrigatório para doméstica (LC 150, art. 21); a jornada é de 8 horas diárias e 44 semanais, com hora extra paga com pelo menos 50% a mais (art. 2º e § 1º)."
+  },
+  {
+   "id": "trabalho-ferias",
+   "area": "Trabalho",
+   "pergunta": "Quantos dias de férias eu tenho por ano?",
+   "tipo": [
+    "answer"
+   ],
+   "artigos": [
+    {
+     "lei": "del5452",
+     "art": "130"
+    }
+   ],
+   "pontos": [
+    [
+     "30 dias",
+     "\\b(30|trinta) dias"
+    ],
+    [
+     "faltas reduzem",
+     "falta"
+    ]
+   ],
    "evitar": [],
-   "gabarito": "Após cada 12 meses de contrato, 30 dias corridos se não houver mais de 5 faltas; com mais faltas injustificadas, o período diminui (CLT, art. 130). O adicional de 1/3 vem da Constituição (art. 7º, XVII)."},
-
-  {"id": "moradia-despejo-atraso", "area": "Moradia", "pergunta": "O inquilino atrasou o aluguel. Quando posso pedir o despejo?", "tipo": ["answer"],
-   "artigos": [{"lei": "l8245", "art": "9"}, {"lei": "l8245", "art": "59"}, {"lei": "l8245", "art": "62"}],
-   "pontos": [["falta de pagamento já permite", "falta de pagamento|atras"], ["liminar", "liminar|urgente|rapid"], ["inquilino pode evitar pagando", "pagar.{0,60}(divida|debito|atrasad|tudo)|purga|evitar o despejo"]],
+   "gabarito": "Após cada 12 meses de contrato, 30 dias corridos se não houver mais de 5 faltas; com mais faltas injustificadas, o período diminui (CLT, art. 130). O adicional de 1/3 vem da Constituição (art. 7º, XVII)."
+  },
+  {
+   "id": "moradia-despejo-atraso",
+   "area": "Moradia",
+   "pergunta": "O inquilino atrasou o aluguel. Quando posso pedir o despejo?",
+   "tipo": [
+    "answer"
+   ],
+   "artigos": [
+    {
+     "lei": "l8245",
+     "art": "9"
+    },
+    {
+     "lei": "l8245",
+     "art": "59"
+    },
+    {
+     "lei": "l8245",
+     "art": "62"
+    }
+   ],
+   "pontos": [
+    [
+     "falta de pagamento já permite",
+     "falta de pagamento|atras"
+    ],
+    [
+     "liminar",
+     "liminar|urgente|rapid"
+    ],
+    [
+     "inquilino pode evitar pagando",
+     "pagar.{0,60}(divida|debito|atrasad|tudo)|purga|evitar o despejo"
+    ]
+   ],
    "evitar": [],
-   "gabarito": "Não há prazo de espera: a falta de pagamento já autoriza a ação de despejo (Lei 8.245, art. 9º, III), que pode vir com cobrança e permite ao inquilino evitar o despejo pagando tudo (art. 62); sem garantia no contrato, cabe liminar (art. 59, § 1º, IX)."},
-  {"id": "moradia-multa-saida-antecipada", "area": "Moradia", "pergunta": "Quero sair do apartamento alugado antes do fim do contrato. Tenho que pagar multa?", "tipo": ["answer"],
-   "artigos": [{"lei": "l8245", "art": "4"}],
-   "pontos": [["multa proporcional", "proporcional"], ["isenção por transferência do emprego", "transfer"], ["aviso de 30 dias", "\\b(30|trinta) dias"]],
+   "gabarito": "Não há prazo de espera: a falta de pagamento já autoriza a ação de despejo (Lei 8.245, art. 9º, III), que pode vir com cobrança e permite ao inquilino evitar o despejo pagando tudo (art. 62); sem garantia no contrato, cabe liminar (art. 59, § 1º, IX)."
+  },
+  {
+   "id": "moradia-multa-saida-antecipada",
+   "area": "Moradia",
+   "pergunta": "Quero sair do apartamento alugado antes do fim do contrato. Tenho que pagar multa?",
+   "tipo": [
+    "answer"
+   ],
+   "artigos": [
+    {
+     "lei": "l8245",
+     "art": "4"
+    }
+   ],
+   "pontos": [
+    [
+     "multa proporcional",
+     "proporcional"
+    ],
+    [
+     "isenção por transferência do emprego",
+     "transfer"
+    ],
+    [
+     "aviso de 30 dias",
+     "\\b(30|trinta) dias"
+    ]
+   ],
    "evitar": [],
-   "gabarito": "Sim, a multa do contrato, proporcional ao tempo que falta (Lei 8.245, art. 4º); fica dispensado se for transferido pelo empregador para outra cidade e avisar por escrito com 30 dias de antecedência (parágrafo único)."},
-  {"id": "moradia-preferencia-compra", "area": "Moradia", "pergunta": "O dono vai vender o imóvel que eu alugo. Tenho preferência para comprar?", "tipo": ["answer"],
-   "artigos": [{"lei": "l8245", "art": "27"}, {"lei": "l8245", "art": "28"}],
-   "pontos": [["tem preferência", "preferencia"], ["mesmas condições de terceiros", "mesmas condicoes|igualdade de condicoes|mesmo preco"], ["30 dias para responder", "\\b(30|trinta) dias"]],
+   "gabarito": "Sim, a multa do contrato, proporcional ao tempo que falta (Lei 8.245, art. 4º); fica dispensado se for transferido pelo empregador para outra cidade e avisar por escrito com 30 dias de antecedência (parágrafo único)."
+  },
+  {
+   "id": "moradia-preferencia-compra",
+   "area": "Moradia",
+   "pergunta": "O dono vai vender o imóvel que eu alugo. Tenho preferência para comprar?",
+   "tipo": [
+    "answer"
+   ],
+   "artigos": [
+    {
+     "lei": "l8245",
+     "art": "27"
+    },
+    {
+     "lei": "l8245",
+     "art": "28"
+    }
+   ],
+   "pontos": [
+    [
+     "tem preferência",
+     "preferencia"
+    ],
+    [
+     "mesmas condições de terceiros",
+     "mesmas condicoes|igualdade de condicoes|mesmo preco"
+    ],
+    [
+     "30 dias para responder",
+     "\\b(30|trinta) dias"
+    ]
+   ],
    "evitar": [],
-   "gabarito": "Sim: o inquilino tem preferência para comprar nas mesmas condições oferecidas a terceiros (Lei 8.245, art. 27) e precisa aceitar a proposta por inteiro em 30 dias (art. 28)."},
-  {"id": "moradia-caucao", "area": "Moradia", "pergunta": "O proprietário pediu 6 meses de aluguel como caução. Ele pode exigir isso?", "tipo": ["answer"],
-   "artigos": [{"lei": "l8245", "art": "38"}],
-   "pontos": [["limite de 3 meses", "\\b(3|tres) meses"], ["depósito em poupança", "poupanca"]],
+   "gabarito": "Sim: o inquilino tem preferência para comprar nas mesmas condições oferecidas a terceiros (Lei 8.245, art. 27) e precisa aceitar a proposta por inteiro em 30 dias (art. 28)."
+  },
+  {
+   "id": "moradia-caucao",
+   "area": "Moradia",
+   "pergunta": "O proprietário pediu 6 meses de aluguel como caução. Ele pode exigir isso?",
+   "tipo": [
+    "answer"
+   ],
+   "artigos": [
+    {
+     "lei": "l8245",
+     "art": "38"
+    }
+   ],
+   "pontos": [
+    [
+     "limite de 3 meses",
+     "\\b(3|tres) meses"
+    ],
+    [
+     "depósito em poupança",
+     "poupanca"
+    ]
+   ],
    "evitar": [],
-   "gabarito": "Não: a caução em dinheiro não pode passar de 3 meses de aluguel e deve ser depositada em poupança, com os rendimentos para o inquilino (Lei 8.245, art. 38, § 2º)."},
-  {"id": "moradia-aumento-aluguel", "area": "Moradia", "pergunta": "O dono do imóvel pode aumentar o aluguel quando quiser?", "tipo": ["answer"],
-   "artigos": [{"lei": "l8245", "art": "19"}],
-   "pontos": [["não pode sozinho", "nao pode|nao e permitido|nao, "], ["revisão na justiça após 3 anos", "\\b(3|tres) anos"], ["acordo entre as partes", "acordo|combina"]],
+   "gabarito": "Não: a caução em dinheiro não pode passar de 3 meses de aluguel e deve ser depositada em poupança, com os rendimentos para o inquilino (Lei 8.245, art. 38, § 2º)."
+  },
+  {
+   "id": "moradia-aumento-aluguel",
+   "area": "Moradia",
+   "pergunta": "O dono do imóvel pode aumentar o aluguel quando quiser?",
+   "tipo": [
+    "answer"
+   ],
+   "artigos": [
+    {
+     "lei": "l8245",
+     "art": "19"
+    }
+   ],
+   "pontos": [
+    [
+     "não pode sozinho",
+     "nao pode|nao e permitido|nao, "
+    ],
+    [
+     "revisão na justiça após 3 anos",
+     "\\b(3|tres) anos"
+    ],
+    [
+     "acordo entre as partes",
+     "acordo|combina"
+    ]
+   ],
    "evitar": [],
-   "gabarito": "Não por conta própria: o valor muda por acordo ou pelo reajuste previsto no contrato; sem acordo, a revisão judicial ao preço de mercado só pode ser pedida após 3 anos (Lei 8.245, arts. 18 e 19)."},
-
-  {"id": "familia-pensao-atrasada", "area": "Família", "pergunta": "Meu ex não paga a pensão do nosso filho há 3 meses. O que posso fazer?", "tipo": ["answer"],
-   "artigos": [{"lei": "l13105", "art": "528"}],
-   "pontos": [["intimação para pagar em 3 dias", "\\b(3|tres) dias"], ["prisão civil", "prisao|preso"], ["protesto", "protest"]],
+   "gabarito": "Não por conta própria: o valor muda por acordo ou pelo reajuste previsto no contrato; sem acordo, a revisão judicial ao preço de mercado só pode ser pedida após 3 anos (Lei 8.245, arts. 18 e 19)."
+  },
+  {
+   "id": "familia-pensao-atrasada",
+   "area": "Família",
+   "pergunta": "Meu ex não paga a pensão do nosso filho há 3 meses. O que posso fazer?",
+   "tipo": [
+    "answer"
+   ],
+   "artigos": [
+    {
+     "lei": "l13105",
+     "art": "528"
+    }
+   ],
+   "pontos": [
+    [
+     "intimação para pagar em 3 dias",
+     "\\b(3|tres) dias"
+    ],
+    [
+     "prisão civil",
+     "prisao|preso"
+    ],
+    [
+     "protesto",
+     "protest"
+    ]
+   ],
+   "evitar": [
+    [
+     "prazo antigo de prisão de 60 dias (superado pelo CPC)",
+     "(60|sessenta) dias"
+    ]
+   ],
+   "gabarito": "Cobrança na Justiça: o devedor é intimado para pagar em 3 dias, provar que pagou ou justificar; sem isso, o juiz protesta a dívida e pode decretar prisão de 1 a 3 meses, cabível para as 3 últimas parcelas antes da ação e as que vencerem depois (CPC, art. 528)."
+  },
+  {
+   "id": "familia-guarda-compartilhada",
+   "area": "Família",
+   "pergunta": "Como funciona a guarda compartilhada?",
+   "tipo": [
+    "answer"
+   ],
+   "artigos": [
+    {
+     "lei": "l10406",
+     "art": "1583"
+    },
+    {
+     "lei": "l10406",
+     "art": "1584"
+    }
+   ],
+   "pontos": [
+    [
+     "responsabilidade conjunta dos pais",
+     "conjunt|os dois|ambos|pai e (a )?mae"
+    ],
+    [
+     "é a regra quando não há acordo",
+     "regra|sera aplicada|e aplicada|preferencia|prioridade"
+    ]
+   ],
    "evitar": [],
-   "gabarito": "Cobrança na Justiça: o devedor é intimado para pagar em 3 dias, provar que pagou ou justificar; sem isso, o juiz protesta a dívida e pode decretar prisão de 1 a 3 meses, cabível para as 3 últimas parcelas antes da ação e as que vencerem depois (CPC, art. 528)."},
-  {"id": "familia-guarda-compartilhada", "area": "Família", "pergunta": "Como funciona a guarda compartilhada?", "tipo": ["answer"],
-   "artigos": [{"lei": "l10406", "art": "1583"}, {"lei": "l10406", "art": "1584"}],
-   "pontos": [["responsabilidade conjunta dos pais", "conjunt|os dois|ambos|pai e (a )?mae"], ["é a regra quando não há acordo", "regra|sera aplicada|e aplicada|preferencia|prioridade"]],
+   "gabarito": "Os dois pais dividem as decisões e responsabilidades sobre o filho (CC, art. 1.583, § 1º); sem acordo e com ambos aptos, o juiz aplica a guarda compartilhada, salvo se um deles disser que não a quer (art. 1.584, § 2º)."
+  },
+  {
+   "id": "familia-valor-pensao",
+   "area": "Família",
+   "pergunta": "Como é decidido o valor da pensão alimentícia?",
+   "tipo": [
+    "answer"
+   ],
+   "artigos": [
+    {
+     "lei": "l10406",
+     "art": "1694"
+    }
+   ],
+   "pontos": [
+    [
+     "necessidade de quem recebe",
+     "necessidade"
+    ],
+    [
+     "possibilidade de quem paga",
+     "recursos|possibilidade|condicoes de quem paga|capacidade"
+    ]
+   ],
+   "evitar": [
+    [
+     "percentual fixo de 30% como regra legal",
+     "(lei|regra) (fixa|determina|manda).{0,30}30 ?%"
+    ]
+   ],
+   "gabarito": "Na proporção das necessidades de quem pede e dos recursos de quem paga (CC, art. 1.694, § 1º); a lei não fixa um percentual."
+  },
+  {
+   "id": "transito-celular",
+   "area": "Trânsito",
+   "pergunta": "Qual é a multa por dirigir mexendo no celular?",
+   "tipo": [
+    "answer"
+   ],
+   "artigos": [
+    {
+     "lei": "l9503",
+     "art": "252"
+    },
+    {
+     "lei": "l9503",
+     "art": "258"
+    },
+    {
+     "lei": "l9503",
+     "art": "259"
+    }
+   ],
+   "pontos": [
+    [
+     "gravíssima",
+     "gravissima"
+    ],
+    [
+     "R$ 293,47",
+     "293,47"
+    ],
+    [
+     "7 pontos",
+     "\\b(7|sete) pontos"
+    ]
+   ],
    "evitar": [],
-   "gabarito": "Os dois pais dividem as decisões e responsabilidades sobre o filho (CC, art. 1.583, § 1º); sem acordo e com ambos aptos, o juiz aplica a guarda compartilhada, salvo se um deles disser que não a quer (art. 1.584, § 2º)."},
-  {"id": "familia-valor-pensao", "area": "Família", "pergunta": "Como é decidido o valor da pensão alimentícia?", "tipo": ["answer"],
-   "artigos": [{"lei": "l10406", "art": "1694"}],
-   "pontos": [["necessidade de quem recebe", "necessidade"], ["possibilidade de quem paga", "recursos|possibilidade|condicoes de quem paga|capacidade"]],
-   "evitar": [["percentual fixo de 30% como regra legal", "(lei|regra) (fixa|determina|manda).{0,30}30 ?%"]],
-   "gabarito": "Na proporção das necessidades de quem pede e dos recursos de quem paga (CC, art. 1.694, § 1º); a lei não fixa um percentual."},
-
-  {"id": "transito-celular", "area": "Trânsito", "pergunta": "Qual é a multa por dirigir mexendo no celular?", "tipo": ["answer"],
-   "artigos": [{"lei": "l9503", "art": "252"}, {"lei": "l9503", "art": "258"}, {"lei": "l9503", "art": "259"}],
-   "pontos": [["gravíssima", "gravissima"], ["R$ 293,47", "293,47"], ["7 pontos", "\\b(7|sete) pontos"]],
+   "gabarito": "Segurar ou manusear o celular ao dirigir é infração gravíssima (CTB, art. 252, parágrafo único): multa de R$ 293,47 (art. 258, I) e 7 pontos (art. 259, I)."
+  },
+  {
+   "id": "transito-suspensao-cnh",
+   "area": "Trânsito",
+   "pergunta": "Com quantos pontos a minha carteira de motorista é suspensa?",
+   "tipo": [
+    "answer"
+   ],
+   "artigos": [
+    {
+     "lei": "l9503",
+     "art": "261"
+    }
+   ],
+   "pontos": [
+    [
+     "20 pontos com 2+ gravíssimas",
+     "\\b(20|vinte) pontos"
+    ],
+    [
+     "30 pontos com 1 gravíssima",
+     "\\b(30|trinta) pontos"
+    ],
+    [
+     "40 pontos sem gravíssima",
+     "\\b(40|quarenta) pontos"
+    ],
+    [
+     "em 12 meses",
+     "\\b(12|doze) meses"
+    ]
+   ],
    "evitar": [],
-   "gabarito": "Segurar ou manusear o celular ao dirigir é infração gravíssima (CTB, art. 252, parágrafo único): multa de R$ 293,47 (art. 258, I) e 7 pontos (art. 259, I)."},
-  {"id": "transito-suspensao-cnh", "area": "Trânsito", "pergunta": "Com quantos pontos a minha carteira de motorista é suspensa?", "tipo": ["answer"],
-   "artigos": [{"lei": "l9503", "art": "261"}],
-   "pontos": [["20 pontos com 2+ gravíssimas", "\\b(20|vinte) pontos"], ["30 pontos com 1 gravíssima", "\\b(30|trinta) pontos"], ["40 pontos sem gravíssima", "\\b(40|quarenta) pontos"], ["em 12 meses", "\\b(12|doze) meses"]],
+   "gabarito": "Em 12 meses: 20 pontos se houver 2 ou mais gravíssimas, 30 se houver 1 gravíssima e 40 se não houver nenhuma (CTB, art. 261, I)."
+  },
+  {
+   "id": "transito-alcool",
+   "area": "Trânsito",
+   "pergunta": "Qual é a punição para quem dirige depois de beber?",
+   "tipo": [
+    "answer"
+   ],
+   "artigos": [
+    {
+     "lei": "l9503",
+     "art": "165"
+    },
+    {
+     "lei": "l9503",
+     "art": "306"
+    }
+   ],
+   "pontos": [
+    [
+     "gravíssima",
+     "gravissima"
+    ],
+    [
+     "multa dez vezes",
+     "dez vezes|10 vezes|multiplicad"
+    ],
+    [
+     "suspensão por 12 meses",
+     "\\b(12|doze) meses"
+    ],
+    [
+     "pode ser crime",
+     "crime|detencao"
+    ]
+   ],
    "evitar": [],
-   "gabarito": "Em 12 meses: 20 pontos se houver 2 ou mais gravíssimas, 30 se houver 1 gravíssima e 40 se não houver nenhuma (CTB, art. 261, I)."},
-  {"id": "transito-alcool", "area": "Trânsito", "pergunta": "Qual é a punição para quem dirige depois de beber?", "tipo": ["answer"],
-   "artigos": [{"lei": "l9503", "art": "165"}, {"lei": "l9503", "art": "306"}],
-   "pontos": [["gravíssima", "gravissima"], ["multa dez vezes", "dez vezes|10 vezes|multiplicad"], ["suspensão por 12 meses", "\\b(12|doze) meses"], ["pode ser crime", "crime|detencao"]],
+   "gabarito": "Infração gravíssima, multa multiplicada por dez e suspensão por 12 meses (CTB, art. 165); com a capacidade alterada pelo álcool, é crime, com detenção de 6 meses a 3 anos (art. 306)."
+  },
+  {
+   "id": "transito-batida-traseira",
+   "area": "Trânsito",
+   "pergunta": "Bateram na traseira do meu carro. Quem paga o conserto?",
+   "tipo": [
+    "answer",
+    "clarify"
+   ],
+   "artigos": [
+    {
+     "lei": "l9503",
+     "art": "29"
+    },
+    {
+     "lei": "l10406",
+     "art": "927"
+    }
+   ],
+   "pontos": [
+    [
+     "distância de segurança",
+     "distancia"
+    ],
+    [
+     "quem causou o dano repara",
+     "repar|indeniz|pagar|arcar"
+    ]
+   ],
    "evitar": [],
-   "gabarito": "Infração gravíssima, multa multiplicada por dez e suspensão por 12 meses (CTB, art. 165); com a capacidade alterada pelo álcool, é crime, com detenção de 6 meses a 3 anos (art. 306)."},
-  {"id": "transito-batida-traseira", "area": "Trânsito", "pergunta": "Bateram na traseira do meu carro. Quem paga o conserto?", "tipo": ["answer", "clarify"],
-   "artigos": [{"lei": "l9503", "art": "29"}, {"lei": "l10406", "art": "927"}],
-   "pontos": [["distância de segurança", "distancia"], ["quem causou o dano repara", "repar|indeniz|pagar|arcar"]],
+   "gabarito": "O motorista deve manter distância de segurança do carro da frente (CTB, art. 29, II); quem causa dano por imprudência ou negligência deve repará-lo (CC, arts. 186 e 927). A responsabilidade concreta depende das provas."
+  },
+  {
+   "id": "penal-furto-pena",
+   "area": "Penal",
+   "pergunta": "Qual é a pena para quem comete furto?",
+   "tipo": [
+    "answer"
+   ],
+   "artigos": [
+    {
+     "lei": "del2848",
+     "art": "155"
+    }
+   ],
+   "pontos": [
+    [
+     "1 a 6 anos",
+     "\\b(1|um) a (6|seis) anos"
+    ],
+    [
+     "e multa",
+     "multa"
+    ],
+    [
+     "aumento no repouso noturno",
+     "noturno|a noite|de noite"
+    ]
+   ],
+   "evitar": [
+    [
+     "confundir com roubo",
+     "roubo (durante|a noite|de noite|no repouso)"
+    ]
+   ],
+   "gabarito": "Reclusão de 1 a 6 anos e multa (CP, art. 155, redação da Lei 15.397/2026); aumenta de metade se for no repouso noturno (§ 1º); furto qualificado: 2 a 8 anos (§ 4º)."
+  },
+  {
+   "id": "penal-furto-x-roubo",
+   "area": "Penal",
+   "pergunta": "Qual é a diferença entre furto e roubo?",
+   "tipo": [
+    "answer"
+   ],
+   "artigos": [
+    {
+     "lei": "del2848",
+     "art": "155"
+    },
+    {
+     "lei": "del2848",
+     "art": "157"
+    }
+   ],
+   "pontos": [
+    [
+     "roubo tem violência ou grave ameaça",
+     "violencia|grave ameaca"
+    ],
+    [
+     "pena do roubo 6 a 10 anos",
+     "\\b(6|seis) a (10|dez) anos"
+    ],
+    [
+     "pena do furto 1 a 6 anos",
+     "\\b(1|um) a (6|seis) anos"
+    ]
+   ],
    "evitar": [],
-   "gabarito": "O motorista deve manter distância de segurança do carro da frente (CTB, art. 29, II); quem causa dano por imprudência ou negligência deve repará-lo (CC, arts. 186 e 927). A responsabilidade concreta depende das provas."},
-
-  {"id": "penal-furto-pena", "area": "Penal", "pergunta": "Qual é a pena para quem comete furto?", "tipo": ["answer"],
-   "artigos": [{"lei": "del2848", "art": "155"}],
-   "pontos": [["1 a 6 anos", "\\b(1|um) a (6|seis) anos"], ["e multa", "multa"], ["aumento no repouso noturno", "noturno|a noite|de noite"]],
-   "evitar": [["confundir com roubo", "roubo (durante|a noite|de noite|no repouso)"]],
-   "gabarito": "Reclusão de 1 a 6 anos e multa (CP, art. 155, redação da Lei 15.397/2026); aumenta de metade se for no repouso noturno (§ 1º); furto qualificado: 2 a 8 anos (§ 4º)."},
-  {"id": "penal-furto-x-roubo", "area": "Penal", "pergunta": "Qual é a diferença entre furto e roubo?", "tipo": ["answer"],
-   "artigos": [{"lei": "del2848", "art": "155"}, {"lei": "del2848", "art": "157"}],
-   "pontos": [["roubo tem violência ou grave ameaça", "violencia|grave ameaca"], ["pena do roubo 6 a 10 anos", "\\b(6|seis) a (10|dez) anos"], ["pena do furto 1 a 6 anos", "\\b(1|um) a (6|seis) anos"]],
+   "gabarito": "Furto é tirar o bem sem violência (1 a 6 anos, CP art. 155); roubo é com violência ou grave ameaça (6 a 10 anos, art. 157). Penas conforme os textos atualizados em 2026."
+  },
+  {
+   "id": "penal-preso-em-flagrante",
+   "area": "Penal",
+   "pergunta": "Fui preso em flagrante. Quais são os meus direitos?",
+   "tipo": [
+    "answer",
+    "urgent"
+   ],
+   "artigos": [
+    {
+     "lei": "cf88",
+     "art": "5"
+    },
+    {
+     "lei": "del3689",
+     "art": "306"
+    }
+   ],
+   "pontos": [
+    [
+     "avisar a família",
+     "familia"
+    ],
+    [
+     "advogado",
+     "advogad|defensor"
+    ],
+    [
+     "ficar calado",
+     "calad|silencio"
+    ],
+    [
+     "juiz em 24 horas",
+     "\\b(24|vinte e quatro) horas"
+    ]
+   ],
    "evitar": [],
-   "gabarito": "Furto é tirar o bem sem violência (1 a 6 anos, CP art. 155); roubo é com violência ou grave ameaça (6 a 10 anos, art. 157). Penas conforme os textos atualizados em 2026."},
-  {"id": "penal-preso-em-flagrante", "area": "Penal", "pergunta": "Fui preso em flagrante. Quais são os meus direitos?", "tipo": ["answer", "urgent"],
-   "artigos": [{"lei": "cf88", "art": "5"}, {"lei": "del3689", "art": "306"}],
-   "pontos": [["avisar a família", "familia"], ["advogado", "advogad|defensor"], ["ficar calado", "calad|silencio"], ["juiz em 24 horas", "\\b(24|vinte e quatro) horas"]],
+   "gabarito": "A prisão é comunicada na hora ao juiz e à família (CF, art. 5º, LXII; CPP, art. 306); o preso pode ficar calado e ter advogado (CF, art. 5º, LXIII); o auto de prisão vai ao juiz em até 24 horas (CPP, art. 306, § 1º)."
+  },
+  {
+   "id": "penal-prisao-por-divida",
+   "area": "Penal",
+   "pergunta": "Posso ser preso por ter dívida no banco?",
+   "tipo": [
+    "answer"
+   ],
+   "artigos": [
+    {
+     "lei": "cf88",
+     "art": "5"
+    }
+   ],
+   "pontos": [
+    [
+     "não há prisão por dívida",
+     "\\bnao\\b.{0,80}(pres[oa]|prisao)|(pres[oa]|prisao).{0,80}\\bnao\\b|ninguem.{0,30}pres|proib"
+    ],
+    [
+     "exceção da pensão alimentícia",
+     "pensao|alimenti"
+    ]
+   ],
+   "evitar": [
+    [
+     "dizer que pode ser preso por dívida bancária",
+     "(?<!(?:nao|ninguem) )(pode|podera) ser pres[oa] por (divida|deve)"
+    ]
+   ],
+   "gabarito": "Não. A Constituição proíbe prisão civil por dívida (art. 5º, LXVII); a única exceção aplicada hoje é a pensão alimentícia (o texto ainda cita o depositário infiel, mas essa prisão não é mais admitida pelo STF)."
+  },
+  {
+   "id": "penal-medida-protetiva",
+   "area": "Penal",
+   "pergunta": "Meu marido me agride. Como peço uma medida protetiva?",
+   "tipo": [
+    "urgent",
+    "answer"
+   ],
+   "artigos": [
+    {
+     "lei": "l11340",
+     "art": "18"
+    },
+    {
+     "lei": "l11340",
+     "art": "12-C"
+    },
+    {
+     "lei": "l11340",
+     "art": "19"
+    },
+    {
+     "lei": "l11340",
+     "art": "22"
+    }
+   ],
+   "pontos": [
+    [
+     "juiz decide em 48 horas",
+     "\\b(48|quarenta e oito) horas"
+    ],
+    [
+     "medida protetiva",
+     "medida(s)? protetiva"
+    ],
+    [
+     "buscar a polícia ou ajuda",
+     "190|180|delegacia|policia"
+    ]
+   ],
    "evitar": [],
-   "gabarito": "A prisão é comunicada na hora ao juiz e à família (CF, art. 5º, LXII; CPP, art. 306); o preso pode ficar calado e ter advogado (CF, art. 5º, LXIII); o auto de prisão vai ao juiz em até 24 horas (CPP, art. 306, § 1º)."},
-  {"id": "penal-prisao-por-divida", "area": "Penal", "pergunta": "Posso ser preso por ter dívida no banco?", "tipo": ["answer"],
-   "artigos": [{"lei": "cf88", "art": "5"}],
-   "pontos": [["não há prisão por dívida", "\\bnao\\b.{0,80}(pres[oa]|prisao)|(pres[oa]|prisao).{0,80}\\bnao\\b|ninguem.{0,30}pres|proib"], ["exceção da pensão alimentícia", "pensao|alimenti"]],
-   "evitar": [["dizer que pode ser preso por dívida bancária", "(?<!(?:nao|ninguem) )(pode|podera) ser pres[oa] por (divida|deve)"]],
-   "gabarito": "Não. A Constituição proíbe prisão civil por dívida (art. 5º, LXVII); a única exceção aplicada hoje é a pensão alimentícia (o texto ainda cita o depositário infiel, mas essa prisão não é mais admitida pelo STF)."},
-  {"id": "penal-medida-protetiva", "area": "Penal", "pergunta": "Meu marido me agride. Como peço uma medida protetiva?", "tipo": ["urgent", "answer"],
-   "artigos": [{"lei": "l11340", "art": "18"}],
-   "pontos": [["juiz decide em 48 horas", "\\b(48|quarenta e oito) horas"], ["medida protetiva", "medida(s)? protetiva"], ["buscar a polícia ou ajuda", "190|180|delegacia|policia"]],
+   "gabarito": "Situação urgente: pedir na delegacia (ou ligar 190/180); o juiz tem 48 horas para decidir as medidas protetivas (Lei Maria da Penha, art. 18)."
+  },
+  {
+   "id": "penal-foto-intima",
+   "area": "Penal",
+   "pergunta": "Divulgaram uma foto íntima minha na internet sem eu permitir. O que posso fazer?",
+   "tipo": [
+    "answer",
+    "urgent"
+   ],
+   "artigos": [
+    {
+     "lei": "l12965",
+     "art": "21"
+    },
+    {
+     "lei": "del2848",
+     "art": "218-C"
+    }
+   ],
+   "pontos": [
+    [
+     "notificar o site/app",
+     "notifica|denunci"
+    ],
+    [
+     "remoção do conteúdo",
+     "remov|retir|tirar do ar|indisponib"
+    ],
+    [
+     "é crime",
+     "crime"
+    ]
+   ],
    "evitar": [],
-   "gabarito": "Situação urgente: pedir na delegacia (ou ligar 190/180); o juiz tem 48 horas para decidir as medidas protetivas (Lei Maria da Penha, art. 18)."},
-  {"id": "penal-foto-intima", "area": "Penal", "pergunta": "Divulgaram uma foto íntima minha na internet sem eu permitir. O que posso fazer?", "tipo": ["answer", "urgent"],
-   "artigos": [{"lei": "l12965", "art": "21"}, {"lei": "del2848", "art": "218-C"}],
-   "pontos": [["notificar o site/app", "notifica|denunci"], ["remoção do conteúdo", "remov|retir|tirar do ar|indisponib"], ["é crime", "crime"]],
+   "gabarito": "Notificar a plataforma pedindo a retirada: se não remover, ela passa a responder (Marco Civil, art. 21); divulgar cena de nudez sem consentimento é crime (CP, art. 218-C)."
+  },
+  {
+   "id": "previdencia-tempo-aposentadoria",
+   "area": "Previdência",
+   "pergunta": "Quanto tempo de contribuição preciso para me aposentar pelo INSS?",
+   "tipo": [
+    "answer",
+    "clarify"
+   ],
+   "artigos": [
+    {
+     "nome": "emenda constitucional.{0,15}103"
+    },
+    {
+     "lei": "cf88",
+     "art": "201"
+    }
+   ],
+   "pontos": [
+    [
+     "15 anos (mulheres)",
+     "\\b(15|quinze) anos"
+    ],
+    [
+     "20 anos (homens)",
+     "\\b(20|vinte) anos"
+    ],
+    [
+     "regras de transição para quem já contribuía",
+     "transicao|regras? antigas?|antes (de|da) (2019|reforma)|quem ja (contribuia|trabalhava|pagava)|quando (voce )?comecou a (contribuir|pagar)|data em que (voce )?comecou"
+    ]
+   ],
+   "evitar": [
+    [
+     "regras anteriores à reforma de 2019 como se valessem hoje",
+     "(30|trinta|35|trinta e cinco) anos (de (trabalho|servico|contribuicao) )?(para )?(os )?hom|(25|vinte e cinco|30|trinta) anos (de (trabalho|servico|contribuicao) )?(para )?(as )?mulher|(60|sessenta) anos (de idade )?(para )?(as )?mulheres|aposentadoria por tempo de servico"
+    ]
+   ],
+   "gabarito": "Pela reforma (EC 103/2019): 15 anos de contribuição para mulheres e 20 para homens que entraram depois dela, com idade mínima de 62 e 65 anos; quem já contribuía antes pode ter regras de transição."
+  },
+  {
+   "id": "previdencia-bpc-loas",
+   "area": "Previdência",
+   "pergunta": "Quem tem direito ao BPC/LOAS?",
+   "tipo": [
+    "answer"
+   ],
+   "artigos": [
+    {
+     "lei": "l8742",
+     "art": "20"
+    }
+   ],
+   "pontos": [
+    [
+     "idoso com 65 anos",
+     "\\b(65|sessenta e cinco)"
+    ],
+    [
+     "pessoa com deficiência",
+     "deficiencia"
+    ],
+    [
+     "renda de até 1/4 do salário mínimo por pessoa",
+     "1/4|um quarto"
+    ],
+    [
+     "benefício de um salário mínimo",
+     "salario.minimo"
+    ]
+   ],
    "evitar": [],
-   "gabarito": "Notificar a plataforma pedindo a retirada: se não remover, ela passa a responder (Marco Civil, art. 21); divulgar cena de nudez sem consentimento é crime (CP, art. 218-C)."},
-
-  {"id": "previdencia-tempo-aposentadoria", "area": "Previdência", "pergunta": "Quanto tempo de contribuição preciso para me aposentar pelo INSS?", "tipo": ["answer", "clarify"],
-   "artigos": [{"nome": "emenda constitucional.{0,15}103"}],
-   "pontos": [["15 anos (mulheres)", "\\b(15|quinze) anos"], ["20 anos (homens)", "\\b(20|vinte) anos"], ["regras de transição para quem já contribuía", "transicao|regras? antigas?|antes (de|da) (2019|reforma)|quem ja (contribuia|trabalhava|pagava)|quando (voce )?comecou a (contribuir|pagar)|data em que (voce )?comecou"]],
+   "gabarito": "Idoso com 65 anos ou mais ou pessoa com deficiência, sem meios de se manter, com renda familiar por pessoa de até 1/4 do salário mínimo; o benefício é de um salário mínimo (Lei 8.742, art. 20)."
+  },
+  {
+   "id": "previdencia-afastamento-doenca",
+   "area": "Previdência",
+   "pergunta": "Estou afastado por doença há mais de 15 dias. Quem paga o meu salário?",
+   "tipo": [
+    "answer"
+   ],
+   "artigos": [
+    {
+     "lei": "l8213",
+     "art": "59"
+    },
+    {
+     "lei": "l8213",
+     "art": "60"
+    }
+   ],
+   "pontos": [
+    [
+     "primeiros 15 dias",
+     "\\b(15|quinze) (primeiros )?dias"
+    ],
+    [
+     "empresa paga no início",
+     "empresa|empregador"
+    ],
+    [
+     "depois, o INSS",
+     "inss|previdencia|auxilio"
+    ]
+   ],
    "evitar": [],
-   "gabarito": "Pela reforma (EC 103/2019): 15 anos de contribuição para mulheres e 20 para homens que entraram depois dela, com idade mínima de 62 e 65 anos; quem já contribuía antes pode ter regras de transição."},
-  {"id": "previdencia-bpc-loas", "area": "Previdência", "pergunta": "Quem tem direito ao BPC/LOAS?", "tipo": ["answer"],
-   "artigos": [{"lei": "l8742", "art": "20"}],
-   "pontos": [["idoso com 65 anos", "\\b(65|sessenta e cinco)"], ["pessoa com deficiência", "deficiencia"], ["renda de até 1/4 do salário mínimo por pessoa", "1/4|um quarto"], ["benefício de um salário mínimo", "salario.minimo"]],
+   "gabarito": "Os primeiros 15 dias são pagos pela empresa; a partir do 16º, o INSS paga o auxílio por incapacidade, se cumprida a carência de 12 contribuições (Lei 8.213, arts. 59, 60 § 3º e 25, I)."
+  },
+  {
+   "id": "dados-vazamento",
+   "area": "Dados pessoais",
+   "pergunta": "Uma empresa vazou meus dados pessoais. Quais são os meus direitos?",
+   "tipo": [
+    "answer"
+   ],
+   "artigos": [
+    {
+     "lei": "l13709",
+     "art": "42"
+    },
+    {
+     "lei": "l13709",
+     "art": "48"
+    }
+   ],
+   "pontos": [
+    [
+     "reparação de danos",
+     "indeniz|repar"
+    ],
+    [
+     "empresa deve comunicar",
+     "comunic|avis|informar"
+    ]
+   ],
    "evitar": [],
-   "gabarito": "Idoso com 65 anos ou mais ou pessoa com deficiência, sem meios de se manter, com renda familiar por pessoa de até 1/4 do salário mínimo; o benefício é de um salário mínimo (Lei 8.742, art. 20)."},
-  {"id": "previdencia-afastamento-doenca", "area": "Previdência", "pergunta": "Estou afastado por doença há mais de 15 dias. Quem paga o meu salário?", "tipo": ["answer"],
-   "artigos": [{"lei": "l8213", "art": "59"}, {"lei": "l8213", "art": "60"}],
-   "pontos": [["primeiros 15 dias", "\\b(15|quinze) (primeiros )?dias"], ["empresa paga no início", "empresa|empregador"], ["depois, o INSS", "inss|previdencia|auxilio"]],
+   "gabarito": "A empresa responde pelos danos causados (LGPD, art. 42) e deve comunicar o incidente à autoridade (ANPD) e ao titular (art. 48)."
+  },
+  {
+   "id": "dados-apagar",
+   "area": "Dados pessoais",
+   "pergunta": "Posso pedir para uma empresa apagar os meus dados pessoais?",
+   "tipo": [
+    "answer"
+   ],
+   "artigos": [
+    {
+     "lei": "l13709",
+     "art": "18"
+    }
+   ],
+   "pontos": [
+    [
+     "direito de eliminação",
+     "elimina|apag|exclu"
+    ],
+    [
+     "dados tratados com consentimento",
+     "consentimento"
+    ]
+   ],
    "evitar": [],
-   "gabarito": "Os primeiros 15 dias são pagos pela empresa; a partir do 16º, o INSS paga o auxílio por incapacidade, se cumprida a carência de 12 contribuições (Lei 8.213, arts. 59, 60 § 3º e 25, I)."},
-
-  {"id": "dados-vazamento", "area": "Dados pessoais", "pergunta": "Uma empresa vazou meus dados pessoais. Quais são os meus direitos?", "tipo": ["answer"],
-   "artigos": [{"lei": "l13709", "art": "42"}, {"lei": "l13709", "art": "48"}],
-   "pontos": [["reparação de danos", "indeniz|repar"], ["empresa deve comunicar", "comunic|avis|informar"]],
+   "gabarito": "Sim, a eliminação dos dados tratados com seu consentimento, salvo exceções legais como guarda obrigatória (LGPD, art. 18, VI, e art. 16)."
+  },
+  {
+   "id": "saude-plano-urgencia",
+   "area": "Saúde",
+   "pergunta": "O plano de saúde negou cobertura de um atendimento de urgência. O que diz a lei?",
+   "tipo": [
+    "answer",
+    "urgent"
+   ],
+   "artigos": [
+    {
+     "lei": "l9656",
+     "art": "35-C"
+    },
+    {
+     "lei": "l9656",
+     "art": "12"
+    }
+   ],
+   "pontos": [
+    [
+     "cobertura obrigatória",
+     "obrigatori"
+    ],
+    [
+     "urgência/emergência",
+     "urgencia|emergencia"
+    ],
+    [
+     "carência máxima de 24 horas",
+     "\\b(24|vinte e quatro) horas"
+    ]
+   ],
    "evitar": [],
-   "gabarito": "A empresa responde pelos danos causados (LGPD, art. 42) e deve comunicar o incidente à autoridade (ANPD) e ao titular (art. 48)."},
-  {"id": "dados-apagar", "area": "Dados pessoais", "pergunta": "Posso pedir para uma empresa apagar os meus dados pessoais?", "tipo": ["answer"],
-   "artigos": [{"lei": "l13709", "art": "18"}],
-   "pontos": [["direito de eliminação", "elimina|apag|exclu"], ["dados tratados com consentimento", "consentimento"]],
+   "gabarito": "A cobertura de urgência e emergência é obrigatória (Lei 9.656, art. 35-C), com carência máxima de 24 horas (art. 12, V, c)."
+  },
+  {
+   "id": "imovel-atraso-construtora",
+   "area": "Imóvel",
+   "pergunta": "Comprei um apartamento na planta e a construtora atrasou a entrega. Quais são os meus direitos?",
+   "tipo": [
+    "answer"
+   ],
+   "artigos": [
+    {
+     "lei": "l4591",
+     "art": "43-A"
+    }
+   ],
+   "pontos": [
+    [
+     "tolerância de 180 dias",
+     "\\b(180|cento e oitenta) dias"
+    ],
+    [
+     "indenização de 1% ao mês",
+     "\\b1 ?%|um por cento"
+    ],
+    [
+     "pode desfazer e receber de volta",
+     "resol|rescis|desfazer|devolu|restitu"
+    ]
+   ],
    "evitar": [],
-   "gabarito": "Sim, a eliminação dos dados tratados com seu consentimento, salvo exceções legais como guarda obrigatória (LGPD, art. 18, VI, e art. 16)."},
-
-  {"id": "saude-plano-urgencia", "area": "Saúde", "pergunta": "O plano de saúde negou cobertura de um atendimento de urgência. O que diz a lei?", "tipo": ["answer", "urgent"],
-   "artigos": [{"lei": "l9656", "art": "35-C"}, {"lei": "l9656", "art": "12"}],
-   "pontos": [["cobertura obrigatória", "obrigatori"], ["urgência/emergência", "urgencia|emergencia"], ["carência máxima de 24 horas", "\\b(24|vinte e quatro) horas"]],
+   "gabarito": "Se o contrato prevê, a construtora tem tolerância de 180 dias (Lei 4.591, art. 43-A); depois disso o comprador pode desfazer o contrato com devolução do que pagou e multa, ou manter e receber 1% ao mês do valor pago (§§ 1º e 2º)."
+  },
+  {
+   "id": "educacao-documentos-retidos",
+   "area": "Educação",
+   "pergunta": "A escola pode segurar o histórico escolar do meu filho porque a mensalidade está atrasada?",
+   "tipo": [
+    "answer"
+   ],
+   "artigos": [
+    {
+     "nome": "9\\.?870"
+    }
+   ],
+   "pontos": [
+    [
+     "é proibido reter documentos",
+     "proibid|nao pode|vedad|ilegal"
+    ],
+    [
+     "documentos/histórico",
+     "document|historic"
+    ]
+   ],
    "evitar": [],
-   "gabarito": "A cobertura de urgência e emergência é obrigatória (Lei 9.656, art. 35-C), com carência máxima de 24 horas (art. 12, V, c)."},
-  {"id": "imovel-atraso-construtora", "area": "Imóvel", "pergunta": "Comprei um apartamento na planta e a construtora atrasou a entrega. Quais são os meus direitos?", "tipo": ["answer"],
-   "artigos": [{"lei": "l4591", "art": "43-A"}],
-   "pontos": [["tolerância de 180 dias", "\\b(180|cento e oitenta) dias"], ["indenização de 1% ao mês", "\\b1 ?%|um por cento"], ["pode desfazer e receber de volta", "resol|rescis|desfazer|devolu|restitu"]],
+   "gabarito": "Não: a lei das mensalidades escolares proíbe reter documentos, suspender provas ou aplicar penalidades pedagógicas por atraso (Lei 9.870/1999, art. 6º). Teste do índice: essa lei não está no acervo distribuído com o app."
+  },
+  {
+   "id": "constitucional-casa-inviolavel",
+   "area": "Constitucional",
+   "pergunta": "A polícia pode entrar na minha casa sem mandado?",
+   "tipo": [
+    "answer"
+   ],
+   "artigos": [
+    {
+     "lei": "cf88",
+     "art": "5"
+    }
+   ],
+   "pontos": [
+    [
+     "flagrante",
+     "flagrante"
+    ],
+    [
+     "desastre ou socorro",
+     "desastre|socorro"
+    ],
+    [
+     "de dia com ordem judicial",
+     "durante o dia|de dia|diurn"
+    ]
+   ],
    "evitar": [],
-   "gabarito": "Se o contrato prevê, a construtora tem tolerância de 180 dias (Lei 4.591, art. 43-A); depois disso o comprador pode desfazer o contrato com devolução do que pagou e multa, ou manter e receber 1% ao mês do valor pago (§§ 1º e 2º)."},
-  {"id": "educacao-documentos-retidos", "area": "Educação", "pergunta": "A escola pode segurar o histórico escolar do meu filho porque a mensalidade está atrasada?", "tipo": ["answer"],
-   "artigos": [{"nome": "9\\.?870"}],
-   "pontos": [["é proibido reter documentos", "proibid|nao pode|vedad|ilegal"], ["documentos/histórico", "document|historic"]],
-   "evitar": [],
-   "gabarito": "Não: a lei das mensalidades escolares proíbe reter documentos, suspender provas ou aplicar penalidades pedagógicas por atraso (Lei 9.870/1999, art. 6º). Teste do índice: essa lei não está no acervo distribuído com o app."},
-  {"id": "constitucional-casa-inviolavel", "area": "Constitucional", "pergunta": "A polícia pode entrar na minha casa sem mandado?", "tipo": ["answer"],
-   "artigos": [{"lei": "cf88", "art": "5"}],
-   "pontos": [["flagrante", "flagrante"], ["desastre ou socorro", "desastre|socorro"], ["de dia com ordem judicial", "durante o dia|de dia|diurn"]],
-   "evitar": [],
-   "gabarito": "Só com consentimento do morador, em flagrante delito, desastre ou para prestar socorro; com ordem judicial, apenas durante o dia (CF, art. 5º, XI)."},
-
-  {"id": "limite-lei-estrangeira", "area": "Limites", "pergunta": "Como faço um testamento nos Estados Unidos?", "tipo": ["nosources", "limit", "answer", "clarify"],
+   "gabarito": "Só com consentimento do morador, em flagrante delito, desastre ou para prestar socorro; com ordem judicial, apenas durante o dia (CF, art. 5º, XI)."
+  },
+  {
+   "id": "limite-lei-estrangeira",
+   "area": "Limites",
+   "pergunta": "Como faço um testamento nos Estados Unidos?",
+   "tipo": [
+    "nosources",
+    "limit",
+    "answer",
+    "clarify"
+   ],
    "artigos": [],
-   "pontos": [["avisa que só trata do Direito brasileiro", "brasil|brasileir"]],
-   "evitar": [["ensinar regras americanas como se fossem brasileiras", "segundo a lei (dos eua|americana|estadunidense)"]],
-   "gabarito": "Deve dizer que só trata do Direito brasileiro e orientar a buscar um profissional do país/estado envolvido, sem inventar regras estrangeiras."},
-  {"id": "limite-previsao-processo", "area": "Limites", "pergunta": "Vou ganhar o processo trabalhista contra a empresa?", "tipo": ["limit", "clarify", "answer"],
+   "pontos": [
+    [
+     "avisa que só trata do Direito brasileiro",
+     "brasil|brasileir"
+    ]
+   ],
+   "evitar": [
+    [
+     "ensinar regras americanas como se fossem brasileiras",
+     "segundo a lei (dos eua|americana|estadunidense)"
+    ]
+   ],
+   "gabarito": "Deve dizer que só trata do Direito brasileiro e orientar a buscar um profissional do país/estado envolvido, sem inventar regras estrangeiras."
+  },
+  {
+   "id": "limite-previsao-processo",
+   "area": "Limites",
+   "pergunta": "Vou ganhar o processo trabalhista contra a empresa?",
+   "tipo": [
+    "limit",
+    "clarify",
+    "answer"
+   ],
    "artigos": [],
-   "pontos": [["não promete resultado", "nao (e possivel|da para|posso|consigo) (garantir|prever|afirmar|dizer)|depende|sem (garantia|prever)"]],
-   "evitar": [["prometer vitória", "(vai|ira) ganhar com certeza|certamente (vai )?ganh|ganho garantido"]],
-   "gabarito": "Não deve prever o resultado; explica do que depende (provas, documentos, prazos) e indica advogado, sindicato ou Defensoria."},
-  {"id": "limite-despejo-amanha", "area": "Limites", "pergunta": "Recebi uma ordem de despejo para sair amanhã. O que eu faço?", "tipo": ["urgent"],
+   "pontos": [
+    [
+     "não promete resultado",
+     "nao (e possivel|da para|posso|consigo) (garantir|prever|afirmar|dizer)|depende|sem (garantia|prever)"
+    ]
+   ],
+   "evitar": [
+    [
+     "prometer vitória",
+     "(vai|ira) ganhar com certeza|certamente (vai )?ganh|ganho garantido"
+    ]
+   ],
+   "gabarito": "Não deve prever o resultado; explica do que depende (provas, documentos, prazos) e indica advogado, sindicato ou Defensoria."
+  },
+  {
+   "id": "limite-despejo-amanha",
+   "area": "Limites",
+   "pergunta": "Recebi uma ordem de despejo para sair amanhã. O que eu faço?",
+   "tipo": [
+    "urgent"
+   ],
    "artigos": [],
-   "pontos": [["procurar ajuda já", "urgente|imediat|hoje|o quanto antes|agora|sem demora"], ["advogado ou Defensoria", "advogad|defensoria"]],
+   "pontos": [
+    [
+     "procurar ajuda já",
+     "urgente|imediat|hoje|o quanto antes|agora|sem demora"
+    ],
+    [
+     "advogado ou Defensoria",
+     "advogad|defensoria"
+    ]
+   ],
    "evitar": [],
-   "gabarito": "Resposta de urgência: procurar imediatamente advogado ou Defensoria Pública com a ordem em mãos, sem tentar resolver sozinho."}
+   "gabarito": "Resposta de urgência: procurar imediatamente advogado ou Defensoria Pública com a ordem em mãos, sem tentar resolver sozinho."
+  }
  ]
 }

@@ -124,7 +124,18 @@ function parseArticles(paras) {
   flush();
   return articles;
 }
+/* O Planalto costuma mostrar a redação antiga riscada antes da atual. Se, depois do cabeçalho riscado, o mesmo artigo
+   reaparece com redação em vigor, ele não foi revogado: vale a redação atual (antes, o artigo inteiro saía como
+   revogado e sumia da busca — caso dos arts. 6º e 201 da Constituição). */
+function sameArticle(text, label) {
+  const m = /^[“"'‘]/.test(text) ? null : text.match(RX_ART);
+  return !!m && 'Art. ' + m[1].replace(/\./g, '') + (m[2] ? '-' + m[2] : '') === label;
+}
 function finish(a) {
+  if (a.struckHeader) {
+    const again = a.paras.findIndex((p, i) => i > 0 && sameArticle(p, a.label));
+    if (again > 0) { a.paras = a.paras.slice(again); a.struckHeader = false; a.hist.push('(redação anterior substituída)'); }
+  }
   a.text = a.paras.join('\n');
   const caput = a.paras[0] || '';
   if (a.struckHeader || /\(\s*(?:[Aa]rtigo\s+|[Aa]rt\.\s+)?(?:Revogad[oa]|REVOGAD[OA]|revogad[oa])\b/.test(caput.slice(0, 260)) || /^Art\.[^(]{0,20}\(\s*(?:Revogad|revogad|REVOGAD)/.test(caput)) a.status = 'revogado';
