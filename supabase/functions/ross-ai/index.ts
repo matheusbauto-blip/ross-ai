@@ -47,6 +47,10 @@ const HEDGE_ENABLED = Deno.env.get("ROSS_HEDGE") !== "off";
 const thinking = (name: string) => { const value = (Deno.env.get(name) ?? "low").trim().toLowerCase(); return value === "off" ? "" : value; };
 const ANSWER_THINKING = thinking("ROSS_ANSWER_THINKING");
 const HELPER_THINKING = thinking("ROSS_HELPER_THINKING");
+/* Um modelo que o Google recusou por limite de uso (429) não é repetido: o alternativo assume na hora e, por um minuto,
+   passa a ser o primeiro tentado neste servidor (o recusado fica como última opção). */
+const RATE_LIMIT_COOLDOWN_MS = 60_000;
+const rateLimitedUntil = new Map<string, number>();
 const BUDGET = {
   prepare: { perCallMs: 15_000, totalMs: 25_000, hedgeAfterMs: 5_000, minRemainingMs: 15_000 },
   answer: { perCallMs: 90_000, totalMs: 120_000, hedgeAfterMs: 30_000, minRemainingMs: 45_000 },
@@ -299,7 +303,10 @@ type GenerateOptions = { system: string; parts: Array<{ text: string } | { inlin
 type Budget = { perCallMs: number; totalMs: number; hedgeAfterMs: number; minRemainingMs: number };
 async function generate(models: string[], options: GenerateOptions, apiKey: string, budget: Budget, onText?: (text: string) => void) {
   const deadline = Date.now() + Math.min(budget.totalMs, workerRemaining() - 5_000);
-  const list = models.filter((model, index) => model && models.indexOf(model) === index);
+  const preferred = models[0];
+  const unique = models.filter((model, index) => model && models.indexOf(model) === index);
+  const limited = (model: string) => (rateLimitedUntil.get(model) ?? 0) > Date.now();
+  const list = unique.filter((model) => !limited(model)).concat(unique.filter(limited));
   const controllers = list.map(() => new AbortController());
   let committed = -1, timer: ReturnType<typeof setTimeout> | null = null;
   const commit = (index: number) => {
@@ -315,10 +322,11 @@ async function generate(models: string[], options: GenerateOptions, apiKey: stri
       const started = Date.now();
       try {
         const result = await generateGemini({ apiKey, model, timeoutMs: Math.min(budget.perCallMs, remaining), signal: controllers[index].signal, ...options, ...textFor(index) });
-        return index > 0 ? { ...result, fallback: true } : result;
+        return model !== preferred ? { ...result, fallback: true } : result;
       } catch (e) {
         last = e;
         if (!controllers[index].signal.aborted) console.warn("gemini", model, e instanceof GeminiError ? e.status : "erro", Date.now() - started);
+        if (e instanceof GeminiError && e.status === 429) { rateLimitedUntil.set(model, Date.now() + RATE_LIMIT_COOLDOWN_MS); throw e; }
         if (committed === index || !(e instanceof GeminiError) || !TRANSIENT_STATUS.has(e.status) || e.status === 504) throw e;
         await new Promise((resolve) => setTimeout(resolve, 1_000));
       }
@@ -459,7 +467,7 @@ async function opAnswer(apiKey: string, body: Record<string, unknown>, onText?: 
    última é {"t":"done",...} com a resposta já validada ou {"t":"error","error":...}. Falhas antes do primeiro pedaço
    seguem o caminho normal (status HTTP), e o app as trata como sempre. */
 function upstreamError(e: unknown) {
-  if (e instanceof GeminiError) return e.status === 429 ? { error: "rate_limited" } : e.status === 504 ? { error: "upstream_timeout" } : { error: "upstream", status: e.status };
+  if (e instanceof GeminiError) return e.status === 429 ? { error: "upstream_busy" } : e.status === 504 ? { error: "upstream_timeout" } : { error: "upstream", status: e.status };
   return { error: "internal" };
 }
 async function streamAnswer(apiKey: string, body: Record<string, unknown>, origin: string | null) {
@@ -581,7 +589,8 @@ Deno.serve(async (req: Request) => {
     return json(200, result, origin);
   } catch (e) {
     if (e instanceof GeminiError) {
-      if (e.status === 429) return json(429, { error: "rate_limited" }, origin);
+      // Limite do Google (não o limite de perguntas da pessoa): o app mostra os trechos com o aviso de modelo indisponível.
+      if (e.status === 429) return json(503, { error: "upstream_busy" }, origin);
       if (e.status === 504) return json(504, { error: "upstream_timeout" }, origin);
       console.error("google", e.status);
       return json(502, { error: "upstream", status: e.status }, origin);

@@ -235,3 +235,20 @@ test('a complaint letter is written only from the cited excerpts, counts against
   assert.deepEqual(await refused.json(), { error: 'no_sources' });
   assert.equal(empty.counts().modelCalls, 0, 'without legal grounds the model is not called');
 });
+
+test('a model refused by Google for its usage limit is not retried: the fallback answers at once and leads for a while', async () => {
+  const s = server({ models: { 'gemini-3.1-flash-lite': [429], 'gemini-3.5-flash': [{ terms: ['a'], laws: [] }, { terms: ['b'], laws: [] }] } });
+  const first = await (await s.raw({ op: 'prepare', question: 'pergunta', catalog: [] })).json();
+  assert.equal(first.fallback, true);
+  assert.deepEqual(s.modelsCalled(), ['gemini-3.1-flash-lite', 'gemini-3.5-flash'], 'no second attempt on the refused model');
+  const second = await (await s.raw({ op: 'prepare', question: 'outra', catalog: [] })).json();
+  assert.equal(second.fallback, true, 'still marked as the alternative model');
+  assert.deepEqual(s.modelsCalled().slice(2), ['gemini-3.5-flash'], 'the refused model is skipped while its limit lasts');
+});
+
+test('when Google refuses every model for its usage limit, the app is told the model is busy, not that the person hit a limit', async () => {
+  const s = server({ models: { 'gemini-3.5-flash': [429], 'gemini-3.1-flash-lite': [429] } });
+  const response = await s.raw({ op: 'answer', question: 'pergunta', excerpts: [], history: [], attachments: [] });
+  assert.equal(response.status, 503);
+  assert.deepEqual(await response.json(), { error: 'upstream_busy' });
+});
