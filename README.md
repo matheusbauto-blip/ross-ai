@@ -32,6 +32,10 @@ Tempo de resposta: o pedido de resposta chega ao app em partes (NDJSON), e o res
 
 Quando o próximo passo de uma resposta é reclamar por escrito (notificar a loja, registrar no Procon), o app oferece “Montar carta de reclamação”. A função (`op: "letter"`) escreve a carta só com os artigos já citados na resposta; nomes, datas, números e contatos que a pessoa não informou viram campos entre colchetes, como `[SEU NOME COMPLETO]`, preenchidos no próprio app. O texto editado fica salvo com a conversa neste navegador e não volta ao modelo. Há também uma versão curta para formulários do Procon e do consumidor.gov.br, além de copiar e baixar em `.txt`.
 
+## Avaliação das respostas
+
+`qa/perguntas-avaliacao.json` reúne 42 perguntas do dia a dia (consumidor, trabalho, moradia, família, trânsito, penal, previdência, dados pessoais, saúde, imóvel, educação e limites do serviço), cada uma com gabarito conferido nos textos oficiais do acervo: artigos que devem ser citados, pontos que a resposta precisa trazer e afirmações que não pode fazer. `node qa/avaliar-respostas.mjs` faz as perguntas ao app real (busca, índice e servidor com o Gemini) e dá a nota de cada resposta (certo, incompleto, errado), com detalhes em `qa/resultados/`. O modelo não aprende com as perguntas: as falhas viram correções no app e testes automáticos. Cada pergunta gasta de 2 a 3 das chamadas diárias de IA por conexão (`ROSS_IP_DAILY_LIMIT`); use `--de`, `--limite`, `--ids` ou `--area` para rodar em partes.
+
 ## Índice completo do repositório de leis
 
 Além das 67 normas distribuídas com o app e dos textos importados no banco, o site publica um índice estático de todas as normas do [ctresb/leis](https://github.com/ctresb/leis) (edição fixa): federais, estaduais, municipais, órgãos reguladores, jurisprudência e tratados. A pesquisa e as respostas usam esse índice para encontrar a norma pelo título, ementa ou número; o texto integral é lido sob demanda, com conferência de hash. Detalhes, limites e como gerar de novo: `docs/indice-repositorio.md`.

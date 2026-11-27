@@ -10,3 +10,4 @@ entrega/
 .env.*
 !.env.example
 .law-index/
+qa/resultados/
