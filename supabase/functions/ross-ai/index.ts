@@ -114,6 +114,8 @@ async function sha256(s: string) {
   return Array.from(new Uint8Array(buf)).map((b) => b.toString(16).padStart(2, "0")).join("");
 }
 const str = (v: unknown, max = 4000) => (typeof v === "string" ? v.slice(0, max) : "");
+// Data de hoje no horário de Brasília: o servidor roda em UTC, que à noite já está no dia seguinte.
+const todayBR = () => new Date().toLocaleDateString("en-CA", { timeZone: "America/Sao_Paulo" });
 const arr = (v: unknown) => (Array.isArray(v) ? v : []);
 
 /* O corpo é lido com limite de bytes antes de ser interpretado: um pedido sem Content-Length
@@ -366,7 +368,7 @@ async function opLetter(apiKey: string, body: Record<string, unknown>) {
   if (!excerpts.length) return { error: "no_sources" };
   const nextSteps = arr(body.nextSteps).slice(0, 5).map((step) => str(step, 400)).filter(Boolean);
   const text = [
-    `Context: ${str(body.jurisdiction, 80) || "Brasil"}. Today is ${new Date().toISOString().slice(0, 10)}.`,
+    `Context: ${str(body.jurisdiction, 80) || "Brasil"}. Today is ${todayBR()}.`,
     `THE PERSON'S SITUATION (their own words):\n${str(body.question, 3000) || "(not stated)"}`,
     str(body.summary, 1500) ? `EXPLANATION ALREADY GIVEN TO THE PERSON:\n${str(body.summary, 1500)}` : "",
     nextSteps.length ? `SUGGESTED NEXT STEPS:\n${nextSteps.map((step) => "- " + step).join("\n")}` : "",
@@ -432,7 +434,7 @@ async function opAnswer(apiKey: string, body: Record<string, unknown>, onText?: 
     content.push({ inlineData: { mimeType: mediaType, data } });
   }
   const text = [
-    `Context: ${jurisdiction || "Brasil"}. Today is ${new Date().toISOString().slice(0, 10)}.`,
+    `Context: ${jurisdiction || "Brasil"}. Today is ${todayBR()}.`,
     grounded ? `CONSULTED EXCERPTS (bundled capture ${capturedAt || "recently"}; repository dates and versions are stated separately):\n` + excerpts.map((e) => `[${e.n}] ${e.name} — ${e.article}${e.heading ? ` (${e.heading})` : ""}${e.nota ? ` [${e.nota}]` : ""}\n"""\n${e.excerpt}\n"""`).join("\n\n") : "",
     unread.length ? `Attached files that could not be read: ${unread.join(", ")}. Say so and ask for the text or a readable file.` : "",
     history ? `CONVERSATION SO FAR:\n${history}` : "",
