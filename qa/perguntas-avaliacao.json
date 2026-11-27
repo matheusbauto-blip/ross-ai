@@ -2094,6 +2094,394 @@
    ],
    "evitar": [],
    "gabarito": "Pode ter direito à usucapião urbana: quem possui como sua área urbana de até 250 m² por 5 anos, sem interrupção e sem oposição, usando-a como moradia, e não é proprietário de outro imóvel urbano ou rural, adquire a propriedade (CF, art. 183; CC, art. 1.240). Imóveis públicos não podem ser usucapidos. O pedido pode ser feito na Justiça ou no cartório de registro de imóveis, com advogado (Lei 6.015, art. 216-A)."
+  },
+  {
+   "id": "trabalho-estagio-jornada",
+   "area": "Trabalho",
+   "pergunta": "Sou estagiário e faço faculdade. Quantas horas por dia posso estagiar? Tenho direito a férias?",
+   "tipo": [
+    "answer"
+   ],
+   "artigos": [
+    {
+     "lei": "l11788",
+     "art": "10"
+    },
+    {
+     "lei": "l11788",
+     "art": "13"
+    }
+   ],
+   "pontos": [
+    [
+     "6 horas por dia",
+     "\\b(6|seis) horas"
+    ],
+    [
+     "30 horas por semana",
+     "\\b(30|trinta) horas"
+    ],
+    [
+     "recesso de 30 dias",
+     "recesso"
+    ]
+   ],
+   "evitar": [],
+   "gabarito": "Para estudante do ensino superior, a jornada de estágio não pode passar de 6 horas por dia e 30 horas por semana (Lei 11.788/2008, art. 10, II). Estágio não é emprego, então não há férias da CLT, mas quem estagia 1 ano ou mais tem recesso de 30 dias, de preferência nas férias escolares, remunerado se recebe bolsa e proporcional se o estágio for mais curto (art. 13)."
+  },
+  {
+   "id": "trabalho-decimo-terceiro-proporcional",
+   "area": "Trabalho",
+   "pergunta": "Comecei no emprego em julho. Vou receber o 13º salário inteiro em dezembro?",
+   "tipo": [
+    "answer"
+   ],
+   "artigos": [
+    {
+     "lei": "l4090",
+     "art": "1"
+    }
+   ],
+   "pontos": [
+    [
+     "proporcional, 1/12 por mês",
+     "1/12|doze avos|proporciona"
+    ],
+    [
+     "15 dias contam como mês",
+     "\\b(15|quinze) dias"
+    ]
+   ],
+   "evitar": [],
+   "gabarito": "Não inteiro. O 13º corresponde a 1/12 da remuneração de dezembro por mês trabalhado no ano (Lei 4.090/1962, art. 1º, § 1º), e a fração de 15 dias ou mais conta como mês inteiro (§ 2º). Quem começou em julho recebe, em regra, 6/12, ou seja, metade."
+  },
+  {
+   "id": "dividas-casa-penhora",
+   "area": "Dívidas e bancos",
+   "pergunta": "Tenho muitas dívidas no banco. Podem tomar a única casa onde moro com minha família?",
+   "tipo": [
+    "answer"
+   ],
+   "artigos": [
+    {
+     "lei": "l8009",
+     "art": "1"
+    },
+    {
+     "lei": "l8009",
+     "art": "3"
+    }
+   ],
+   "pontos": [
+    [
+     "a casa da família é impenhorável",
+     "impenhora|bem de familia|nao pode ser penhorad"
+    ],
+    [
+     "há exceções",
+     "financiamento|pensao|iptu|imposto|fianca|hipoteca"
+    ]
+   ],
+   "evitar": [],
+   "gabarito": "Em regra, não. O imóvel residencial próprio da família, onde ela mora, é impenhorável e não responde por dívidas, inclusive com banco (Lei 8.009/1990, art. 1º). Há exceções: a dívida do financiamento da própria casa, pensão alimentícia, IPTU e taxas do imóvel, hipoteca dada com a própria casa como garantia e fiança em contrato de aluguel (art. 3º)."
+  },
+  {
+   "id": "dividas-carro-financiado",
+   "area": "Dívidas e bancos",
+   "pergunta": "Atrasei as parcelas do meu carro financiado. O banco pode tomar o carro?",
+   "tipo": [
+    "answer"
+   ],
+   "artigos": [
+    {
+     "lei": "del911",
+     "art": "3"
+    },
+    {
+     "lei": "del911",
+     "art": "2"
+    }
+   ],
+   "pontos": [
+    [
+     "busca e apreensão",
+     "busca e apreens"
+    ],
+    [
+     "mora comprovada por carta",
+     "carta|notifica|\\bmora\\b"
+    ],
+    [
+     "pagar a dívida em 5 dias para ter o carro de volta",
+     "\\b(5|cinco) dias"
+    ]
+   ],
+   "evitar": [],
+   "gabarito": "Pode. No carro com alienação fiduciária, o atraso já caracteriza a mora, que o banco comprova por carta registrada com aviso de recebimento (Decreto-Lei 911/1969, art. 2º, § 2º). Comprovada a mora, o banco pode pedir na Justiça a busca e apreensão do carro, concedida por liminar (art. 3º). Em até 5 dias depois da apreensão, quem financiou pode pagar a integralidade da dívida pendente e receber o carro de volta (art. 3º, §§ 1º e 2º). Se o carro for vendido, o que sobrar depois de pagar a dívida é devolvido (art. 2º)."
+  },
+  {
+   "id": "justica-juizado-sem-advogado",
+   "area": "Justiça",
+   "pergunta": "Posso entrar com um processo no Juizado Especial sem advogado?",
+   "tipo": [
+    "answer"
+   ],
+   "artigos": [
+    {
+     "lei": "l9099",
+     "art": "9"
+    },
+    {
+     "lei": "l9099",
+     "art": "3"
+    }
+   ],
+   "pontos": [
+    [
+     "sem advogado até 20 salários mínimos",
+     "\\b(20|vinte) (salarios|vezes o salario)"
+    ],
+    [
+     "limite de 40 salários mínimos",
+     "\\b(40|quarenta) (salarios|vezes o salario)"
+    ]
+   ],
+   "evitar": [],
+   "gabarito": "Sim, nas causas de até 20 salários mínimos você pode ir pessoalmente, sem advogado (Lei 9.099/1995, art. 9º). Acima disso, até o limite de 40 salários mínimos do Juizado Especial Cível (art. 3º, I), a assistência de advogado é obrigatória."
+  },
+  {
+   "id": "servico-publico-acesso-informacao",
+   "area": "Serviço público",
+   "pergunta": "Pedi uma informação à prefeitura pela Lei de Acesso à Informação. Em quanto tempo eles têm que responder?",
+   "tipo": [
+    "answer"
+   ],
+   "artigos": [
+    {
+     "lei": "l12527",
+     "art": "11"
+    }
+   ],
+   "pontos": [
+    [
+     "até 20 dias",
+     "\\b(20|vinte) dias"
+    ],
+    [
+     "prorrogáveis por mais 10 dias",
+     "\\b(10|dez) dias"
+    ]
+   ],
+   "evitar": [],
+   "gabarito": "Se a informação estiver disponível, o acesso deve ser imediato. Se não for possível, o órgão tem até 20 dias para responder, dizer onde obter a informação ou explicar a recusa (Lei 12.527/2011, art. 11, § 1º). Esse prazo pode ser prorrogado por mais 10 dias, com justificativa expressa comunicada a quem pediu (§ 2º)."
+  },
+  {
+   "id": "constitucional-voto-17-anos",
+   "area": "Constitucional",
+   "pergunta": "Tenho 17 anos. Sou obrigado a votar?",
+   "tipo": [
+    "answer"
+   ],
+   "artigos": [
+    {
+     "lei": "cf88",
+     "art": "14"
+    }
+   ],
+   "pontos": [
+    [
+     "voto facultativo entre 16 e 18 anos",
+     "facultativ|opcional|nao (e|esta|sou) obrigad"
+    ],
+    [
+     "obrigatório a partir dos 18",
+     "\\b(18|dezoito) anos"
+    ]
+   ],
+   "evitar": [],
+   "gabarito": "Não. Para quem tem mais de 16 e menos de 18 anos, o alistamento eleitoral e o voto são facultativos. Eles passam a ser obrigatórios para maiores de 18 anos e voltam a ser facultativos para maiores de 70 (Constituição, art. 14, § 1º)."
+  },
+  {
+   "id": "penal-maus-tratos-animais",
+   "area": "Penal",
+   "pergunta": "Meu vizinho maltrata o cachorro dele. Isso é crime?",
+   "tipo": [
+    "answer"
+   ],
+   "artigos": [
+    {
+     "lei": "l9605",
+     "art": "32"
+    }
+   ],
+   "pontos": [
+    [
+     "é crime",
+     "crime"
+    ],
+    [
+     "pena de 2 a 5 anos para cão ou gato",
+     "\\b(2|dois) (a|e) (5|cinco) anos"
+    ]
+   ],
+   "evitar": [],
+   "gabarito": "Sim. Maus-tratos contra animais são crime (Lei 9.605/1998, art. 32). Quando o animal é cão ou gato, a pena é de reclusão de 2 a 5 anos, multa e proibição da guarda (art. 32, § 1º-A), aumentada de um sexto a um terço se o animal morrer (§ 2º)."
+  },
+  {
+   "id": "previdencia-salario-maternidade",
+   "area": "Previdência",
+   "pergunta": "Vou ter um bebê. Por quanto tempo recebo o salário-maternidade do INSS?",
+   "tipo": [
+    "answer"
+   ],
+   "artigos": [
+    {
+     "lei": "l8213",
+     "art": "71"
+    }
+   ],
+   "pontos": [
+    [
+     "120 dias",
+     "\\b(120|cento e vinte) dias"
+    ],
+    [
+     "pode começar 28 dias antes do parto",
+     "\\b(28|vinte e oito) dias"
+    ]
+   ],
+   "evitar": [],
+   "gabarito": "O salário-maternidade é pago por 120 dias e pode começar entre 28 dias antes do parto e a data do parto (Lei 8.213/1991, art. 71). Se a mãe ou o bebê ficar internado por mais de 2 semanas por complicações do parto, ele é pago durante a internação e por mais 120 dias depois da alta (art. 71, § 3º)."
+  },
+  {
+   "id": "previdencia-pensao-por-morte",
+   "area": "Previdência",
+   "pergunta": "Meu marido morreu. Tenho direito à pensão por morte do INSS? Tem prazo para pedir?",
+   "tipo": [
+    "answer"
+   ],
+   "artigos": [
+    {
+     "lei": "l8213",
+     "art": "74"
+    },
+    {
+     "lei": "l8213",
+     "art": "16"
+    }
+   ],
+   "pontos": [
+    [
+     "o cônjuge é dependente",
+     "conjuge|esposa|viuv|dependente"
+    ],
+    [
+     "pedir em até 90 dias para receber desde a morte",
+     "\\b(90|noventa) dias"
+    ]
+   ],
+   "evitar": [],
+   "gabarito": "Sim, se ele era segurado do INSS, aposentado ou não. O cônjuge é dependente (Lei 8.213/1991, art. 16, I) e a pensão é devida ao conjunto dos dependentes (art. 74). Pedida em até 90 dias depois do óbito, ela é paga desde a data da morte; depois disso, só a partir do pedido. Para filhos menores de 16 anos, o prazo é de 180 dias (art. 74, I e II)."
+  },
+  {
+   "id": "educacao-vaga-creche",
+   "area": "Educação",
+   "pergunta": "A prefeitura diz que não tem vaga na creche para minha filha de 2 anos. Ela tem direito à vaga?",
+   "tipo": [
+    "answer"
+   ],
+   "artigos": [
+    {
+     "lei": "cf88",
+     "art": "208"
+    },
+    {
+     "lei": "l8069",
+     "art": "54"
+    }
+   ],
+   "pontos": [
+    [
+     "é dever do Estado",
+     "dever do (estado|poder publico|municipio)|tem direito|e (um )?direito"
+    ],
+    [
+     "creche até 5 anos",
+     "\\b(5|cinco) anos"
+    ]
+   ],
+   "evitar": [],
+   "gabarito": "Sim. É dever do Estado garantir educação infantil, em creche e pré-escola, às crianças de até 5 anos (Constituição, art. 208, IV; ECA, art. 54, IV). Se a prefeitura não oferecer a vaga, a família pode pedir por escrito, guardar o protocolo da recusa e procurar o Conselho Tutelar, a Defensoria Pública ou o Ministério Público."
+  },
+  {
+   "id": "saude-remedio-sus",
+   "area": "Saúde",
+   "pergunta": "O SUS é obrigado a me dar de graça o remédio que o médico receitou?",
+   "tipo": [
+    "answer"
+   ],
+   "artigos": [
+    {
+     "lei": "l8080",
+     "art": "19-M"
+    },
+    {
+     "lei": "l8080",
+     "art": "6"
+    },
+    {
+     "lei": "l8080",
+     "art": "19-P"
+    }
+   ],
+   "pontos": [
+    [
+     "assistência farmacêutica integral",
+     "assistencia (terapeutica|farmaceutica)|farmaceutic"
+    ],
+    [
+     "depende de protocolo clínico ou lista oficial",
+     "protocolo|relac(ao|oes) de medicamentos|lista|rename"
+    ]
+   ],
+   "evitar": [],
+   "gabarito": "O SUS deve prestar assistência terapêutica integral, inclusive farmacêutica (Lei 8.080/1990, art. 6º, I, d). Isso abrange os remédios cuja prescrição segue o protocolo clínico da doença ou, na falta dele, os que constam das listas oficiais de medicamentos do SUS, federal, estaduais e municipais (arts. 19-M, I, e 19-P). Para remédio fora dessas listas, o fornecimento não é automático e depende do caso."
+  },
+  {
+   "id": "penal-ameaca",
+   "area": "Penal",
+   "pergunta": "Uma pessoa me ameaçou de morte por mensagem. Isso é crime?",
+   "tipo": [
+    "answer",
+    "urgent"
+   ],
+   "artigos": [
+    {
+     "lei": "del2848",
+     "art": "147"
+    }
+   ],
+   "pontos": [
+    [
+     "crime de ameaça",
+     "ameaca"
+    ],
+    [
+     "pena de 1 a 6 meses ou multa",
+     "\\b(1|um) a (6|seis) meses"
+    ],
+    [
+     "depende de representação da vítima",
+     "representa"
+    ]
+   ],
+   "evitar": [
+    [
+     "confundir com a ameaça no crime organizado (1 a 3 anos)",
+     "\\b(1|um) a (3|tres) anos"
+    ]
+   ],
+   "gabarito": "Sim. Ameaçar alguém, por palavra, escrito ou outro meio, de causar mal injusto e grave é crime de ameaça, com pena de detenção de 1 a 6 meses ou multa (Código Penal, art. 147). Em regra, o processo depende de representação da vítima, isto é, de ela dizer que quer a punição (§ 2º). Se a ameaça for contra mulher por razões da condição do sexo feminino, a pena dobra e a representação não é exigida (§§ 1º e 2º). Guarde as mensagens e registre um boletim de ocorrência."
   }
  ]
 }

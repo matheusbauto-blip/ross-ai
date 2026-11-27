@@ -1229,6 +1229,32 @@ test('new subject routes: the specific subject wins over dismissal, and supersed
   assert.ok(texts.some(x => /Art\. 43 \|[\s\S]*cinco anos/.test(x)));
 });
 
+test('routes for internship, family home, maternity pay, daycare, voting, public information, animal cruelty and threats', async t => {
+  const { api, answers } = routeApp(t);
+  const ask = async (question) => { await api.submitMessage(question); return sent(answers.at(-1)); };
+  let texts = await ask('Sou estagiário e faço faculdade. Quantas horas por dia posso estagiar? Tenho direito a férias?');
+  assert.ok(texts.some(x => /Art\. 10 \|[\s\S]*6 \(seis\) horas diárias e 30 \(trinta\) horas semanais/.test(x)), 'internship hours (Lei 11.788)');
+  assert.ok(texts.some(x => /Art\. 13 \|[\s\S]*recesso de 30 \(trinta\) dias/.test(x)));
+  texts = await ask('Tenho muitas dívidas no banco. Podem tomar a única casa onde moro com minha família?');
+  assert.ok(texts.some(x => /Art\. 1 \|[\s\S]*impenhorável/.test(x)), 'family home before over-indebtedness: ' + texts.map(x => x.slice(0, 40)).join(' / '));
+  assert.ok(texts.some(x => /Art\. 3 \|[\s\S]*pensão alimentícia/.test(x)), 'with its exceptions');
+  texts = await ask('Vou ter um bebê. Por quanto tempo recebo o salário-maternidade do INSS?');
+  assert.ok(texts.some(x => /Art\. 71 \|[\s\S]*120 \(cento e vinte\) dias[\s\S]*28 \(vinte e oito\) dias antes do parto/.test(x)));
+  texts = await ask('A prefeitura diz que não tem vaga na creche para minha filha de 2 anos. Ela tem direito à vaga?');
+  assert.ok(texts.some(x => /Constituição[^|]*\| Art\. 208 \|[\s\S]*creche e pré-escola, às crianças até 5/.test(x)));
+  texts = await ask('Tenho 17 anos. Sou obrigado a votar?');
+  const art14 = texts.find(x => /Constituição[^|]*\| Art\. 14 \|/.test(x)) || '';
+  assert.match(art14, /obrigatórios para os maiores de dezoito anos[\s\S]*maiores de dezesseis e menores de dezoito anos/, 'the paragraph keeps its items');
+  assert.doesNotMatch(art14, /Roraima/, 'not the transitional article with the same number');
+  texts = await ask('Pedi uma informação à prefeitura pela Lei de Acesso à Informação. Em quanto tempo eles têm que responder?');
+  assert.ok(texts.some(x => /Art\. 11 \|[\s\S]*20 \(vinte\) dias[\s\S]*10 \(dez\) dias/.test(x)));
+  texts = await ask('Meu vizinho maltrata o cachorro dele. Isso é crime?');
+  assert.ok(texts.some(x => /Art\. 32 \|[\s\S]*cão ou gato[\s\S]*2 \(dois\) a 5 \(cinco\) anos/.test(x)));
+  texts = await ask('Uma pessoa me ameaçou de morte por mensagem. Isso é crime?');
+  assert.ok(texts.some(x => /Art\. 147 \|[\s\S]*um a seis meses/.test(x)));
+  assert.ok(!texts.some(x => /Art\. 147-C \|/.test(x)), 'the organised-crime threat is left out');
+});
+
 test('a retirement question looks up the 2019 reform and never sends the superseded retirement rules', async t => {
   const { api, searches, answers } = routeApp(t);
   await api.submitMessage('Quanto tempo de contribuição preciso para me aposentar pelo INSS?');
