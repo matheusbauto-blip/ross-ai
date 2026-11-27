@@ -139,13 +139,16 @@
     });
     return lines.join('\n');
   }
+  function downloadText(filename, text) {
+    if (typeof Blob !== 'function' || !URL.createObjectURL) throw new Error('download unavailable');
+    const url = URL.createObjectURL(new Blob([text], { type: 'text/plain;charset=utf-8' }));
+    const a = document.createElement('a'); a.href = url; a.download = filename; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
   function exportHistory() {
     const text = historyExportText();
     try {
-      if (typeof Blob !== 'function' || !URL.createObjectURL) throw new Error('download unavailable');
-      const url = URL.createObjectURL(new Blob([text], { type: 'text/plain;charset=utf-8' }));
-      const a = document.createElement('a'); a.href = url; a.download = 'ross-ai-historico-' + new Date().toISOString().slice(0, 10) + '.txt'; document.body.appendChild(a); a.click(); a.remove();
-      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      downloadText('ross-ai-historico-' + new Date().toISOString().slice(0, 10) + '.txt', text);
       toast(t('storage.exported'));
     } catch (e) {
       if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(() => toast(t('storage.copied')), () => toast(t('chat.copyFailed')));
@@ -543,6 +546,7 @@
     if (a.sources && a.sources.length) h += '<section class="ans-sec"><details class="sources-disclosure"><summary><span>' + esc(isAI ? t('sections.sourcesAI') : t('sections.sources')) + '</span><svg class="sources-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m6 9 6 6 6-6"/></svg></summary><ol class="src-list">' + a.sources.map((s, i) => sourceCardHTML(s, i + 1, m, isAI)).join('') + '</ol></details></section>';
     else if (a.kind === 'answer' || a.kind === 'document') h += section(t('sections.sources'), '<p class="muted">' + esc(t('sections.noSources')) + '</p>');
     if (a.nextSteps && a.nextSteps.length) h += section(t('sections.next'), '<ol>' + a.nextSteps.map((x) => '<li>' + esc(x) + '</li>').join('') + '</ol>');
+    h += letterHTML(a, m);
     if (a.limitNotice) h += callout('neutral', '<b>' + esc(t('sections.limit')) + '</b><br>' + esc(a.limitNotice.text) + (a.limitNotice.referrals && a.limitNotice.referrals.length ? list(a.limitNotice.referrals) : ''));
     if (a.warnings && a.warnings.length) h += a.warnings.map((w) => callout('warn', esc(w))).join('');
     h += '<div class="msg-actions">' +
@@ -592,6 +596,18 @@
       if (state.feedback[m.id]) toast(t('chat.thanks'));
     }));
     const att = $('[data-attach]', node); if (att) att.addEventListener('click', () => pickFiles());
+    $$('[data-letter]', node).forEach((b) => b.addEventListener('click', () => writeLetter(m, conv)));
+    const letterBody = $('[data-letter-body]', node);
+    if (letterBody) letterBody.addEventListener('input', () => { m.letter.body = letterBody.value; const fill = $('[data-letter-fill]', node); if (fill) fill.innerHTML = letterFillHTML(letterBody.value); save(); });
+    const letterShort = $('[data-letter-short]', node);
+    if (letterShort) letterShort.addEventListener('input', () => { m.letter.shortText = letterShort.value; save(); });
+    const letterCopy = $('[data-letter-copy]', node); if (letterCopy) letterCopy.addEventListener('click', () => copyText(letterFileText(m.letter), t('letter.copied')));
+    const shortCopy = $('[data-letter-short-copy]', node); if (shortCopy) shortCopy.addEventListener('click', () => copyText(m.letter.shortText, t('letter.shortCopied')));
+    const letterDownload = $('[data-letter-download]', node);
+    if (letterDownload) letterDownload.addEventListener('click', () => {
+      try { downloadText(t('letter.fileName') + '-' + new Date().toISOString().slice(0, 10) + '.txt', letterFileText(m.letter)); }
+      catch (e) { copyText(letterFileText(m.letter), t('letter.copied')); }
+    });
     const retry = $('[data-retry]', node); if (retry) retry.addEventListener('click', () => retryMessage(m, conv));
     const stop = $('[data-stop]', node); if (stop) stop.addEventListener('click', stopAnswer);
     $$('[data-quick]', node).forEach((b) => b.addEventListener('click', () => {
@@ -633,17 +649,112 @@
     lines.push('', t('composer.disclaimer'));
     return lines.join('\n');
   }
-  function copyAnswer(m) {
-    const text = answerToText(m.answer, m);
+  function copyAnswer(m) { copyText(answerToText(m.answer, m), t('chat.copied')); }
+  function copyText(text, done) {
     const fallback = () => {
       try {
         const ta = document.createElement('textarea'); ta.value = text; ta.setAttribute('readonly', ''); ta.style.position = 'fixed'; ta.style.opacity = '0'; document.body.appendChild(ta); ta.select();
         const ok = document.execCommand && document.execCommand('copy'); document.body.removeChild(ta);
-        toast(ok ? t('chat.copied') : t('chat.copyFailed'));
+        toast(ok ? done : t('chat.copyFailed'));
       } catch (e) { toast(t('chat.copyFailed')); }
     };
-    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(() => toast(t('chat.copied')), fallback);
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(() => toast(done), fallback);
     else fallback();
+  }
+
+  /* ---------- Carta de reclamação ----------
+     Escrita pelo modelo só com os artigos já citados na resposta. Dados que a pessoa não informou viram campos entre
+     colchetes, preenchidos por ela aqui mesmo: o que ela digita na carta fica neste navegador e não vai ao modelo. */
+  const LETTER_HINT = /reclam|notifi|por escrito|carta|formal|procon|consumidor\.gov|protocol|e-?mail|complain|in writing|letter/i;
+  function letterEligible(a) {
+    if (!a || a.mode !== 'oficial' || a.kind !== 'answer' || (!API_URL && !sampleFn)) return false;
+    if (!(a.sources || []).some((s) => s && s.excerpt && s.excerpt.trim())) return false;
+    return LETTER_HINT.test([a.summary].concat(a.nextSteps || []).join(' '));
+  }
+  const PLACEHOLDER = /\[[^\[\]\n]{2,60}\]/g;
+  function letterFillHTML(body) {
+    const missing = Array.from(new Set(String(body || '').match(PLACEHOLDER) || []));
+    if (!missing.length) return '<p class="muted">' + esc(t('letter.filled')) + '</p>';
+    return '<p class="letter-fill-title">' + esc(t('letter.fill')) + '</p><ul class="letter-chips">' + missing.map((x) => '<li>' + esc(x) + '</li>').join('') + '</ul>';
+  }
+  function letterHTML(a, m) {
+    if (!m || !letterEligible(a)) return '';
+    const l = m.letter;
+    if (!l) return '<div class="letter-cta"><button type="button" class="btn btn-secondary btn-sm" data-letter>' + ICONS.doc + '<span>' + esc(t('letter.cta')) + '</span></button><p class="muted">' + esc(t('letter.ctaHint')) + '</p></div>';
+    let inner;
+    if (l.status === 'loading') inner = '<p class="muted" aria-live="polite">' + esc(t('letter.loading')) + '</p><div class="skeleton" aria-hidden="true"><span></span><span></span><span></span></div>';
+    else if (l.status === 'unsuitable') inner = callout('neutral', esc(t('letter.unsuitable')) + (l.reason ? '<br>' + esc(l.reason) : ''));
+    else if (l.status === 'error') inner = '<div class="error-card" role="alert"><p>' + esc(l.error || t('letter.error')) + '</p><div class="row"><button type="button" class="btn btn-secondary btn-sm" data-letter>' + esc(t('letter.retry')) + '</button></div></div>';
+    else inner = callout('neutral', esc(t('letter.notice'))) +
+      '<dl class="letter-meta">' + (l.recipient ? '<dt>' + esc(t('letter.to')) + '</dt><dd>' + esc(l.recipient) + '</dd>' : '') + (l.subject ? '<dt>' + esc(t('letter.subject')) + '</dt><dd>' + esc(l.subject) + '</dd>' : '') + '</dl>' +
+      '<div class="letter-fill" data-letter-fill>' + letterFillHTML(l.body) + '</div>' +
+      '<label class="letter-label" for="letter-' + esc(m.id) + '">' + esc(t('letter.bodyLabel')) + '</label>' +
+      '<textarea id="letter-' + esc(m.id) + '" class="letter-text" rows="16" spellcheck="true" data-letter-body>' + esc(l.body) + '</textarea>' +
+      '<div class="letter-actions"><button type="button" class="btn btn-sm" data-letter-copy>' + ICONS.copy + '<span>' + esc(t('letter.copy')) + '</span></button>' +
+      '<button type="button" class="btn btn-secondary btn-sm" data-letter-download>' + esc(t('letter.download')) + '</button>' +
+      '<button type="button" class="btn btn-ghost btn-sm" data-letter>' + esc(t('letter.regenerate')) + '</button></div>' +
+      (l.citations && l.citations.length ? '<p class="muted letter-basis">' + esc(t('letter.basedOn')) + ' ' + esc(l.citations.map((c) => c.article).join('; ')) + '</p>' : '') +
+      (l.shortText ? '<label class="letter-label" for="letter-short-' + esc(m.id) + '">' + esc(t('letter.short')) + '</label>' +
+        '<textarea id="letter-short-' + esc(m.id) + '" class="letter-text" rows="6" spellcheck="true" data-letter-short>' + esc(l.shortText) + '</textarea>' +
+        '<div class="letter-actions"><button type="button" class="btn btn-secondary btn-sm" data-letter-short-copy>' + esc(t('letter.shortCopy')) + '</button></div>' : '') +
+      (l.notes && l.notes.length ? '<p class="letter-fill-title">' + esc(t('letter.notes')) + '</p>' + list(l.notes) : '');
+    return '<section class="ans-sec letter" data-letter-panel><h3>' + esc(t('letter.title')) + '</h3>' + inner + '</section>';
+  }
+  function letterPayload(m, conv) {
+    const index = conv.messages.indexOf(m);
+    const said = conv.messages.slice(0, index < 0 ? conv.messages.length : index).filter((x) => x.role === 'user' && x.text).slice(-4).map((x) => x.text).join('\n');
+    const where = m.jurisdiction || { country: conv.country, region: conv.region };
+    const sources = (m.answer.sources || []).filter((s) => s && s.excerpt && s.excerpt.trim()).slice(0, 8);
+    return {
+      lang: t('langName'), jurisdiction: jurisdictionLabel(where.country, where.region), question: said.slice(0, 3000),
+      summary: String(m.answer.summary || '').slice(0, 1500), nextSteps: (m.answer.nextSteps || []).slice(0, 5),
+      excerpts: sources.map((s) => ({ n: s.n, name: s.name, article: s.article, excerpt: s.excerpt.slice(0, 3000) })),
+    };
+  }
+  function letterSample(payload) {
+    return sampleFn.json([
+      'Write a complaint letter for a person in Brazil, in ' + payload.lang + ', plain, respectful and firm. Use ONLY the law excerpts below as legal grounds and cite them by name; never cite anything else. Never invent facts: every missing detail (names, dates, amounts, numbers, addresses) is a placeholder in square brackets and capitals, such as [SEU NOME COMPLETO]. No threats, no promised outcome. If a written complaint is not appropriate (urgent risk, violence, crime, nobody to address), set suitable to false and explain in reason.',
+      'Situation: ' + payload.question, 'Explanation already given: ' + payload.summary,
+      'Excerpts:\n' + payload.excerpts.map((e) => '[' + e.n + '] ' + e.name + ' — ' + e.article + '\n' + e.excerpt).join('\n\n'),
+      'Reply with ONLY one JSON object: {"suitable":boolean,"reason":string,"recipient":string,"subject":string,"body":string,"shortText":string (at most 900 characters, for a Procon form),"citations":[{"ref":number,"article":string}],"notes":[string] (up to 4 tips on sending and keeping proof)}.'
+    ].join('\n\n'), { modelTier: 'default' });
+  }
+  function normalizeLetter(data, excerpts) {
+    const text = (v, max) => (typeof v === 'string' ? v : '').slice(0, max);
+    const body = text(data && data.body, 8000).trim();
+    if (!body) throw { code: 'invalid_json' };
+    const refs = new Set(excerpts.map((e) => e.n));
+    return {
+      status: 'done', recipient: text(data.recipient, 300), subject: text(data.subject, 300), body: body, shortText: text(data.shortText, 1500).trim(),
+      citations: (Array.isArray(data.citations) ? data.citations : []).filter((c) => c && refs.has(Number(c.ref)) && typeof c.article === 'string').slice(0, 6).map((c) => ({ ref: Number(c.ref), article: c.article.slice(0, 120) })),
+      notes: (Array.isArray(data.notes) ? data.notes : []).filter((x) => typeof x === 'string' && x.trim()).slice(0, 4).map((x) => x.slice(0, 300)),
+      createdAt: Date.now(),
+    };
+  }
+  function repaintMessage(m, conv) {
+    const node = $('.msg[data-id="' + m.id + '"]');
+    if (!node) return null;
+    const fresh = renderMessage(m, conv); node.replaceWith(fresh); return fresh;
+  }
+  async function writeLetter(m, conv) {
+    if (m.letter && m.letter.status === 'loading') return;
+    m.letter = { status: 'loading' };
+    repaintMessage(m, conv);
+    try {
+      const payload = letterPayload(m, conv);
+      const data = sampleFn ? await letterSample(payload) : await apiCall('letter', payload, null);
+      const letter = data && data.letter ? data.letter : data;
+      m.letter = letter && letter.suitable === false ? { status: 'unsuitable', reason: String(letter.reason || '').slice(0, 600) } : normalizeLetter(letter, payload.excerpts);
+    } catch (e) {
+      m.letter = { status: 'error', error: e && e.code === 'rate_limited' ? t('errors.rate_limited') : t('letter.error') };
+    }
+    save();
+    const node = repaintMessage(m, conv);
+    const panel = node && $('[data-letter-panel]', node);
+    if (panel && panel.scrollIntoView) panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+  function letterFileText(l) {
+    return [l.recipient ? t('letter.to') + ': ' + l.recipient : '', l.subject ? t('letter.subject') + ': ' + l.subject : '', '', l.body].filter((x, i) => x || i === 2).join('\n').replace(/^\n/, '');
   }
 
   /* ---------- Provedores de resposta ----------
@@ -728,7 +839,7 @@
   /* O Supabase encerra cada servidor depois de 150 s de vida, mesmo no meio de uma resposta (546, que chega ao navegador
      como falha de rede por não trazer CORS), e o servidor recusa na hora quando está perto disso (worker_recycling).
      Nos dois casos as chamadas ao modelo tentam mais uma vez, já em um servidor novo. */
-  const MODEL_OPS = ['prepare', 'answer'];
+  const MODEL_OPS = ['prepare', 'answer', 'letter'];
   function waitFor(ms, signal) {
     return new Promise((resolve, reject) => {
       if (signal && signal.aborted) return reject({ code: 'cancelled' });

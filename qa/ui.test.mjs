@@ -1021,3 +1021,69 @@ test('a slow search preparation is abandoned after its own deadline, and a recog
   assert.equal(message.status, 'done', message.error);
   assert.deepEqual(prepares, ['relevance'], 'a recognised subject (defective product) does not wait for the preparation');
 });
+
+function letterApp(t, { answer, letter }) {
+  const requests = [];
+  const env = setup(t, async (url, options) => {
+    const local = lawFetch(String(url)); if (local) return local;
+    const body = JSON.parse(options.body);
+    if (body.op === 'search') return Response.json({ results: [] });
+    if (body.op === 'prepare') return Response.json(body.catalog.some(law => /^passage-/.test(law.id)) ? { terms: [], laws: ['passage-1'] } : { terms: ['desistir'], laws: ['l8078'] });
+    if (body.op === 'letter') { requests.push(body); return typeof letter === 'function' ? letter(body) : Response.json({ letter }); }
+    return Response.json({ answer });
+  });
+  env.api.state.mode = 'oficial';
+  return Object.assign(env, { requests });
+}
+const complaintAnswer = { kind: 'answer', summary: 'Você pode desistir em 7 dias.', sourcesSay: [{ title: 'CDC', text: 'Prazo de 7 dias.', ref: 1 }], sources: [{ ref: 1, why: 'arrependimento' }], nextSteps: ['Avise a loja por escrito, por e-mail.'], warnings: [] };
+const settle = async () => { for (let i = 0; i < 10; i++) await tick(); };
+
+test('a complaint letter is drafted from the cited articles, with placeholders the person fills in here', async t => {
+  const { api, document, clipboard, requests, storage } = letterApp(t, { answer: complaintAnswer, letter: {
+    suitable: true, reason: '', recipient: 'Loja [NOME DA LOJA]', subject: 'Desistência da compra', body: '[CIDADE], [DATA]\n\nEu, [SEU NOME COMPLETO], desisto da compra.',
+    shortText: 'Desisto da compra feita em [DATA DA COMPRA].', citations: [{ ref: 1, article: 'art. 49 do CDC' }, { ref: 9, article: 'artigo inventado' }], notes: ['Envie por e-mail com confirmação de leitura.'],
+  } });
+  await api.submitMessage('Comprei pela internet e quero desistir. Posso?');
+  const button = document.querySelector('[data-letter]');
+  assert.ok(button, 'the answer offers the letter');
+  button.click(); await settle();
+  assert.equal(requests.length, 1);
+  assert.equal(requests[0].excerpts.length, 1, 'only the articles cited in the answer are sent');
+  assert.match(requests[0].question, /desistir/);
+  assert.equal('attachments' in requests[0], false);
+  const text = document.querySelector('[data-letter-body]');
+  assert.match(text.value, /\[SEU NOME COMPLETO\]/);
+  assert.deepEqual(Array.from(document.querySelectorAll('.letter-chips li'), li => li.textContent), ['[CIDADE]', '[DATA]', '[SEU NOME COMPLETO]']);
+  assert.doesNotMatch(document.querySelector('.letter-basis').textContent, /inventado/, 'a citation outside the answer is dropped');
+  text.value = 'Recife, 26/11/2026\n\nEu, Maria Silva, desisto da compra.';
+  text.dispatchEvent(new document.defaultView.Event('input', { bubbles: true }));
+  assert.equal(document.querySelector('.letter-chips'), null, 'filled placeholders leave the list');
+  document.querySelector('[data-letter-copy]').click(); await settle();
+  assert.match(clipboard.at(-1), /^Para: Loja \[NOME DA LOJA\]\nAssunto: Desistência da compra\n\nRecife/);
+  const message = api.state.conversations[0].messages.at(-1);
+  assert.equal(message.letter.body, text.value, 'the edited letter is kept with the conversation');
+  document.querySelector('[data-letter-download]').click(); await settle();
+  assert.match(clipboard.at(-1), /Maria Silva/, 'without file downloads the letter is copied instead');
+  await new Promise(resolve => setTimeout(resolve, 400));
+  assert.match(storage.get([...storage.keys()].find(key => /ross/i.test(key))) || '', /Maria Silva/);
+});
+
+test('the letter is offered only when the next step is a written complaint, and explains when it does not fit or fails', async t => {
+  const plain = letterApp(t, { answer: Object.assign({}, complaintAnswer, { summary: 'O artigo define o prazo.', nextSteps: ['Leia o artigo completo.'] }), letter: {} });
+  await plain.api.submitMessage('Comprei pela internet e quero desistir. Posso?');
+  assert.equal(plain.document.querySelector('[data-letter]'), null);
+
+  const unsuitable = letterApp(t, { answer: complaintAnswer, letter: { suitable: false, reason: 'A situação pede ajuda imediata.' } });
+  await unsuitable.api.submitMessage('Comprei pela internet e quero desistir. Posso?');
+  unsuitable.document.querySelector('[data-letter]').click(); await settle();
+  assert.match(unsuitable.document.querySelector('[data-letter-panel]').textContent, /ajuda imediata/);
+  assert.equal(unsuitable.document.querySelector('[data-letter-body]'), null);
+
+  let calls = 0;
+  const failing = letterApp(t, { answer: complaintAnswer, letter: () => { calls++; return calls === 1 ? Response.json({ error: 'upstream' }, { status: 502 }) : Response.json({ letter: { suitable: true, body: 'Texto [SEU NOME].', citations: [], notes: [] } }); } });
+  await failing.api.submitMessage('Comprei pela internet e quero desistir. Posso?');
+  failing.document.querySelector('[data-letter]').click(); await settle();
+  assert.match(failing.document.querySelector('[data-letter-panel] .error-card').textContent, /Não foi possível escrever a carta/);
+  failing.document.querySelector('[data-letter-panel] [data-letter]').click(); await settle();
+  assert.match(failing.document.querySelector('[data-letter-body]').value, /SEU NOME/);
+});

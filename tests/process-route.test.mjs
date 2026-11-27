@@ -222,3 +222,16 @@ test('when the primary model fails before writing, the fallback streams the answ
   assert.deepEqual(lines.map(l => l.t), ['d', 'done']);
   assert.equal(lines[1].fallback, true);
 });
+
+test('a complaint letter is written only from the cited excerpts, counts against the quota and needs at least one excerpt', async () => {
+  const s = server({ models: { 'gemini-3.5-flash': { suitable: true } } });
+  const response = await s.raw({ op: 'letter', question: 'O motor do carro quebrou um mês depois da compra.', summary: 'Você pode reclamar.', nextSteps: ['Notifique a loja por escrito.'], excerpts: [{ n: 1, name: 'CDC', article: 'Art. 18', excerpt: 'Os fornecedores respondem pelos vícios.' }] });
+  assert.equal(response.status, 200);
+  assert.deepEqual(s.modelsCalled(), ['gemini-3.5-flash']);
+  assert.deepEqual(s.thinkingLevels(), ['low']);
+  assert.equal(s.counts().quotaCalls, 1);
+  const empty = server({ models: { 'gemini-3.5-flash': { suitable: true } } });
+  const refused = await empty.raw({ op: 'letter', question: 'pergunta', excerpts: [{ n: 1, excerpt: '   ' }] });
+  assert.deepEqual(await refused.json(), { error: 'no_sources' });
+  assert.equal(empty.counts().modelCalls, 0, 'without legal grounds the model is not called');
+});
