@@ -1238,12 +1238,15 @@
     { id: 'aposentadoria', test: (q) => /\baposent\w*/.test(q) && !/\bservidor\w*\b/.test(q),
       /* Depois da reforma (EC 103/2019): idade mínima na Constituição (art. 201, § 7º) e tempo de contribuição na própria
          emenda (art. 19). As regras de aposentadoria por tempo de serviço e de idade da Lei 8.213 (arts. 48 e 52 a 56)
-         ficaram superadas e levariam a uma resposta desatualizada. */
+         ficaram superadas e levariam a uma resposta desatualizada; a pontuação do art. 29-C (95/85) também mudou com a emenda. */
       laws: ['cf88', 'l8213'],
-      terms: 'aposentadoria regime geral idade tempo mínimo de contribuição sessenta e dois sessenta e cinco anos',
+      /* Os termos também escolhem os artigos da emenda no acervo: com estas palavras vêm o art. 19 (regra atual: 15 anos de
+         contribuição para mulheres e 20 para homens) e os arts. 17 e 18 (transição para quem já contribuía). */
+      terms: 'aposentadoria segurado filiado ao regime geral após a data de entrada em vigor aposentado aos 62 anos de idade se mulher 65 anos se homem 15 quinze anos 20 vinte anos de tempo de contribuição transição',
       references: [{ type: 'emenda constitucional', number: '103', year: 2019 }],
-      focus: { cf88: [/65 \(sessenta e cinco\) anos de idade, se homem, e 62 \(sessenta e dois\) anos de idade, se mulher/] },
-      exclude: { l8213: ['48', '52', '53', '54', '55', '56'] } },
+      focus: { cf88: [/65 \(sessenta e cinco\) anos de idade, se homem, e 62 \(sessenta e dois\) anos de idade, se mulher/],
+        acervo: [/15 \(quinze\) anos de tempo de contribuicao, se mulher, e 20 \(vinte\) anos de tempo de contribuicao, se homem/] },
+      exclude: { l8213: ['29-C', '48', '52', '53', '54', '55', '56'] } },
     { id: 'colisao', test: (q) => (/\b(?:batida|batidas|bateram|bateu|bati|bater|colisao|colisoes|abalroamento)\b/.test(q) && /\b(?:carro|carros|veiculo|veiculos|moto|motocicleta|caminhao|traseira|para-choque)\b/.test(q)) || /\bengavetamento\b|\bacidente de transito\b/.test(q),
       laws: ['l9503', 'l10406'],
       terms: 'acidente de trânsito colisão veículo condutor distância de segurança lateral frontal negligência imprudência causar dano reparação indenização ato ilícito',
@@ -1406,7 +1409,8 @@
     const intent = typeof questionOrIntent === 'string' ? searchIntent(questionOrIntent) : questionOrIntent;
     if (!intent || !intent.focus) return [];
     return sources.filter((source) => {
-      const patterns = intent.focus[source.lawId];
+      // "acervo": linhas procuradas nos trechos importados do acervo (normas fora do catálogo, como a EC 103).
+      const patterns = intent.focus[source.lawId] || (source.imported && intent.focus.acervo);
       if (!patterns || !source.excerpt) return false;
       const text = norm(source.excerpt).replace(/\s+/g, ' ');
       return patterns.some((pattern) => pattern.test(text));

@@ -1163,12 +1163,12 @@ test('a traffic offence brings the articles with the value of the fine and the p
   assert.ok(excerpts.some(e => e.article === 'Art. 259' && /gravíssima - sete pontos/.test(e.excerpt)), 'points');
 });
 
-function routeApp(t) {
+function routeApp(t, searchResults = []) {
   const searches = [], answers = [];
   const env = setup(t, async (url, options) => {
     const local = lawFetch(String(url)); if (local) return local;
     const body = JSON.parse(options.body);
-    if (body.op === 'search') { searches.push(body); return Response.json({ results: [] }); }
+    if (body.op === 'search') { searches.push(body); return Response.json({ results: searchResults }); }
     if (body.op === 'prepare') return Response.json({ terms: [], laws: body.catalog.some(law => /^passage-/.test(law.id)) ? ['passage-1'] : [] });
     answers.push(body);
     return Response.json({ answer: { kind: 'answer', summary: 'Resposta.', sourcesSay: [{ title: 'Lei', text: 'Texto.', ref: 1 }], sources: [{ ref: 1, why: 'x' }], warnings: [] } });
@@ -1200,5 +1200,21 @@ test('a retirement question looks up the 2019 reform and never sends the superse
   assert.ok(searches.at(-1).references.some(r => r.number === '103' && /emenda/.test(r.type)), 'EC 103/2019 is requested from the full collection');
   const texts = sent(answers.at(-1));
   assert.ok(texts.some(x => /Art\. 201 \|[\s\S]*62 \(sessenta e dois\) anos de idade, se mulher/.test(x)), texts.map(x => x.slice(0, 60)).join(' / '));
-  assert.ok(!texts.some(x => /8\.213[^|]*\| Art\. (?:48|52|53|54|55|56) \|/.test(x)), 'pre-reform retirement articles are excluded');
+  assert.ok(!texts.some(x => /8\.213[^|]*\| Art\. (?:29-C|48|52|53|54|55|56) \|/.test(x)), 'pre-reform retirement articles are excluded');
+});
+
+test('a retirement answer always carries EC 103 art. 19 from the collection, not the civil-servant articles', async t => {
+  const ec = (article, excerpt) => ({ id: 'ec103-' + article, title: 'Emenda Constitucional nº 103 de 12/11/2019', article, excerpt, content_mode: 'full',
+    source_url: 'https://www.planalto.gov.br/ccivil_03/constituicao/emendas/emc/emc103.htm', captured_at: '2026-11-16', repository_ref: 'c9f21b4ab11aa0d7ca6fe861d75028e94219c2d6',
+    repository_path: 'federal/emendas-constitucionais/2019/emc-103.md', text_version: 'Texto do acervo' });
+  const { api, searches, answers } = routeApp(t, [
+    ec('Art. 10', '**Art. 10.** Até que entre em vigor lei federal que discipline os benefícios do regime próprio de previdência social dos servidores da União, aplica-se o disposto neste artigo.'),
+    ec('Art. 21', '**Art. 21.** O segurado ou o servidor público federal que se tenha filiado ao Regime Geral de Previdência Social até a data de entrada em vigor desta Emenda Constitucional cujas atividades tenham sido exercidas com efetiva exposição a agentes químicos...'),
+    ec('Art. 19', '**Art. 19.** Até que lei disponha sobre o tempo de contribuição a que se refere o inciso I do § 7º do art. 201 da Constituição Federal, o segurado filiado ao Regime Geral de Previdência Social após a data de entrada em vigor desta Emenda Constitucional será aposentado aos 62 (sessenta e dois) anos de idade, se mulher, 65 (sessenta e cinco) anos de idade, se homem, com 15 (quinze) anos de tempo de contribuição, se mulher, e 20 (vinte) anos de tempo de contribuição, se homem.'),
+  ]);
+  await api.submitMessage('Quanto tempo de contribuição preciso para me aposentar pelo INSS?');
+  assert.match(searches.at(-1).query, /15 quinze anos 20 vinte anos de tempo de contribuição/, 'the collection search asks for the current-rule article');
+  const texts = sent(answers.at(-1));
+  assert.ok(texts.some(x => /Emenda Constitucional nº 103[^|]*\| Art\. 19 \|[\s\S]*15 \(quinze\) anos de tempo de contribuição, se mulher/.test(x)), texts.map(x => x.slice(0, 60)).join(' / '));
+  assert.ok(texts.some(x => /Art\. 201 \|/.test(x)), 'the constitutional age rule stays');
 });
