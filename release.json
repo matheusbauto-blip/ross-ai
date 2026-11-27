@@ -1,10 +1,10 @@
 {
-  "version": "b9bc46c7e0c0",
+  "version": "f6e5096241f2",
   "files": [
     {
       "path": "index.html",
       "bytes": 1941,
-      "sha256": "e379b61fe49bd1246e97f529a8a1bf3bf3d10cab8078cf8ae6d4551a734aa5e8"
+      "sha256": "c9f0a397d7a6aca7edeae20f4e2fb53a8657268f04cd37600104712f00152711"
     },
     {
       "path": "styles.css",
@@ -33,13 +33,13 @@
     },
     {
       "path": "app.js",
-      "bytes": 179292,
-      "sha256": "f9a050b8b856fed173c65d871b6d354fd0d781f608314b6262ee5435192832c0"
+      "bytes": 182266,
+      "sha256": "1f1c10095083a64442179122db14f19016a99ab66ce18f6f90ca474af4571fca"
     },
     {
       "path": "data/catalog.json",
-      "bytes": 89254,
-      "sha256": "5acae88cdf99e134438ed9eac0a0f602e2626dcd172d283ef6a876f25699fa5b"
+      "bytes": 90468,
+      "sha256": "0ed4afe3d345a3bbd0caffe8230e04b9adf65407df7dce910d972830af39c2fa"
     },
     {
       "path": "data/laws/cf88.json",
@@ -282,6 +282,11 @@
       "sha256": "cea09901f54ae477654c3973540a1b0c7d6ae6eed4413d032c62597f2273f78a"
     },
     {
+      "path": "data/laws/l4090.json",
+      "bytes": 2719,
+      "sha256": "681ea16eb3007978393c1a73aa4b120df31b89e19f7061dca47efe0da7bb93ab"
+    },
+    {
       "path": "data/laws/l11788.json",
       "bytes": 19816,
       "sha256": "4e2e69edb665cd9849a1aa24c1219c594d30dd8f8f264b4a10431a580a1fee17"
@@ -382,5 +387,5 @@
       "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
     }
   ],
-  "bundledLaws": 66
+  "bundledLaws": 67
 }

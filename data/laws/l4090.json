@@ -1,0 +1,55 @@
+{
+ "id": "l4090",
+ "name": "Lei nº 4.090, de 13 de julho de 1962 (gratificação de Natal — 13º salário)",
+ "shortName": "Lei do 13º Salário",
+ "number": "Lei nº 4.090/1962",
+ "type": "lei",
+ "date": "1962-07-13",
+ "url": "https://www.planalto.gov.br/ccivil_03/leis/l4090.htm",
+ "lexml": "urn:lex:br:federal:lei:1962-07-13;4090",
+ "jurisdiction": "Brasil · Federal",
+ "source": "Câmara dos Deputados — Legislação Informatizada (texto atualizado)",
+ "textUrl": "https://www2.camara.leg.br/legin/fed/lei/1960-1969/lei-4090-13-julho-1962-353863-normaatualizada-pl.html",
+ "index": "LexML Brasil (https://www.lexml.gov.br)",
+ "retrievedAt": "2026-11-27T01:01:20.701Z",
+ "sha256": "4f9547e5b93ad3241055980b0929e8e69544c5a386cd5bd1bf342cf1c8da57a6",
+ "bytes": 32007,
+ "articleCount": 4,
+ "vigentes": 4,
+ "revogados": 0,
+ "articles": [
+  {
+   "id": "1",
+   "label": "Art. 1",
+   "heading": "",
+   "text": "Art. 1º No mês de dezembro de cada ano, a todo empregado será paga, pelo empregador, uma gratificação salarial, independentemente da remuneração a que fizer jus.\n§ 1º A gratificação corresponderá a 1/12 avos da remuneração devida em dezembro, por mês de serviço, do ano correspondente.\n§ 2º A fração igual ou superior a 15 (quinze) dias de trabalho será havida como mês integral para os efeitos do parágrafo anterior.\n§ 3º A gratificação será proporcional:\nI - na extinção dos contratos a prazo, entre estes incluídos os de safra, ainda que a relação de emprego haja findado antes de dezembro; e\nII - na cessação da relação de emprego resultante da aposentadoria do trabalhador, ainda que verificada antes de dezembro. (Parágrafo acrescido pela Lei nº 9.011, de 30/3/1995)\n/",
+   "status": "vigente",
+   "nota": "Parágrafo acrescido pela Lei nº 9.011, de 30/3/1995",
+   "hasHistory": false
+  },
+  {
+   "id": "2",
+   "label": "Art. 2",
+   "heading": "",
+   "text": "Art. 2º As faltas legais e justificadas ao serviço não serão deduzidas para os fins previstos no parágrafo 1º do Art. 1º, desta Lei.\n/",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "3",
+   "label": "Art. 3",
+   "heading": "",
+   "text": "Art. 3º Ocorrendo rescisão, sem justa causa, do contrato de trabalho, o empregado receberá a gratificação devida nos termos dos parágrafos 1º e 2º, do art. 1º desta Lei, calculada sobre a remuneração do mês da rescisão.\n/",
+   "status": "vigente",
+   "hasHistory": false
+  },
+  {
+   "id": "4",
+   "label": "Art. 4",
+   "heading": "",
+   "text": "Art. 4º Esta Lei entrará em vigor na data de sua publicação, revogadas as disposições em contrário.\n/",
+   "status": "vigente",
+   "hasHistory": false
+  }
+ ]
+}
