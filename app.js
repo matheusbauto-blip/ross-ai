@@ -525,6 +525,33 @@
   function sourceById(id) { return SOURCES.find((s) => s.id === id); }
   function statusBadge(status) { return '<span class="badge badge-' + esc(status) + '">' + esc(t('status.' + status)) + '</span>'; }
   function list(items, cls) { return '<ul class="' + (cls || '') + '">' + items.map((x) => '<li>' + esc(x) + '</li>').join('') + '</ul>'; }
+  /* Observações técnicas (modelo alternativo, trechos escolhidos por palavras, cobertura parcial, afirmações removidas)
+     ficam juntas em "Sobre esta resposta"; em amarelo aparece só o que muda o caso da pessoa. Respostas salvas antes
+     desta separação guardavam essas observações junto dos avisos e são reorganizadas na exibição. */
+  const NOTICE_KEYS = ['oficial.fallbackModel', 'oficial.relevanceFallback', 'oficial.partialCoverage', 'oficial.droppedClaims'];
+  function textIn(lang, path) { return path.split('.').reduce((node, key) => (node ? node[key] : undefined), window.ROSS_I18N[lang]); }
+  function isTechnicalNotice(text) {
+    return NOTICE_KEYS.some((key) => Object.keys(window.ROSS_I18N).some((lang) => {
+      const prefix = String(textIn(lang, key) || '').split('{')[0];
+      return prefix.length > 10 && String(text).startsWith(prefix);
+    }));
+  }
+  function answerNotes(a) {
+    const warnings = [], notices = (a.notices || []).slice();
+    (a.warnings || []).forEach((w) => (isTechnicalNotice(w) ? notices : warnings).push(w));
+    return { warnings: warnings, notices: Array.from(new Set(notices)) };
+  }
+  function aboutLines(a, notices) {
+    const lines = [];
+    if (a.mode === 'oficial' && a.capturedAt) lines.push(t('chat.aboutOficial', { date: fmtDate(a.capturedAt) }));
+    if (a.corpus) lines.push(t('corpus.answerNotice'));
+    return lines.concat(notices);
+  }
+  function aboutHTML(a, notices) {
+    const lines = aboutLines(a, notices);
+    if (!lines.length) return '';
+    return '<details class="about-answer"><summary>' + ICONS.info + '<span>' + esc(t('chat.about')) + (notices.length ? ' · ' + esc(t(notices.length === 1 ? 'chat.aboutNote' : 'chat.aboutNotes', { n: notices.length })) : '') + '</span></summary>' + list(lines) + '</details>';
+  }
   function section(title, inner, cls) { return inner ? '<section class="ans-sec ' + (cls || '') + '"><h3>' + esc(title) + '</h3>' + inner + '</section>' : ''; }
   function callout(kind, html) { return '<div class="callout callout-' + kind + '">' + (kind === 'danger' ? ICONS.alert : kind === 'warn' ? ICONS.warn : ICONS.info) + '<div>' + html + '</div></div>'; }
 
@@ -532,7 +559,7 @@
     if (!a) return '';
     const isAI = a.mode === 'ai', isOficial = a.mode === 'oficial';
     let h = '';
-    h += '<div class="mode-banner">' + ICONS.info + '<span>' + esc(isAI ? t('chat.aiBanner') : a.corpus ? t('corpus.answerNotice') : isOficial ? t('chat.oficialBanner', { date: a.capturedAt ? fmtDate(a.capturedAt) : '' }) : t('chat.demoBanner')) + '</span></div>';
+    h += '<div class="mode-banner">' + ICONS.info + '<span>' + esc(isAI ? t('chat.aiBanner') : a.corpus ? t('corpus.answerBanner') : isOficial ? t('chat.oficialBanner') : t('chat.demoBanner')) + '</span></div>';
     if (a.kind === 'urgent') h += callout('danger', '<b>' + esc(t('sections.urgent')) + '</b><br>' + esc(a.summary));
     if (a.document) h += documentHTML(a.document, m);
     if (a.kind !== 'urgent' && a.summary) h += section(t('sections.summary'), '<p>' + esc(a.summary) + '</p>', 'summary');
@@ -548,7 +575,9 @@
     if (a.nextSteps && a.nextSteps.length) h += section(t('sections.next'), '<ol>' + a.nextSteps.map((x) => '<li>' + esc(x) + '</li>').join('') + '</ol>');
     h += letterHTML(a, m);
     if (a.limitNotice) h += callout('neutral', '<b>' + esc(t('sections.limit')) + '</b><br>' + esc(a.limitNotice.text) + (a.limitNotice.referrals && a.limitNotice.referrals.length ? list(a.limitNotice.referrals) : ''));
-    if (a.warnings && a.warnings.length) h += a.warnings.map((w) => callout('warn', esc(w))).join('');
+    const notes = answerNotes(a);
+    if (notes.warnings.length) h += notes.warnings.map((w) => callout('warn', esc(w))).join('');
+    h += aboutHTML(a, notes.notices);
     h += '<div class="msg-actions">' +
       '<button type="button" class="icon-btn" data-copy aria-label="' + esc(t('chat.copy')) + '" title="' + esc(t('chat.copy')) + '">' + ICONS.copy + '</button>' +
       '<button type="button" class="icon-btn' + (state.feedback[m.id] === 'up' ? ' is-active' : '') + '" data-fb="up" aria-pressed="' + (state.feedback[m.id] === 'up') + '" aria-label="' + esc(t('chat.helpful')) + '" title="' + esc(t('chat.helpful')) + '">' + ICONS.up + '</button>' +
@@ -621,7 +650,7 @@
     const lines = [];
     const push = (title, items) => { if (!items || !items.length) return; lines.push('', title.toUpperCase()); items.forEach((x) => lines.push('- ' + x)); };
     lines.push('ROSS AI · ' + (a.mode === 'ai' ? t('chat.modeAI') : a.mode === 'oficial' ? t('chat.modeOficial') : t('chat.modeDemo')));
-    lines.push(a.mode === 'ai' ? t('chat.aiBanner') : a.corpus ? t('corpus.answerNotice') : a.mode === 'oficial' ? t('chat.oficialBanner', { date: a.capturedAt ? fmtDate(a.capturedAt) : '' }) : t('chat.demoBanner'));
+    lines.push(a.mode === 'ai' ? t('chat.aiBanner') : a.corpus ? t('corpus.answerBanner') : a.mode === 'oficial' ? t('chat.oficialBanner') : t('chat.demoBanner'));
     if (a.document) {
       lines.push('', t('sections.document').toUpperCase() + ': ' + (a.document.name || m.docName || ''));
       (a.document.notes || []).forEach((n) => lines.push('- ' + n));
@@ -645,7 +674,10 @@
     }
     if (a.nextSteps && a.nextSteps.length) { lines.push('', t('sections.next').toUpperCase()); a.nextSteps.forEach((x, i) => lines.push((i + 1) + '. ' + x)); }
     if (a.limitNotice) { lines.push('', t('sections.limit').toUpperCase(), a.limitNotice.text); (a.limitNotice.referrals || []).forEach((r) => lines.push('- ' + r)); }
-    (a.warnings || []).forEach((w) => lines.push('', t('sections.attention') + ': ' + w));
+    const notes = answerNotes(a);
+    notes.warnings.forEach((w) => lines.push('', t('sections.attention') + ': ' + w));
+    const about = aboutLines(a, notes.notices);
+    if (about.length) { lines.push('', t('chat.about').toUpperCase()); about.forEach((x) => lines.push('- ' + x)); }
     lines.push('', t('composer.disclaimer'));
     return lines.join('\n');
   }
@@ -1310,7 +1342,9 @@
   }
   function plainAnswerQuestion(question) {
     return question + '\n\nESCOPO DESTA VERSÃO: O ROSS AI atende apenas ao Direito brasileiro. Não apresente leis brasileiras como se fossem de outro país. Se o pedido depender de legislação estrangeira, explique brevemente a limitação; se houver dúvida sobre a aplicação no Brasil, peça o esclarecimento necessário.' +
-      '\n\nESTILO PARA PÚBLICO GERAL: No campo summary (Em resumo), use duas ou três frases curtas e linguagem cotidiana. Comece aplicando a regra ao problema relatado e diga o próximo passo sustentado pelos trechos. Explique termos técnicos em palavras comuns, como "vício" por "defeito". Evite definições abstratas, "garantia legal de adequação" sem explicar e aberturas como "de acordo com os trechos da lei". Use os fatos informados, sem transformar uma hipótese em certeza, diagnosticar a causa de um defeito ou prometer resultado. Não acrescente prazos, direitos ou conclusões que os trechos não sustentem. Respeite um pedido específico de formato ou detalhamento da pessoa.';
+      '\n\nESTILO PARA PÚBLICO GERAL: No campo summary (Em resumo), use duas ou três frases curtas e linguagem cotidiana. Comece aplicando a regra ao problema relatado e diga o próximo passo sustentado pelos trechos. Explique termos técnicos em palavras comuns, como "vício" por "defeito". Evite definições abstratas, "garantia legal de adequação" sem explicar e aberturas como "de acordo com os trechos da lei". Use os fatos informados, sem transformar uma hipótese em certeza, diagnosticar a causa de um defeito ou prometer resultado. Não acrescente prazos, direitos ou conclusões que os trechos não sustentem. Respeite um pedido específico de formato ou detalhamento da pessoa.' +
+      '\n\nLINGUAGEM EM TODOS OS CAMPOS: troque termos jurídicos por palavras do dia a dia também em sourcesSay, depends e nextSteps (ex.: "culpa exclusiva de terceiros" → "quando a culpa é só de outra pessoa"; "prestação do serviço" → "o serviço contratado"; "fornecedor" → "a loja ou a empresa", quando couber). Se um termo técnico for indispensável, explique-o na mesma frase.' +
+      '\n\nAVISOS: em warnings, no máximo dois cuidados que mudam o caso desta pessoa (ex.: um prazo que pode estar acabando). Dicas práticas, como guardar comprovantes, vão em nextSteps. Não repita que a resposta é informativa, que foi gerada por IA ou que convém procurar um advogado: o app já mostra isso. Use limitNotice só quando houver um limite real deste caso (ex.: depende de perícia, prazo judicial curto).';
   }
   function isRephraseRequest(question) {
     const text = norm(question);
@@ -1397,7 +1431,7 @@
       const missingLaws = laws.filter((law, i) => settled[i].status === 'rejected').map((law) => law.name);
       if (laws.length && !loaded.length) throw { code: 'law_fetch' };
       const withCoverage = (answer) => {
-        if (missingLaws.length && answer && answer.mode === 'oficial') answer.warnings = (answer.warnings || []).concat(t('oficial.partialCoverage', { laws: missingLaws.join(', ') }));
+        if (missingLaws.length && answer && answer.mode === 'oficial') answer.notices = (answer.notices || []).concat(t('oficial.partialCoverage', { laws: missingLaws.join(', ') }));
         return answer;
       };
       onStep(1);
@@ -1428,7 +1462,7 @@
       try {
         const data = sampleFn ? await askOfficial(context.answerQuestion, sources, conv, attachments, signal, question) : await askOfficialAPI(context.answerQuestion, sources, conv, attachments, signal, question, onPartial);
         const answer = normalizeOfficial(data, sources, attachments);
-        if (relevanceFallback && answer.kind !== 'nosources') answer.warnings = (answer.warnings || []).concat(t('oficial.relevanceFallback'));
+        if (relevanceFallback && answer.kind !== 'nosources') answer.notices = (answer.notices || []).concat(t('oficial.relevanceFallback'));
         return withCoverage(answer);
       } catch (e) {
         if (e && e.code === 'api_not_configured') return withCoverage(retrievalOnly(sources));
@@ -1490,7 +1524,7 @@
      automaticamente para dar aparência de fundamentação. */
   function normalizeOfficial(d, sources, attachments) {
     const a = normalizeAI(d, attachments);
-    if (d && d.fallbackModel === true) a.warnings = (a.warnings || []).concat(t('oficial.fallbackModel'));
+    if (d && d.fallbackModel === true) a.notices = (a.notices || []).concat(t('oficial.fallbackModel'));
     a.mode = 'oficial'; a.capturedAt = state.catalog ? state.catalog.generatedAt : ''; a.corpus = sources.some((s) => s.imported);
     const byN = Object.fromEntries(sources.map((s) => [s.n, s]));
     const validRef = (value) => { const n = Number(value); return Number.isInteger(n) && byN[n] ? n : null; };
@@ -1511,7 +1545,7 @@
       if (!a.nextSteps.length) a.nextSteps = [t('oficial.emptyStep')];
       return a;
     }
-    if (droppedClaims) a.warnings = a.warnings.concat(t('oficial.droppedClaims', { n: droppedClaims }));
+    if (droppedClaims) a.notices = (a.notices || []).concat(t('oficial.droppedClaims', { n: droppedClaims }));
     if (!a.sources.length && sources.length && (a.kind === 'answer' || a.kind === 'document')) a.warnings = a.warnings.concat(t('oficial.unlinked'));
     return a;
   }
@@ -1547,7 +1581,7 @@
   function homeNotice() {
     const em = effectiveMode();
     if (em === 'oficial' && !state.catalog) return t('home.catalogLoading');
-    if (em === 'oficial') return t('home.oficialNotice', { n: state.catalog.laws.length, date: fmtDate(state.catalog.generatedAt) }) + (state.aiAvailable ? '' : ' ' + t('home.oficialNoAI'));
+    if (em === 'oficial') return t(INDEX_URL ? 'home.oficialNoticeIndex' : 'home.oficialNotice', { n: state.catalog.laws.length, date: fmtDate(state.catalog.generatedAt) }) + (state.aiAvailable ? '' : ' ' + t('home.oficialNoAI'));
     if (em === 'ai') return t('home.aiNotice');
     return t('home.demoNotice');
   }

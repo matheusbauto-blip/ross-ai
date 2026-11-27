@@ -1,15 +1,15 @@
 {
-  "version": "a5ef688d0b3f",
+  "version": "b9bc46c7e0c0",
   "files": [
     {
       "path": "index.html",
       "bytes": 1941,
-      "sha256": "5ef4e8147067388af9f4f37f57584c5e8acaf5861d8576c747b4457db6a011f2"
+      "sha256": "e379b61fe49bd1246e97f529a8a1bf3bf3d10cab8078cf8ae6d4551a734aa5e8"
     },
     {
       "path": "styles.css",
-      "bytes": 43752,
-      "sha256": "5d10db822b7dfa4724ca20bcc60bcc2ebe01943f743c11f0000ed58ae4b0c46d"
+      "bytes": 44470,
+      "sha256": "f8586a4d4f9390ddf7b52139285e9d5c0c42b483572dc049d1f614052bbe7566"
     },
     {
       "path": "config.js",
@@ -18,8 +18,8 @@
     },
     {
       "path": "i18n.js",
-      "bytes": 81322,
-      "sha256": "ef8453b2c624fb533998983b64bbbda1c85ae40cf0b0766455c68b33877cda34"
+      "bytes": 82792,
+      "sha256": "154308a8246b95eba826e8ae9d5dd8d31ee278f079c1aef881138a7a815acaa9"
     },
     {
       "path": "demo-data.js",
@@ -33,8 +33,8 @@
     },
     {
       "path": "app.js",
-      "bytes": 176459,
-      "sha256": "84e3f4683d4529a1a1df9940c47ab80640fc6870bbc3b1ac4dc550ab5ecad840"
+      "bytes": 179292,
+      "sha256": "f9a050b8b856fed173c65d871b6d354fd0d781f608314b6262ee5435192832c0"
     },
     {
       "path": "data/catalog.json",
