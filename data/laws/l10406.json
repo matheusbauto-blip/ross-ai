@@ -14,8 +14,8 @@
  "sha256": "f0c90817fe160942ed497236e169948136834af83fa6567ab1c452c2d389e82e",
  "bytes": 923805,
  "articleCount": 2092,
- "vigentes": 2011,
- "revogados": 81,
+ "vigentes": 2016,
+ "revogados": 76,
  "articles": [
   {
    "id": "1",
@@ -38,7 +38,7 @@
    "label": "Art. 3",
    "heading": "LIVRO I · DAS PESSOAS › TÍTULO I · DAS PESSOAS NATURAIS › CAPÍTULO I · Da Personalidade e da Capacidade",
    "text": "Art. 3 o São absolutamente incapazes de exercer pessoalmente os atos da vida civil os menores de 16 (dezesseis) anos. (Redação dada pela Lei nº 13.146, de 2015) (Vigência)\nI - (Revogado); (Redação dada pela Lei nº 13.146, de 2015) (Vigência)\nII - (Revogado); (Redação dada pela Lei nº 13.146, de 2015) (Vigência)\nIII - (Revogado). (Redação dada pela Lei nº 13.146, de 2015) (Vigência)",
-   "status": "revogado",
+   "status": "vigente",
    "nota": "Redação dada pela Lei nº 13.146, de 2015",
    "hasHistory": false
   },
@@ -1693,7 +1693,7 @@
    "label": "Art. 206",
    "heading": "LIVRO III · Dos Fatos Jurídicos › TÍTULO IV · Da Prescrição e da Decadência › CAPÍTULO I · Da Prescrição › Seção IV · Dos Prazos da Prescrição",
    "text": "Art. 206. Prescreve:\n§ 1 o Em um ano:\nI - a pretensão dos hospedeiros ou fornecedores de víveres destinados a consumo no próprio estabelecimento, para o pagamento da hospedagem ou dos alimentos;\nII - (Revogado pela Lei nº 15.040, de 2024) Vigência\nIII - a pretensão dos tabeliães, auxiliares da justiça, serventuários judiciais, árbitros e peritos, pela percepção de emolumentos, custas e honorários;\nIV - a pretensão contra os peritos, pela avaliação dos bens que entraram para a formação do capital de sociedade anônima, contado da publicação da ata da assembléia que aprovar o laudo;\nV - a pretensão dos credores não pagos contra os sócios ou acionistas e os liquidantes, contado o prazo da publicação da ata de encerramento da liquidação da sociedade.\n§ 2 o Em dois anos, a pretensão para haver prestações alimentares, a partir da data em que se vencerem.\n§ 3 o Em três anos:\nI - a pretensão relativa a aluguéis de prédios urbanos ou rústicos;\nII - a pretensão para receber prestações vencidas de rendas temporárias ou vitalícias;\nIII - a pretensão para haver juros, dividendos ou quaisquer prestações acessórias, pagáveis, em períodos não maiores de um ano, com capitalização ou sem ela;\nIV - a pretensão de ressarcimento de enriquecimento sem causa;\nV - a pretensão de reparação civil;\nVI - a pretensão de restituição dos lucros ou dividendos recebidos de má-fé, correndo o prazo da data em que foi deliberada a distribuição;\nVII - a pretensão contra as pessoas em seguida indicadas por violação da lei ou do estatuto, contado o prazo:\na) para os fundadores, da publicação dos atos constitutivos da sociedade anônima;\nb) para os administradores, ou fiscais, da apresentação, aos sócios, do balanço referente ao exercício em que a violação tenha sido praticada, ou da reunião ou assembléia geral que dela deva tomar conhecimento;\nc) para os liquidantes, da primeira assembléia semestral posterior à violação;\nVIII - a pretensão para haver o pagamento de título de crédito, a contar do vencimento, ressalvadas as disposições de lei especial;\nIX - a pretensão do beneficiário contra o segurador, e a do terceiro prejudicado, no caso de seguro de responsabilidade civil obrigatório.\n§ 4º Em quatro anos, a pretensão relativa à tutela, a contar da data da aprovação das contas.\n§ 5º Em cinco anos:\nI - a pretensão de cobrança de dívidas líquidas constantes de instrumento público ou particular;\nII - a pretensão dos profissionais liberais em geral, procuradores judiciais, curadores e professores pelos seus honorários, contado o prazo da conclusão dos serviços, da cessação dos respectivos contratos ou mandato;\nIII - a pretensão do vencedor para haver do vencido o que despendeu em juízo.",
-   "status": "revogado",
+   "status": "vigente",
    "hasHistory": false
   },
   {
@@ -1878,7 +1878,7 @@
    "label": "Art. 228",
    "heading": "LIVRO III · Dos Fatos Jurídicos › TÍTULO V · Da Prova",
    "text": "Art. 228. Não podem ser admitidos como testemunhas:\nI - os menores de dezesseis anos;\nII - ( Revogado); (Redação dada pela Lei nº 13.146, de 2015) (Vigência)\nIII - (Revogado); (Redação dada pela Lei nº 13.146, de 2015) (Vigência)\nIV - o interessado no litígio, o amigo íntimo ou o inimigo capital das partes;\nV - os cônjuges, os ascendentes, os descendentes e os colaterais, até o terceiro grau de alguma das partes, por consangüinidade, ou afinidade.\n§ 1 o Para a prova de fatos que só elas conheçam, pode o juiz admitir o depoimento das pessoas a que se refere este artigo. (Redação dada pela Lei nº 13.146, de 2015) (Vigência)\n§ 2 o A pessoa com deficiência poderá testemunhar em igualdade de condições com as demais pessoas, sendo-lhe assegurados todos os recursos de tecnologia assistiva. (Incluído pela Lei nº 13.146, de 2015) (Vigência)",
-   "status": "revogado",
+   "status": "vigente",
    "nota": "Redação dada pela Lei nº 13.146, de 2015",
    "hasHistory": false
   },
@@ -12837,7 +12837,7 @@
    "label": "Art. 1548",
    "heading": "LIVRO IV · Do Direito de Família › TÍTULO I · Do Direito Pessoal › CAPÍTULO VIII · Da Invalidade do Casamento",
    "text": "Art. 1.548. É nulo o casamento contraído:\nI - (Revogado); (Redação dada pela Lei nº 13.146, de 2015) (Vigência)\nII - por infringência de impedimento.",
-   "status": "revogado",
+   "status": "vigente",
    "nota": "Redação dada pela Lei nº 13.146, de 2015",
    "hasHistory": false
   },
@@ -14603,7 +14603,7 @@
    "label": "Art. 1767",
    "heading": "LIVRO IV · Do Direito de Família › TÍTULO IV › CAPÍTULO II · Da Curatela › Seção I · dos Interditos",
    "text": "Art. 1.767. Estão sujeitos a curatela:\nI - aqueles que, por causa transitória ou permanente, não puderem exprimir sua vontade; (Redação dada pela Lei nº 13.146, de 2015) (Vigência)\nII - (Revogado); (Redação dada pela Lei nº 13.146, de 2015) (Vigência)\nIII - os ébrios habituais e os viciados em tóxico; (Redação dada pela Lei nº 13.146, de 2015) (Vigência)\nIV - (Revogado); (Redação dada pela Lei nº 13.146, de 2015) (Vigência)\nV - os pródigos.",
-   "status": "revogado",
+   "status": "vigente",
    "nota": "Redação dada pela Lei nº 13.146, de 2015",
    "hasHistory": false
   },

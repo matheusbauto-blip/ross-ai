@@ -1194,6 +1194,41 @@ test('subject routes bring the deciding articles: pregnant employee, arrest in t
   assert.ok(!texts.some(x => /Lei de Alimentos \| Art\. 19 \|/.test(x) || /5\.478[^|]*\| Art\. 19 \|/.test(x)), 'the superseded 60-day rule is not sent');
 });
 
+test('long articles are trimmed to the deciding lines, with their paragraph and the items they announce', async t => {
+  const { api, answers } = routeApp(t);
+  await api.submitMessage('O inquilino atrasou o aluguel. Quando posso pedir o despejo?');
+  const texts = sent(answers.at(-1));
+  const art59 = texts.find(x => /Art\. 59 \|/.test(x)) || '';
+  assert.match(art59, /§ 1º Conceder - se - á liminar para desocupação em quinze dias/, 'the paragraph that gives the injunction comes with its item');
+  assert.match(art59, /IX – a falta de pagamento de aluguel/);
+  assert.match(art59, /§ 3 o No caso do inciso IX/, 'how the tenant avoids the injunction');
+  assert.doesNotMatch(art59, /locação para temporada|morte do locatário/, 'the other grounds for an injunction are left out');
+  const art62 = texts.find(x => /Art\. 62 \|/.test(x)) || '';
+  assert.match(art62, /a\) os aluguéis[\s\S]*b\) as multas[\s\S]*c\) os juros de mora[\s\S]*d\) as custas/, 'a line ending in "incluídos:" keeps its items');
+  await api.submitMessage('Fui preso em flagrante. Quais são os meus direitos?');
+  const art5 = sent(answers.at(-1)).find(x => /Constituição[^|]*\| Art\. 5/.test(x)) || '';
+  assert.match(art5, /LXI - ninguém será preso[\s\S]*LXIII - o preso será informado/);
+  assert.doesNotMatch(art5, /pequena propriedade rural|asilo inviolável/, 'single-word matches far from the subject stay out');
+});
+
+test('new subject routes: the specific subject wins over dismissal, and superseded rules stay out', async t => {
+  const { api, answers } = routeApp(t);
+  const ask = async (question) => { await api.submitMessage(question); return sent(answers.at(-1)); };
+  let texts = await ask('Sofri um acidente de trabalho e fiquei afastado pelo INSS. Posso ser demitido quando voltar?');
+  assert.ok(texts.some(x => /Art\. 118 \|[\s\S]*doze meses/.test(x)), 'work accident: 12-month job guarantee, not the dismissal pay articles');
+  texts = await ask('Fui xingado com uma ofensa racista no trabalho. Isso é crime? Qual a pena?');
+  assert.ok(texts.some(x => /Art\. 2-A \|[\s\S]*2 \(dois\) a 5 \(cinco\) anos/.test(x)), 'racial insult (Lei 7.716) even when it happened at work');
+  assert.ok(!texts.some(x => /Código Penal[^|]*\| Art\. 140 \|/.test(x)), 'the general insult article is left out');
+  texts = await ask('Meu filho tem 15 anos. Ele já pode trabalhar?');
+  const art7 = texts.find(x => /Constituição[^|]*\| Art\. 7/.test(x)) || '';
+  assert.match(art7, /XXXIII - proibição de trabalho noturno, perigoso ou insalubre a menores de dezoito/);
+  assert.doesNotMatch(art7, /creches|prazo prescricional/, 'unrelated items of art. 7 are trimmed');
+  assert.ok(!texts.some(x => /Estatuto da Criança[^|]*\| Art\. 60 \|/.test(x)), 'ECA art. 60 (14 years) predates the constitutional rule');
+  texts = await ask('Tenho uma dívida de cartão de crédito de 8 anos atrás. Ainda podem me cobrar e deixar meu nome sujo?');
+  assert.ok(texts.some(x => /Art\. 206 \|[\s\S]*dívidas líquidas/.test(x)), 'Civil Code art. 206 (limitation) is in force and sent');
+  assert.ok(texts.some(x => /Art\. 43 \|[\s\S]*cinco anos/.test(x)));
+});
+
 test('a retirement question looks up the 2019 reform and never sends the superseded retirement rules', async t => {
   const { api, searches, answers } = routeApp(t);
   await api.submitMessage('Quanto tempo de contribuição preciso para me aposentar pelo INSS?');

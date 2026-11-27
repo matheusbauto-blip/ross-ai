@@ -14,8 +14,8 @@
  "sha256": "af3e5c3c9d3644a3ff22e88650f66a2e9c030e5c4d139f82e47ae52d3c2bd371",
  "bytes": 1532358,
  "articleCount": 1012,
- "vigentes": 831,
- "revogados": 181,
+ "vigentes": 837,
+ "revogados": 175,
  "articles": [
   {
    "id": "1",
@@ -707,7 +707,7 @@
    "label": "Art. 74",
    "heading": "TÍTULO I › CAPÍTULO II › SEÇÃO V",
    "text": "Art. 74. O horário de trabalho será anotado em registro de empregados. (Redação dada pela Lei nº 13.874, de 2019)\n§ 1º (Revogado). (Redação dada pela Lei nº 13.874, de 2019)\n§ 2º Para os estabelecimentos com mais de 20 (vinte) trabalhadores será obrigatória a anotação da hora de entrada e de saída, em registro manual, mecânico ou eletrônico, conforme instruções expedidas pela Secretaria Especial de Previdência e Trabalho do Ministério da Economia, permitida a pré-assinalação do período de repouso. (Redação dada pela Lei nº 13.874, de 2019)\n§ 3º Se o trabalho for executado fora do estabelecimento, o horário dos empregados constará do registro manual, mecânico ou eletrônico em seu poder, sem prejuízo do que dispõe o caput deste artigo. (Redação dada pela Lei nº 13.874, de 2019)\n§ 4º Fica permitida a utilização de registro de ponto por exceção à jornada regular de trabalho, mediante acordo individual escrito, convenção coletiva ou acordo coletivo de trabalho. (Incluído pela Lei nº 13.874, de 2019)\nDAS PENALIDADES",
-   "status": "revogado",
+   "status": "vigente",
    "nota": "Redação dada pela Lei nº 13.874, de 2019",
    "hasHistory": false
   },
@@ -3261,7 +3261,7 @@
    "label": "Art. 372",
    "heading": "TÍTULO III › CAPÍTULO III › SEÇÃO I",
    "text": "Art. 372 - Os preceitos que regulam o trabalho masculino são aplicáveis ao trabalho feminino, naquilo em que não colidirem com a proteção especial instituída por este Capítulo.\nParágrafo único - (Revogado pela Lei nº 13.467, de 2017)",
-   "status": "revogado",
+   "status": "vigente",
    "hasHistory": false
   },
   {
@@ -3494,7 +3494,7 @@
    "label": "Art. 392-A",
    "heading": "TÍTULO III › CAPÍTULO III › SEÇÃO V",
    "text": "Art. 392-A. À empregada que adotar ou obtiver guarda judicial para fins de adoção de criança ou adolescente será concedida licença-maternidade nos termos do art. 392 desta Lei. (Redação dada pela Lei nº 13.509, de 2017)\n§ 1 o (Revogado pela Lei nº 12.010, de 2009) Vigência\n§ 2 o (Revogado pela Lei nº 12.010, de 2009) Vigência\n§ 3 o (Revogado pela Lei nº 12.010, de 2009) Vigência\n§ 4 o A licença-maternidade só será concedida mediante apresentação do termo judicial de guarda à adotante ou guardiã. (Incluído pela Lei nº 10.421, de 2002)\n§ 5 o A adoção ou guarda judicial conjunta ensejará a concessão de licença-maternidade a apenas um dos adotantes ou guardiães empregado ou empregada. (Incluído pela Lei nº 12.873, de 2013)",
-   "status": "revogado",
+   "status": "vigente",
    "nota": "Redação dada pela Lei nº 13.509, de 2017",
    "hasHistory": false
   },
@@ -4579,7 +4579,7 @@
    "label": "Art. 507",
    "heading": "TÍTULO IV › CAPÍTULO IX",
    "text": "Art. 507 - As disposições do Capítulo VII do presente Título não serão aplicáveis aos empregados em consultórios ou escritórios de profissionais liberais.\nParágrafo único - (Revogado pela Lei nº 6.533, de 24.5.1978)",
-   "status": "revogado",
+   "status": "vigente",
    "hasHistory": false
   },
   {
@@ -5337,7 +5337,7 @@
    "label": "Art. 590",
    "heading": "TÍTULO V › CAPÍTULO III › SEÇÃO I",
    "text": "Art. 590. Inexistindo confederação, o percentual previsto no art. 589 desta Consolidação caberá à federação representativa do grupo. (Redação dada pela Lei nº 11.648, de 2008) (Vide Lei nº 11.648, de 2008)\n§ 1 o (Revogado). (Redação dada pela Lei nº 11.648, de 2008)\n§ 2 o (Revogado). (Redação dada pela Lei nº 11.648, de 2008)\n§ 3 o Não havendo sindicato, nem entidade sindical de grau superior ou central sindical, a contribuição sindical será creditada, integralmente, à ‘Conta Especial Emprego e Salário’. (Redação dada pela Lei nº 11.648, de 2008)\n§ 4 o Não havendo indicação de central sindical, na forma do § 1 o do art. 589 desta Consolidação, os percentuais que lhe caberiam serão destinados à ‘Conta Especial Emprego e Salário’ (Incluído pela Lei nº 11.648, de 2008)",
-   "status": "revogado",
+   "status": "vigente",
    "nota": "Redação dada pela Lei nº 11.648, de 2008",
    "hasHistory": false
   },
@@ -6235,7 +6235,7 @@
    "label": "Art. 681",
    "heading": "TÍTULO VIII › CAPÍTULO IV › SEÇÃO III",
    "text": "Art. 681 - Os presidentes e vice-presidentes dos Tribunais Regionais do Trabalho tomarão posse perante os respectivos Tribunais. (Redação dada pela Lei nº 6.320, de 5.4.1976)\nParágrafo único. (Revogado pela Lei nº 6.320, de 5.4.1976)",
-   "status": "revogado",
+   "status": "vigente",
    "nota": "Redação dada pela Lei nº 6.320, de 5.4.1976",
    "hasHistory": false
   },

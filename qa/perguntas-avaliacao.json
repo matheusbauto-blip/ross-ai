@@ -299,7 +299,7 @@
    "evitar": [
     [
      "dizer que recebe a multa de 40%",
-     "(tem direito|recebe|recebera|vai receber)( a| ao)? (multa de 40|40 ?%|quarenta por cento)"
+     "(?<!nao )(?<!nao se )(?<!nem )(tem direito|recebe|recebera|vai receber)( a| ao)? (multa de 40|40 ?%|quarenta por cento)"
     ]
    ],
    "gabarito": "Quem pede demissão não recebe a multa de 40% nem saca o FGTS (a lei prevê isso para dispensa pelo empregador sem justa causa) e não tem seguro-desemprego, que é para o trabalhador dispensado sem justa causa (Lei 7.998, art. 3º). Deve dar aviso prévio (CLT, art. 487)."
@@ -582,7 +582,7 @@
    "pontos": [
     [
      "não pode sozinho",
-     "nao pode|nao e permitido|nao, "
+     "nao pode|nao e permitido|nao, |nao por conta propria|(nao|sem) .{0,30}(sozinho|unilateral)"
     ],
     [
      "revisão na justiça após 3 anos",
@@ -655,7 +655,7 @@
     ],
     [
      "é a regra quando não há acordo",
-     "regra|sera aplicada|e aplicada|preferencia|prioridade"
+     "regra|sera aplicada|e aplicada|aplica a guarda|preferencia|prioridade"
     ]
    ],
    "evitar": [],
@@ -750,11 +750,11 @@
     ],
     [
      "30 pontos com 1 gravíssima",
-     "\\b(30|trinta) pontos"
+     "\\b(30|trinta)\\b(?! (dias|anos|meses))"
     ],
     [
      "40 pontos sem gravíssima",
-     "\\b(40|quarenta) pontos"
+     "\\b(40|quarenta)\\b(?! (dias|anos|meses))"
     ],
     [
      "em 12 meses",
@@ -1070,11 +1070,11 @@
    "pontos": [
     [
      "15 anos (mulheres)",
-     "\\b(15|quinze) anos"
+     "\\b(15|quinze) anos|\\b(15|quinze)\\b.{0,30}mulher|mulher\\w*.{0,30}\\b(15|quinze)\\b"
     ],
     [
      "20 anos (homens)",
-     "\\b(20|vinte) anos"
+     "\\b(20|vinte) anos|\\b(20|vinte)\\b.{0,30}hom|hom\\w*.{0,30}\\b(20|vinte)\\b"
     ],
     [
      "regras de transição para quem já contribuía",
@@ -1177,7 +1177,7 @@
    "pontos": [
     [
      "reparação de danos",
-     "indeniz|repar"
+     "indeniz|repar|respond\\w* (pelos|por) (os )?danos"
     ],
     [
      "empresa deve comunicar",
@@ -1293,7 +1293,7 @@
    "pontos": [
     [
      "é proibido reter documentos",
-     "proibid|nao pode|vedad|ilegal"
+     "proib|nao pode|vedad|ilegal"
     ],
     [
      "documentos/histórico",
@@ -1402,6 +1402,698 @@
    ],
    "evitar": [],
    "gabarito": "Resposta de urgência: procurar imediatamente advogado ou Defensoria Pública com a ordem em mãos, sem tentar resolver sozinho."
+  },
+  {
+   "id": "familia-divorcio-sem-acordo",
+   "area": "Família",
+   "pergunta": "Quero me divorciar, mas meu marido não aceita. Ele pode impedir o divórcio?",
+   "tipo": [
+    "answer"
+   ],
+   "artigos": [
+    {
+     "lei": "cf88",
+     "art": "226"
+    },
+    {
+     "lei": "l13105",
+     "art": "733"
+    }
+   ],
+   "pontos": [
+    [
+     "não depende da concordância do outro",
+     "nao (depende|precisa|exige)\\w*.{0,60}(concord|aceit|consentimento|autoriza|acordo)|nao pode impedir|(mesmo|ainda) (que|sem) (ele|o outro|o conjuge|seu marido).{0,40}(aceit|concord)|basta (a sua vontade|que um|a vontade)"
+    ],
+    [
+     "sem acordo, na Justiça; com acordo, pode ser em cartório",
+     "judicial|justica|juiz|processo|acao"
+    ]
+   ],
+   "evitar": [
+    [
+     "exigir separação prévia ou prazo",
+     "(precisa|exige|necessari\\w*).{0,40}(separa\\w* (judicial|previa|de fato)|(1|um|2|dois) anos? de separa)"
+    ]
+   ],
+   "gabarito": "Não: o casamento pode ser dissolvido pelo divórcio (CF, art. 226, § 6º, desde a EC 66/2010), sem prazo nem separação prévia, e o divórcio não depende da concordância do outro. Sem acordo, é pedido na Justiça, em ação judicial; com acordo e sem filhos incapazes ou nascituro, pode ser feito por escritura em cartório, com advogado ou defensor (CPC, art. 733)."
+  },
+  {
+   "id": "familia-uniao-estavel",
+   "area": "Família",
+   "pergunta": "Moro com meu namorado há 3 anos, sem casar. Isso é união estável? Como ficam os bens?",
+   "tipo": [
+    "answer",
+    "clarify"
+   ],
+   "artigos": [
+    {
+     "lei": "l10406",
+     "art": "1723"
+    },
+    {
+     "lei": "l10406",
+     "art": "1725"
+    }
+   ],
+   "pontos": [
+    [
+     "convivência pública, contínua e duradoura com objetivo de família",
+     "(public|continu|duradour).{0,80}famil|objetivo de (constituir|formar) (uma )?familia"
+    ],
+    [
+     "comunhão parcial, salvo contrato escrito",
+     "comunhao parcial"
+    ],
+    [
+     "não há tempo mínimo na lei",
+     "(nao (ha|existe|exige|tem|precisa|define|fixa)\\w*.{0,40}(prazo|tempo)( minimo)?)|(independente(mente)? do tempo)|(sem (prazo|tempo) minimo)"
+    ]
+   ],
+   "evitar": [
+    [
+     "exigir tempo mínimo em anos",
+     "(exige|precis\\w*|necessari\\w*|minimo de)\\s.{0,20}\\b(2|dois|5|cinco) anos (de convivencia|juntos|morando)"
+    ]
+   ],
+   "gabarito": "Pode ser: a união estável é a convivência pública, contínua e duradoura com o objetivo de constituir família (CC, art. 1.723), e a lei não exige tempo mínimo. Salvo contrato escrito entre os companheiros, vale o regime da comunhão parcial de bens (CC, art. 1.725): em regra, o que foi adquirido durante a união é dos dois."
+  },
+  {
+   "id": "familia-heranca-sem-testamento",
+   "area": "Família",
+   "pergunta": "Meu pai morreu e não deixou testamento. Quem fica com a herança?",
+   "tipo": [
+    "answer",
+    "clarify"
+   ],
+   "artigos": [
+    {
+     "lei": "l10406",
+     "art": "1829"
+    }
+   ],
+   "pontos": [
+    [
+     "primeiro os filhos (descendentes)",
+     "descendentes|filhos"
+    ],
+    [
+     "o cônjuge pode concorrer, conforme o regime de bens",
+     "(conjuge|viuv[ao]|esposa|companheir[ao]|mae).{0,140}(concorr|junto|dividi|regime)|concorr\\w*.{0,60}(conjuge|viuv)"
+    ],
+    [
+     "sem filhos, os pais do falecido (ascendentes)",
+     "ascendentes|(pais|avos) do falecido|(pais|avos) dele"
+    ]
+   ],
+   "evitar": [],
+   "gabarito": "Sem testamento vale a ordem da lei (CC, art. 1.829): primeiro os descendentes (filhos), em concorrência com o cônjuge conforme o regime de bens; não havendo descendentes, os ascendentes (pais do falecido) com o cônjuge; depois só o cônjuge; por fim os colaterais. A divisão é feita no inventário."
+  },
+  {
+   "id": "familia-testamento-legitima",
+   "area": "Família",
+   "pergunta": "Tenho dois filhos. Posso deixar todos os meus bens em testamento para um amigo?",
+   "tipo": [
+    "answer"
+   ],
+   "artigos": [
+    {
+     "lei": "l10406",
+     "art": "1789"
+    },
+    {
+     "lei": "l10406",
+     "art": "1845"
+    },
+    {
+     "lei": "l10406",
+     "art": "1846"
+    }
+   ],
+   "pontos": [
+    [
+     "só pode dispor da metade",
+     "metade|50 ?%|cinquenta por cento"
+    ],
+    [
+     "os filhos são herdeiros necessários (legítima)",
+     "herdeiros? necessari|legitima"
+    ]
+   ],
+   "evitar": [
+    [
+     "dizer que pode deixar tudo",
+     "(?<!nao )(?<!nao se )\\bpode (deixar|destinar|doar) (todos os seus bens|todo o seu patrimonio|tudo)"
+    ]
+   ],
+   "gabarito": "Não. Havendo herdeiros necessários (descendentes, ascendentes e cônjuge — CC, art. 1.845), o testador só pode dispor da metade da herança (CC, art. 1.789); a outra metade, a legítima, pertence aos herdeiros necessários (CC, art. 1.846). O amigo pode receber até a metade."
+  },
+  {
+   "id": "familia-prazo-inventario",
+   "area": "Família",
+   "pergunta": "Qual é o prazo para abrir o inventário depois que alguém morre?",
+   "tipo": [
+    "answer"
+   ],
+   "artigos": [
+    {
+     "lei": "l13105",
+     "art": "611"
+    },
+    {
+     "lei": "l13105",
+     "art": "610"
+    }
+   ],
+   "pontos": [
+    [
+     "2 meses para abrir",
+     "\\b(2|dois) meses"
+    ],
+    [
+     "12 meses para terminar",
+     "\\b(12|doze) meses"
+    ],
+    [
+     "em cartório se todos forem capazes e concordarem",
+     "cartorio|escritura|extrajudicial"
+    ]
+   ],
+   "evitar": [],
+   "gabarito": "O inventário deve ser aberto em até 2 meses da morte e terminar nos 12 meses seguintes; o juiz pode prorrogar esses prazos (CPC, art. 611). Se todos forem capazes e estiverem de acordo e não houver testamento, pode ser feito por escritura em cartório, com advogado ou defensor público (CPC, art. 610)."
+  },
+  {
+   "id": "trabalho-acidente-estabilidade",
+   "area": "Trabalho",
+   "pergunta": "Sofri um acidente de trabalho e fiquei afastado pelo INSS. Posso ser demitido quando voltar?",
+   "tipo": [
+    "answer"
+   ],
+   "artigos": [
+    {
+     "lei": "l8213",
+     "art": "118"
+    }
+   ],
+   "pontos": [
+    [
+     "estabilidade de 12 meses",
+     "\\b(12|doze) meses"
+    ],
+    [
+     "contados do fim do auxílio-doença acidentário",
+     "(cessa\\w*|fim|termino|alta|retorno|depois|apos).{0,60}(auxilio|beneficio|afastamento)|(auxilio|beneficio).{0,40}(acabar|terminar|cessar)"
+    ]
+   ],
+   "evitar": [],
+   "gabarito": "Quem sofreu acidente do trabalho tem garantida a manutenção do contrato de trabalho por no mínimo 12 meses depois da cessação do auxílio-doença acidentário (Lei 8.213, art. 118)."
+  },
+  {
+   "id": "trabalho-assedio-rescisao-indireta",
+   "area": "Trabalho",
+   "pergunta": "Meu chefe me humilha na frente de todo mundo. Posso sair do emprego e receber como se tivesse sido demitido?",
+   "tipo": [
+    "answer",
+    "clarify"
+   ],
+   "artigos": [
+    {
+     "lei": "del5452",
+     "art": "483"
+    }
+   ],
+   "pontos": [
+    [
+     "rescisão indireta",
+     "rescisao indireta|considerar rescindido|rescindir o contrato"
+    ],
+    [
+     "rigor excessivo ou ofensa à honra",
+     "rigor excessivo|honra|boa fama|humilha"
+    ],
+    [
+     "juntar provas",
+     "prova|testemunh|mensage|grava|registr"
+    ]
+   ],
+   "evitar": [
+    [
+     "garantir o resultado",
+     "(vai|ira) ganhar|com certeza (vai|ira) receber"
+    ]
+   ],
+   "gabarito": "Pode haver rescisão indireta: o empregado pode considerar rescindido o contrato e pleitear a indenização quando é tratado com rigor excessivo ou sofre ato lesivo da honra e boa fama (CLT, art. 483, b e e). Na prática, ela é pedida na Justiça do Trabalho, e é importante reunir provas (testemunhas, mensagens)."
+  },
+  {
+   "id": "trabalho-intervalo-almoco",
+   "area": "Trabalho",
+   "pergunta": "Trabalho 8 horas por dia. Quanto tempo de intervalo de almoço é meu direito?",
+   "tipo": [
+    "answer"
+   ],
+   "artigos": [
+    {
+     "lei": "del5452",
+     "art": "71"
+    }
+   ],
+   "pontos": [
+    [
+     "no mínimo 1 hora",
+     "\\b(1|uma) hora"
+    ],
+    [
+     "no máximo 2 horas, salvo acordo",
+     "\\b(2|duas) horas"
+    ]
+   ],
+   "evitar": [],
+   "gabarito": "Em jornada acima de 6 horas, o intervalo para repouso ou alimentação é de no mínimo 1 hora e, salvo acordo escrito ou convenção coletiva, de no máximo 2 horas (CLT, art. 71). Se não for concedido, ou só em parte, o empregador paga o período suprimido com acréscimo de 50% (art. 71, § 4º)."
+  },
+  {
+   "id": "dividas-prescricao",
+   "area": "Consumidor",
+   "pergunta": "Tenho uma dívida de cartão de crédito de 8 anos atrás. Ainda podem me cobrar e deixar meu nome sujo?",
+   "tipo": [
+    "answer",
+    "clarify"
+   ],
+   "artigos": [
+    {
+     "lei": "l8078",
+     "art": "43"
+    },
+    {
+     "lei": "l10406",
+     "art": "206"
+    }
+   ],
+   "pontos": [
+    [
+     "nome negativado por no máximo 5 anos",
+     "\\b(5|cinco) anos"
+    ],
+    [
+     "prescrição da cobrança",
+     "prescri"
+    ]
+   ],
+   "evitar": [],
+   "gabarito": "Os cadastros de inadimplentes não podem manter informação negativa por mais de 5 anos e, consumada a prescrição, não podem fornecer informação que impeça novo crédito (CDC, art. 43, §§ 1º e 5º). A cobrança de dívida líquida prevista em contrato prescreve em 5 anos (CC, art. 206, § 5º, I). A dívida não some: pode ser paga ou negociada, mas depois da prescrição não pode ser cobrada na Justiça."
+  },
+  {
+   "id": "consumidor-venda-casada",
+   "area": "Consumidor",
+   "pergunta": "O banco disse que só libera o empréstimo se eu contratar um seguro junto. Isso é permitido?",
+   "tipo": [
+    "answer"
+   ],
+   "artigos": [
+    {
+     "lei": "l8078",
+     "art": "39"
+    }
+   ],
+   "pontos": [
+    [
+     "é venda casada, prática abusiva proibida",
+     "venda casada|pratica abusiva|proibid|vedad|nao (e|esta) permitid|ilegal"
+    ],
+    [
+     "pode recusar e reclamar",
+     "procon|reclam|consumidor\\.gov|banco central|ouvidoria|recusar"
+    ]
+   ],
+   "evitar": [
+    [
+     "dizer que é permitido",
+     "(?<!nao )(e|esta) permitid[oa] (condicionar|exigir|vincular)"
+    ]
+   ],
+   "gabarito": "Não. Condicionar o fornecimento de um produto ou serviço à compra de outro (venda casada) é prática abusiva proibida (CDC, art. 39, I). A pessoa pode recusar o seguro e reclamar no próprio banco, no Procon ou no consumidor.gov.br."
+  },
+  {
+   "id": "consumidor-superendividamento",
+   "area": "Consumidor",
+   "pergunta": "Estou com tantas dívidas que não consigo pagar nem as contas básicas. Existe alguma lei que me ajude?",
+   "tipo": [
+    "answer"
+   ],
+   "artigos": [
+    {
+     "lei": "l8078",
+     "art": "54-A"
+    },
+    {
+     "lei": "l8078",
+     "art": "104-A"
+    }
+   ],
+   "pontos": [
+    [
+     "superendividamento",
+     "superendivid"
+    ],
+    [
+     "mínimo existencial preservado",
+     "minimo existencial|(contas|despesas|necessidades) basicas"
+    ],
+    [
+     "repactuação com plano de pagamento de até 5 anos",
+     "repactua|plano de pagamento|renegocia|(5|cinco) anos"
+    ]
+   ],
+   "evitar": [],
+   "gabarito": "Sim: o CDC trata do superendividamento, a impossibilidade de pagar as dívidas de consumo sem comprometer o mínimo existencial (art. 54-A). O consumidor pode pedir na Justiça a repactuação das dívidas, com audiência de conciliação com todos os credores e um plano de pagamento de até 5 anos, preservado o mínimo existencial (art. 104-A). Ficam fora, entre outras, as dívidas com garantia real e os financiamentos imobiliários."
+  },
+  {
+   "id": "consumidor-cobranca-vexatoria",
+   "area": "Consumidor",
+   "pergunta": "Uma empresa de cobrança liga no meu trabalho e conta para meus colegas que eu estou devendo. Ela pode fazer isso?",
+   "tipo": [
+    "answer"
+   ],
+   "artigos": [
+    {
+     "lei": "l8078",
+     "art": "42"
+    },
+    {
+     "lei": "l8078",
+     "art": "71"
+    }
+   ],
+   "pontos": [
+    [
+     "não pode expor ao ridículo nem constranger",
+     "ridiculo|constrang|expor|exposi"
+    ],
+    [
+     "pode ser crime",
+     "crime|detencao|infracao penal"
+    ]
+   ],
+   "evitar": [],
+   "gabarito": "Não. Na cobrança de dívidas, o consumidor não pode ser exposto a ridículo nem submetido a constrangimento ou ameaça (CDC, art. 42). Cobrar de forma que exponha o consumidor ou interfira em seu trabalho é crime, com detenção de 3 meses a 1 ano e multa (CDC, art. 71). Vale guardar provas e reclamar no Procon."
+  },
+  {
+   "id": "condominio-multa-atraso",
+   "area": "Moradia",
+   "pergunta": "Atrasei a taxa de condomínio. Qual é a multa máxima que podem cobrar?",
+   "tipo": [
+    "answer"
+   ],
+   "artigos": [
+    {
+     "lei": "l10406",
+     "art": "1336"
+    }
+   ],
+   "pontos": [
+    [
+     "multa de até 2%",
+     "\\b2 ?%|dois por cento"
+    ],
+    [
+     "mais juros e correção monetária",
+     "juros|correcao"
+    ]
+   ],
+   "evitar": [
+    [
+     "multa maior que 2%",
+     "multa (de|ate) (5|cinco|10|dez|20|vinte) ?(%|por cento)"
+    ]
+   ],
+   "gabarito": "A multa é de até 2% sobre o débito, mais correção monetária e os juros previstos na convenção ou, se não houver previsão, os juros do art. 406 do Código Civil (CC, art. 1.336, § 1º)."
+  },
+  {
+   "id": "vizinhanca-barulho",
+   "area": "Moradia",
+   "pergunta": "Meu vizinho faz barulho alto toda madrugada. O que a lei diz sobre isso?",
+   "tipo": [
+    "answer"
+   ],
+   "artigos": [
+    {
+     "lei": "l10406",
+     "art": "1277"
+    },
+    {
+     "lei": "del3688",
+     "art": "42"
+    }
+   ],
+   "pontos": [
+    [
+     "direito ao sossego: fazer cessar a interferência",
+     "sossego|fazer cessar|interferencias prejudiciais"
+    ],
+    [
+     "perturbar o sossego é contravenção penal",
+     "contraven|policia|\\b190\\b"
+    ]
+   ],
+   "evitar": [],
+   "gabarito": "Quem mora no imóvel pode fazer cessar as interferências prejudiciais ao sossego causadas pelo uso da propriedade vizinha (CC, art. 1.277), inclusive na Justiça. Perturbar o trabalho ou o sossego alheio com gritaria, algazarra ou abuso de instrumentos sonoros é contravenção penal (Lei das Contravenções Penais, art. 42); a polícia pode ser chamada. Em condomínio, também cabe recorrer ao síndico."
+  },
+  {
+   "id": "idoso-onibus-gratis",
+   "area": "Pessoa idosa",
+   "pergunta": "Tenho 66 anos. Tenho direito a andar de ônibus de graça na cidade?",
+   "tipo": [
+    "answer"
+   ],
+   "artigos": [
+    {
+     "lei": "l10741",
+     "art": "39"
+    }
+   ],
+   "pontos": [
+    [
+     "a partir de 65 anos",
+     "\\b(65|sessenta e cinco)"
+    ],
+    [
+     "transporte coletivo urbano e semiurbano",
+     "urban|coletiv|municipa"
+    ],
+    [
+     "basta documento com a idade",
+     "documento|identidade|\\brg\\b"
+    ]
+   ],
+   "evitar": [],
+   "gabarito": "Sim. Maiores de 65 anos têm gratuidade nos transportes coletivos públicos urbanos e semiurbanos, exceto nos serviços seletivos e especiais prestados em paralelo aos regulares; basta apresentar qualquer documento pessoal que prove a idade (Estatuto da Pessoa Idosa, art. 39)."
+  },
+  {
+   "id": "idoso-abandono",
+   "area": "Pessoa idosa",
+   "pergunta": "Os filhos abandonaram o pai idoso num hospital e não ajudam em nada. Isso é crime?",
+   "tipo": [
+    "answer",
+    "urgent"
+   ],
+   "artigos": [
+    {
+     "lei": "l10741",
+     "art": "98"
+    }
+   ],
+   "pontos": [
+    [
+     "é crime",
+     "crime"
+    ],
+    [
+     "pena de 6 meses a 3 anos",
+     "\\b(6|seis) (\\(seis\\) )?meses|\\b(3|tres) (\\(tres\\) )?anos"
+    ],
+    [
+     "denunciar ou buscar ajuda",
+     "denunci|ministerio publico|delegacia|policia|disque|conselho|assistencia social|cras|creas|defensoria"
+    ]
+   ],
+   "evitar": [],
+   "gabarito": "Sim. Abandonar a pessoa idosa em hospitais, casas de saúde ou entidades de longa permanência, ou não prover suas necessidades básicas quando obrigado por lei, é crime, com detenção de 6 meses a 3 anos e multa (Estatuto da Pessoa Idosa, art. 98). O caso pode ser comunicado ao Ministério Público, à polícia ou à assistência social."
+  },
+  {
+   "id": "crianca-idade-trabalho",
+   "area": "Criança e adolescente",
+   "pergunta": "Meu filho tem 15 anos. Ele já pode trabalhar?",
+   "tipo": [
+    "answer"
+   ],
+   "artigos": [
+    {
+     "lei": "cf88",
+     "art": "7"
+    }
+   ],
+   "pontos": [
+    [
+     "só como aprendiz, a partir de 14",
+     "aprendiz"
+    ],
+    [
+     "trabalho comum só a partir de 16",
+     "\\b(16|dezesseis)"
+    ],
+    [
+     "menor de 18: sem trabalho noturno, perigoso ou insalubre",
+     "noturno|perigos|insalubr"
+    ]
+   ],
+   "evitar": [
+    [
+     "dizer que pode trabalhar normalmente",
+     "(?<!nao )pode trabalhar (normalmente|em qualquer)"
+    ]
+   ],
+   "gabarito": "Aos 15 anos, só como aprendiz: a Constituição proíbe qualquer trabalho a menores de 16 anos, salvo na condição de aprendiz, a partir de 14, e proíbe trabalho noturno, perigoso ou insalubre a menores de 18 (CF, art. 7º, XXXIII)."
+  },
+  {
+   "id": "crianca-castigo-fisico",
+   "area": "Criança e adolescente",
+   "pergunta": "A lei permite bater no filho para educar?",
+   "tipo": [
+    "answer"
+   ],
+   "artigos": [
+    {
+     "lei": "l8069",
+     "art": "18-A"
+    },
+    {
+     "lei": "l8069",
+     "art": "18-B"
+    }
+   ],
+   "pontos": [
+    [
+     "direito de ser educado sem castigo físico",
+     "castigo fisico|sem (o uso de )?(violencia|agressao|bater)"
+    ],
+    [
+     "medidas do Conselho Tutelar (advertência, programas)",
+     "conselho tutelar|advertencia|programa|encaminhamento"
+    ]
+   ],
+   "evitar": [
+    [
+     "dizer que é permitido",
+     "(?<!nao )(e|esta) permitido (bater|castig)|\\blei permite (bater|castig)"
+    ]
+   ],
+   "gabarito": "Não. A criança e o adolescente têm o direito de ser educados sem o uso de castigo físico ou de tratamento cruel ou degradante (ECA, art. 18-A). Quem usar castigo físico fica sujeito a medidas como encaminhamento a programa de proteção à família, tratamento psicológico e advertência, aplicadas pelo Conselho Tutelar (ECA, art. 18-B), sem prejuízo de outras sanções."
+  },
+  {
+   "id": "penal-injuria-racial",
+   "area": "Penal",
+   "pergunta": "Fui xingado com uma ofensa racista no trabalho. Isso é crime? Qual a pena?",
+   "tipo": [
+    "answer",
+    "urgent"
+   ],
+   "artigos": [
+    {
+     "lei": "l7716",
+     "art": "2-A"
+    }
+   ],
+   "pontos": [
+    [
+     "injúria racial é crime",
+     "injuria racial|crime"
+    ],
+    [
+     "pena de 2 a 5 anos",
+     "\\b(2|dois) (\\(dois\\) )?a (5|cinco)"
+    ],
+    [
+     "registrar ocorrência ou denunciar",
+     "boletim|ocorrencia|delegacia|denunci|policia|ministerio publico"
+    ]
+   ],
+   "evitar": [
+    [
+     "pena antiga de 1 a 3 anos",
+     "\\b(1|um) (\\(um\\) )?a (3|tres) anos"
+    ]
+   ],
+   "gabarito": "Sim. Injuriar alguém, ofendendo sua dignidade ou decoro, em razão de raça, cor, etnia ou procedência nacional é crime de injúria racial, com reclusão de 2 a 5 anos e multa (Lei 7.716, art. 2º-A, incluído pela Lei 14.532/2023). A vítima pode registrar boletim de ocorrência na delegacia e guardar provas (testemunhas, mensagens)."
+  },
+  {
+   "id": "penal-golpe-pix",
+   "area": "Penal",
+   "pergunta": "Caí num golpe: paguei por Pix um produto de um anúncio falso na internet. O que posso fazer?",
+   "tipo": [
+    "answer",
+    "urgent"
+   ],
+   "artigos": [
+    {
+     "lei": "del2848",
+     "art": "171"
+    }
+   ],
+   "pontos": [
+    [
+     "é estelionato (fraude)",
+     "estelionato|fraude"
+    ],
+    [
+     "registrar boletim de ocorrência",
+     "boletim|ocorrencia|delegacia|policia"
+    ]
+   ],
+   "evitar": [
+    [
+     "garantir a devolução do dinheiro",
+     "(com certeza|certamente|garantid\\w*).{0,40}(dinheiro|valor) de volta"
+    ]
+   ],
+   "gabarito": "É estelionato (CP, art. 171); quando a fraude usa informações obtidas por redes sociais, telefone, e-mail ou aplicativo de internet, a pena é de reclusão de 4 a 8 anos (§ 2º-A). Registre boletim de ocorrência, guarde comprovantes e conversas e avise o banco o quanto antes; não há garantia de devolução."
+  },
+  {
+   "id": "moradia-usucapiao",
+   "area": "Moradia",
+   "pergunta": "Moro há 6 anos numa casa pequena na cidade que não é minha e nunca ninguém reclamou. Posso ficar com ela?",
+   "tipo": [
+    "answer",
+    "clarify"
+   ],
+   "artigos": [
+    {
+     "lei": "cf88",
+     "art": "183"
+    },
+    {
+     "lei": "l10406",
+     "art": "1240"
+    }
+   ],
+   "pontos": [
+    [
+     "usucapião",
+     "usucapi"
+    ],
+    [
+     "5 anos sem interrupção e sem oposição",
+     "\\b(5|cinco) anos"
+    ],
+    [
+     "área urbana de até 250 m²",
+     "250|duzentos e cinquenta"
+    ],
+    [
+     "não ser dono de outro imóvel",
+     "outro imovel|proprietari\\w* de outro"
+    ]
+   ],
+   "evitar": [],
+   "gabarito": "Pode ter direito à usucapião urbana: quem possui como sua área urbana de até 250 m² por 5 anos, sem interrupção e sem oposição, usando-a como moradia, e não é proprietário de outro imóvel urbano ou rural, adquire a propriedade (CF, art. 183; CC, art. 1.240). Imóveis públicos não podem ser usucapidos. O pedido pode ser feito na Justiça ou no cartório de registro de imóveis, com advogado (Lei 6.015, art. 216-A)."
   }
  ]
 }

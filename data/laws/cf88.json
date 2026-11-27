@@ -14,8 +14,8 @@
  "sha256": "66d27ba2ad3f95238d2b36efe4f23a7c1210a6118b1c7be9a762f35d783aef1e",
  "bytes": 1847715,
  "articleCount": 422,
- "vigentes": 408,
- "revogados": 14,
+ "vigentes": 409,
+ "revogados": 13,
  "articles": [
   {
    "id": "1",
@@ -994,7 +994,7 @@
    "label": "Art. 111",
    "heading": "TÍTULO IV › CAPÍTULO III › Seção V",
    "text": "Art. 111. São órgãos da Justiça do Trabalho:\nI - o Tribunal Superior do Trabalho;\nII - os Tribunais Regionais do Trabalho;\nIII - Juizes do Trabalho. (Redação dada pela Emenda Constitucional nº 24, de 1999)\n(Revogado pela Emenda Constitucional nº 45, de 2004)\n(Revogado pela Emenda Constitucional nº 45, de 2004)\n(Revogado pela Emenda Constitucional nº 45, de 2004)",
-   "status": "revogado",
+   "status": "vigente",
    "nota": "Redação dada pela Emenda Constitucional nº 24, de 1999",
    "hasHistory": true
   },

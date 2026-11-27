@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 /* Repara os textos já capturados em data/laws: artigos marcados como revogados só porque a redação antiga, riscada,
-   vinha antes da atual (o mesmo artigo reaparece depois com redação em vigor). Mantém só a redação atual, marca como
-   vigente e atualiza as contagens do catálogo. Não baixa nada. Pode ser rodado de novo sem efeito.
+   vinha antes da atual (o mesmo artigo reaparece depois com redação em vigor), ou porque só alguns parágrafos ou
+   incisos foram revogados. Mantém só a redação atual, marca como vigente e atualiza as contagens do catálogo.
+   Não baixa nada. Pode ser rodado de novo sem efeito.
    Uso: node scripts/repair-struck-headers.mjs [--check] */
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -15,12 +16,26 @@ const RX_ART = /^Art\.?\s*(\d{1,3}(?:\.\d{3})+|\d+)(?:[ºo°])?(?:-([A-Z]{1,2})(
 const REVOKED = /\(\s*(?:[Aa]rtigo\s+|[Aa]rt\.\s+)?(?:Revogad[oa]|REVOGAD[OA]|revogad[oa])\b/;
 const sameArticle = (text, label) => { const m = /^[“"'‘]/.test(text) ? null : text.match(RX_ART); return !!m && 'Art. ' + m[1].replace(/\./g, '') + (m[2] ? '-' + m[2] : '') === label; };
 
+// Marca de revogação, veto ou rejeição no texto; nota solta ("(Revogado pela Lei …)") numa linha própria.
+export const MARK = /revogad|vetad|rejeitad|sem efeito|prejudicad|caduc/i;
+export const NOTE = /^\(\s*(?:revogad|rejeitad|vetad|sem efeito|prejudicad|caducad|declarad)/i;
+/* Artigo em vigor com parágrafos ou incisos revogados: o caput não traz marca de revogação e a linha seguinte é
+   conteúdo (inciso, parágrafo), não uma nota solta que revogue o caput. Ex.: Código Civil, arts. 3º e 206; CLT,
+   art. 392-A; Constituição, art. 111. Uma emenda rejeitada ("(Rejeitada)" logo após o caput) continua fora. */
+export function partlyRepealed(lines) {
+  return lines.length > 1 && !MARK.test(lines[0]) && !NOTE.test(lines[1].trim());
+}
+
 export function repairArticle(article) {
   if (article.status === 'vigente') return false;
   const lines = article.text.split('\n');
   let again = -1;
   lines.forEach((line, i) => { if (i > 0 && sameArticle(line, article.label)) again = i; });
-  if (again <= 0) return false;
+  if (again <= 0) {
+    if (article.status !== 'revogado' || !partlyRepealed(lines)) return false;
+    article.status = 'vigente';
+    return true;
+  }
   const caput = lines[again];
   if (REVOKED.test(caput.slice(0, 260)) || /^Art\.[^(]{0,20}\(\s*(?:Revogad|revogad|REVOGAD)/.test(caput) || /\(VETADO\)/.test(caput.slice(0, 260))) return false;
   article.text = lines.slice(again).join('\n');

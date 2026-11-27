@@ -23,6 +23,16 @@ test('the evaluation bank is consistent: unique ids, valid expressions and every
   }
 });
 
+test('each answer key, graded as an answer, meets all its own points and none of its forbidden claims', () => {
+  // Pega expressões mal escritas antes de gastar cota: um gabarito certo que o corretor recusa denuncia a expressão.
+  for (const q of bank) {
+    const sources = q.artigos.filter(a => a.lei).map(a => ({ lawId: a.lei, name: a.lei, article: 'Art. ' + a.art }));
+    const r = grade(q, { status: 'done', answer: { kind: q.tipo[0], summary: q.gabarito, sources } }, 1);
+    assert.deepEqual(r.faltouPonto, [], q.id + ': points');
+    assert.deepEqual(r.afirmouIndevido, [], q.id + ': forbidden claims');
+  }
+});
+
 test('article labels compare the same with or without dots, ordinals and letters', () => {
   assert.equal(artKey('Art. 1.584'), artKey('1584'));
   assert.equal(artKey('Art. 5º'), '5');
@@ -70,4 +80,16 @@ test('articles whose current wording follows the struck old one are in force (Co
     assert.deepEqual(law.articles.filter(a => repairArticle(structuredClone(a))).map(a => a.label), [], entry.id + ' has nothing left to repair');
     assert.equal(entry.vigentes, law.articles.filter(a => a.status === 'vigente').length, entry.id + ' catalog count');
   }
+});
+
+test('articles with only some items repealed are in force; a caput followed by its own repeal note is not', () => {
+  const read = file => JSON.parse(readFileSync(new URL('../data/' + file, import.meta.url), 'utf8'));
+  const status = (law, test) => law.articles.find(test).status;
+  const cf = read('laws/cf88.json'), cc = read('laws/l10406.json'), clt = read('laws/del5452.json'), mci = read('laws/l12965.json');
+  assert.equal(status(cc, a => a.label === 'Art. 206'), 'vigente', 'Civil Code art. 206 (limitation periods)');
+  assert.equal(status(cc, a => a.label === 'Art. 3'), 'vigente', 'Civil Code art. 3 (under 16)');
+  assert.equal(status(clt, a => a.label === 'Art. 392-A'), 'vigente', 'CLT art. 392-A (adoption leave)');
+  assert.equal(status(cf, a => a.id === '111'), 'vigente', 'Constitution art. 111 (labour courts)');
+  assert.equal(status(cf, a => a.id === 'ADCT-111'), 'revogado', 'ADCT art. 111, repealed by EC 126');
+  assert.notEqual(status(mci, a => a.label === 'Art. 8-A'), 'vigente', 'Marco Civil art. 8-A came from a rejected provisional measure');
 });

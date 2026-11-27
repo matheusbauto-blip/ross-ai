@@ -40,8 +40,8 @@
    "retrievedAt": "2026-11-12T23:45:36.495Z",
    "sha256": "66d27ba2ad3f95238d2b36efe4f23a7c1210a6118b1c7be9a762f35d783aef1e",
    "articleCount": 422,
-   "vigentes": 408,
-   "revogados": 14,
+   "vigentes": 409,
+   "revogados": 13,
    "file": "laws/cf88.json",
    "status": "vigente",
    "versions": [
@@ -115,8 +115,8 @@
    "retrievedAt": "2026-11-12T23:45:36.555Z",
    "sha256": "f0c90817fe160942ed497236e169948136834af83fa6567ab1c452c2d389e82e",
    "articleCount": 2092,
-   "vigentes": 2011,
-   "revogados": 81,
+   "vigentes": 2016,
+   "revogados": 76,
    "file": "laws/l10406.json",
    "status": "vigente",
    "versions": [
@@ -267,8 +267,8 @@
    "retrievedAt": "2026-11-12T23:45:36.606Z",
    "sha256": "af3e5c3c9d3644a3ff22e88650f66a2e9c030e5c4d139f82e47ae52d3c2bd371",
    "articleCount": 1012,
-   "vigentes": 831,
-   "revogados": 181,
+   "vigentes": 837,
+   "revogados": 175,
    "file": "laws/del5452.json",
    "status": "vigente",
    "versions": [

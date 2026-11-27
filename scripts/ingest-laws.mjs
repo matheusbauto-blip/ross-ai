@@ -138,7 +138,9 @@ function finish(a) {
   }
   a.text = a.paras.join('\n');
   const caput = a.paras[0] || '';
-  if (a.struckHeader || /\(\s*(?:[Aa]rtigo\s+|[Aa]rt\.\s+)?(?:Revogad[oa]|REVOGAD[OA]|revogad[oa])\b/.test(caput.slice(0, 260)) || /^Art\.[^(]{0,20}\(\s*(?:Revogad|revogad|REVOGAD)/.test(caput)) a.status = 'revogado';
+  // Cabeçalho riscado com o caput sem marca de revogação e conteúdo em seguida: só partes do artigo foram revogadas.
+  const partial = a.paras.length > 1 && !/revogad|vetad|rejeitad|sem efeito|prejudicad|caduc/i.test(caput) && !/^\(\s*(?:revogad|rejeitad|vetad|sem efeito|prejudicad|caducad|declarad)/i.test(a.paras[1].trim());
+  if ((a.struckHeader && !partial) || /\(\s*(?:[Aa]rtigo\s+|[Aa]rt\.\s+)?(?:Revogad[oa]|REVOGAD[OA]|revogad[oa])\b/.test(caput.slice(0, 260)) || /^Art\.[^(]{0,20}\(\s*(?:Revogad|revogad|REVOGAD)/.test(caput)) a.status = 'revogado';
   else if (/\(VETADO\)/.test(caput.slice(0, 260))) a.status = 'vetado';
   else a.status = 'vigente';
   const nota = a.text.match(/\(([^()]{0,60}?(?:[Rr]eda[çc][ãa]o dada|[Ii]nclu[íi]d[oa]|[Aa]crescid[oa]|[Rr]enumerad[oa]|[Aa]crescentad[oa])[^()]*)\)/);
