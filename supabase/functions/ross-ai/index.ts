@@ -53,7 +53,8 @@ const RATE_LIMIT_COOLDOWN_MS = 60_000;
 const rateLimitedUntil = new Map<string, number>();
 const BUDGET = {
   prepare: { perCallMs: 15_000, totalMs: 25_000, hedgeAfterMs: 5_000, minRemainingMs: 15_000 },
-  answer: { perCallMs: 90_000, totalMs: 120_000, hedgeAfterMs: 30_000, minRemainingMs: 45_000 },
+  // Com raciocínio curto e resposta em partes, o modelo começa a escrever em 3 a 5 s; sem texto em 12 s, o alternativo começa junto.
+  answer: { perCallMs: 90_000, totalMs: 120_000, hedgeAfterMs: 12_000, minRemainingMs: 45_000 },
   letter: { perCallMs: 60_000, totalMs: 90_000, hedgeAfterMs: 20_000, minRemainingMs: 30_000 },
 };
 const IP_LIMIT = Number(Deno.env.get("ROSS_IP_DAILY_LIMIT") ?? "40");
@@ -325,7 +326,8 @@ async function generate(models: string[], options: GenerateOptions, apiKey: stri
         return model !== preferred ? { ...result, fallback: true } : result;
       } catch (e) {
         last = e;
-        if (!controllers[index].signal.aborted) console.warn("gemini", model, e instanceof GeminiError ? e.status : "erro", Date.now() - started);
+        // Só status e tempo; uma chamada cancelada porque outro modelo venceu aparece como "superado".
+        console.warn("gemini", model, controllers[index].signal.aborted ? "superado" : e instanceof GeminiError ? e.status : "erro", Date.now() - started);
         if (e instanceof GeminiError && e.status === 429) { rateLimitedUntil.set(model, Date.now() + RATE_LIMIT_COOLDOWN_MS); throw e; }
         if (committed === index || !(e instanceof GeminiError) || !TRANSIENT_STATUS.has(e.status) || e.status === 504) throw e;
         await new Promise((resolve) => setTimeout(resolve, 1_000));
