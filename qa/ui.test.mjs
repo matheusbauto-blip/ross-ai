@@ -31,7 +31,7 @@ function setup(t, fetcher = async () => Response.json({ documents: 235, results:
   });
   for (const file of ['config.js', 'i18n.js', 'demo-data.js', 'process-tracker.js']) vm.runInContext(read(file), context);
   const script = read('app.js').replace("if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();",
-    'window.__test = {state, providers, render, go, load, onFilesChosen, newConversation, submitMessage, retryMessage, openConversation, deleteConversation, answerToText, isRephraseRequest, conversationContext, historyForModel, normalizeOfficial, activeProvider, turnText, stopAnswer, exportHistory, MODEL_WAIT_MS};')
+    'window.__test = {state, providers, render, go, load, onFilesChosen, newConversation, submitMessage, retryMessage, openConversation, deleteConversation, answerToText, isRephraseRequest, conversationContext, historyForModel, normalizeOfficial, activeProvider, turnText, stopAnswer, exportHistory, MODEL_WAIT_MS, t};')
     .replace('}, CLIENT_TIMEOUT_MS);', '}, window.__clientTimeout || CLIENT_TIMEOUT_MS);')
     .replace('resolve(null), INDEX_ANSWER_TIMEOUT_MS)', 'resolve(null), window.__indexTimeout || INDEX_ANSWER_TIMEOUT_MS)');
   vm.runInContext(script, context);
@@ -550,7 +550,7 @@ test('claims citing excerpts that were never consulted are dropped and no source
   const answer = api.normalizeOfficial({ kind: 'answer', summary: 'Resumo.', sourcesSay: [{ title: 'Afirmação', text: 'Diz algo', ref: 999999 }, { title: 'Sem referência', text: 'Outra coisa', ref: null }], sources: [{ ref: 999999, why: 'x' }], depends: [], nextSteps: [], questions: [], mentions: [], document: null, limitNotice: null, warnings: [] }, officialSources, []);
   assert.equal(answer.sourcesSay.length, 0);
   assert.equal(answer.sources.length, 0);
-  assert.ok(answer.warnings.some(w => /2 afirmaç/.test(w)));
+  assert.ok(answer.notices.some(w => /2 afirmaç/.test(w)), 'removed claims are a technical note');
   assert.ok(answer.warnings.some(w => /não indicou em quais trechos/.test(w)));
   const valid = api.normalizeOfficial({ kind: 'answer', summary: 'Resumo.', sourcesSay: [{ title: 'Afirmação', text: 'Diz algo', ref: 1 }], sources: [{ ref: 1, why: 'x' }], warnings: [] }, officialSources, []);
   assert.equal(valid.sources.length, 1); assert.equal(valid.sourcesSay[0].ref, 1); assert.equal(valid.warnings.length, 0);
@@ -612,7 +612,7 @@ test('one law that fails to load does not sink the retrieval; the answer flags t
   assert.ok(files.length >= 2, 'more than one law should have been requested');
   assert.ok(ops.includes('answer'), 'the answer step must still run with the laws that loaded');
   assert.equal(message.answer.sources[0].lawId, 'l8078');
-  assert.ok(message.answer.warnings.some(w => /Não consegui carregar o texto de: /.test(w) && /Código Civil|Constituição/.test(w)), JSON.stringify(message.answer.warnings));
+  assert.ok(message.answer.notices.some(w => /Não consegui carregar o texto de: /.test(w) && /Código Civil|Constituição/.test(w)), JSON.stringify(message.answer.notices));
 });
 
 test('when every selected law fails to load the answer is a recoverable error, not a silent empty result', async t => {
@@ -757,7 +757,7 @@ test('when the relevance check fails the answer still uses the governing excerpt
   assert.ok(ops.includes('answer'), 'the answer step must still run');
   assert.ok(answerExcerpts.includes('Art. 18') && answerExcerpts.includes('Art. 26'), answerExcerpts.join(', '));
   assert.ok(answerExcerpts.length <= 5);
-  assert.ok(message.answer.warnings.some(w => /verificação automática de relevância não estava disponível/.test(w)));
+  assert.ok(message.answer.notices.some(w => /verificação automática de relevância não estava disponível/.test(w)));
 });
 
 test('when the model is down the excerpts are still shown with an honest notice instead of only an error', async t => {
@@ -778,7 +778,7 @@ test('when the model is down the excerpts are still shown with an honest notice 
 test('an answer produced by the fallback model carries a visible warning', t => {
   const { api } = setup(t);
   const answer = api.normalizeOfficial({ kind: 'answer', summary: 'Resumo.', sourcesSay: [{ title: 'Afirmação', text: 'Diz algo', ref: 1 }], sources: [{ ref: 1, why: 'x' }], warnings: [], fallbackModel: true }, officialSources, []);
-  assert.ok(answer.warnings.some(w => /modelo alternativo/.test(w)));
+  assert.ok(answer.notices.some(w => /modelo alternativo/.test(w)));
 });
 
 test('the settings screen shows the version so an update can be confirmed', t => {
@@ -1093,4 +1093,31 @@ test('a letter returned as one block of text gets its own lines for subject, gre
   await api.submitMessage('Comprei pela internet e quero desistir. Posso?');
   document.querySelector('[data-letter]').click(); await settle();
   assert.equal(document.querySelector('[data-letter-body]').value, 'Recife, [DATA].\n\nAssunto: Desistência.\n\nPrezados senhores,\n\ndesisto da compra.\n\nAtenciosamente,\n\n[SEU NOME]');
+});
+
+test('technical notes are grouped under "About this answer" and only case warnings stay highlighted, also for saved answers', async t => {
+  const { api, document } = setup(t);
+  const conv = api.newConversation();
+  conv.messages.push({ id: 'u1', role: 'user', text: 'Pergunta', createdAt: Date.now() });
+  conv.messages.push({ id: 'a1', role: 'assistant', status: 'done', provider: 'oficial', createdAt: Date.now(), answer: {
+    mode: 'oficial', kind: 'answer', summary: 'Resumo.', capturedAt: '2026-11-13', sourcesSay: [], sources: [],
+    warnings: ['O prazo de 90 dias pode estar acabando.', api.t('oficial.fallbackModel')], notices: [api.t('oficial.relevanceFallback')],
+  } });
+  api.openConversation(conv.id);
+  const warns = Array.from(document.querySelectorAll('.callout-warn'), node => node.textContent);
+  assert.deepEqual(warns, ['O prazo de 90 dias pode estar acabando.']);
+  const about = document.querySelector('.about-answer');
+  assert.match(about.querySelector('summary').textContent, /Sobre esta resposta · 2 observações/);
+  assert.equal(about.querySelectorAll('li').length, 3, 'capture date and the two technical notes');
+  assert.match(document.querySelector('.mode-banner').textContent, /textos oficiais de lei/);
+  const copy = api.answerToText(conv.messages[1].answer, conv.messages[1]);
+  assert.match(copy, /SOBRE ESTA RESPOSTA/); assert.match(copy, /modelo alternativo/);
+});
+
+test('the home page offers concrete examples and mentions the full index', async t => {
+  const { api, document } = setup(t);
+  api.go('home');
+  const examples = Array.from(document.querySelectorAll('[data-example]'), node => node.textContent);
+  assert.ok(examples.some(text => /geladeira/.test(text)) && examples.some(text => /aluguel/.test(text)), examples.join(' | '));
+  assert.match(document.querySelector('#main').textContent, /1,2 milhão de normas/);
 });

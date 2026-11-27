@@ -61,6 +61,7 @@ window.ROSS_I18N = {
       repealed: 'Revogação ou veto indicado no texto', previous: 'Anteriores', next: 'Próximos resultados',
       empty: 'Nenhum trecho encontrado no acervo já importado. Tente menos palavras, o número da norma ou outros filtros.',
       unavailable: 'A busca não está disponível agora. Tente novamente em instantes.', rateLimit: 'Você atingiu o limite de consultas por agora. Tente mais tarde.',
+      answerBanner: 'Inclui textos de um acervo de leis cuja vigência atual não foi confirmada. A explicação é gerada por IA: confira os artigos citados.',
       answerNotice: 'Esta resposta inclui trechos importados do ctresb/leis. Confira a edição, a data de captura e a fonte indicadas em cada referência. A vigência atual desses textos não foi verificada.',
       noAI: 'Encontrei estes trechos. A explicação por IA ainda não está disponível; você pode consultar o texto e abrir a fonte de cada resultado.',
       regulador: 'Órgãos reguladores', organ: 'Órgão', chooseOrgan: 'Escolha o órgão', federalActs: 'Incluir decretos, medidas provisórias e resoluções federais',
@@ -77,15 +78,16 @@ window.ROSS_I18N = {
       headline: 'Entenda informações jurídicas com mais clareza.',
       placeholder: 'O que você gostaria de entender?',
       examples: [
-        { label: 'Pode explicar esta cláusula do meu contrato?', intent: 'clause' },
-        { label: 'O que esta lei diz em palavras simples?', intent: 'law' },
-        { label: 'Quais informações preciso reunir sobre esta situação?', intent: 'gather' },
-        { label: 'Onde posso procurar ajuda para este problema?', intent: 'help' }
+        { label: 'Comprei uma geladeira e ela parou de funcionar em 20 dias. O que posso fazer?', intent: 'defect' },
+        { label: 'Comprei pela internet e me arrependi. Posso devolver?', intent: 'withdrawal' },
+        { label: 'Fui demitido sem justa causa. O que tenho direito de receber?', intent: 'dismissal' },
+        { label: 'O dono do imóvel pode aumentar o aluguel quando quiser?', intent: 'rent' }
       ],
       examplesLabel: 'Exemplos para começar',
       footnote: 'O ROSS AI é uma ferramenta de informação e compreensão jurídica. Não substitui a análise de um profissional.',
       demoNotice: 'Versão de demonstração: as respostas usam fontes fictícias e ainda não estão conectadas a bases jurídicas reais.',
       oficialNotice: 'Fontes oficiais: {n} normas federais com texto oficial (Planalto e Câmara dos Deputados), capturado em {date}. A explicação em linguagem simples é gerada por IA; confira sempre os artigos citados.',
+      oficialNoticeIndex: 'Consulta um índice de mais de 1,2 milhão de normas brasileiras (federais, estaduais, municipais e de órgãos reguladores). {n} leis federais muito usadas têm texto oficial conferido (Planalto e Câmara dos Deputados), capturado em {date}. A explicação é gerada por IA; confira sempre os artigos citados.',
       oficialNoAI: 'Neste ambiente a explicação por IA não está disponível: as respostas mostram os trechos oficiais encontrados.',
       aiNotice: 'Modo IA sem fontes verificadas: as respostas são gerais e marcadas como não confirmadas.'
     },
@@ -143,7 +145,11 @@ window.ROSS_I18N = {
       aiBanner: 'Modo IA experimental: resposta gerada sem consulta a fontes oficiais. Nomes de normas e artigos não foram verificados.',
       demoBanner: 'Demonstração com fontes fictícias. Nenhuma norma citada aqui é real.',
       modeOficial: 'Fontes oficiais',
-      oficialBanner: 'Baseado em trechos do texto oficial (Planalto ou Câmara dos Deputados), capturados em {date}. A explicação é gerada por IA e deve ser conferida nos artigos citados.'
+      oficialBanner: 'Baseado em textos oficiais de lei. A explicação é gerada por IA: confira os artigos citados.',
+      about: 'Sobre esta resposta',
+      aboutNote: '1 observação',
+      aboutNotes: '{n} observações',
+      aboutOficial: 'Os textos de lei citados foram capturados das fontes oficiais (Planalto e Câmara dos Deputados) em {date}.'
     },
     letter: {
       cta: 'Montar carta de reclamação',
@@ -183,7 +189,7 @@ window.ROSS_I18N = {
       inDocument: 'No documento',
       inLaw: 'Na legislação citada',
       document: 'Sobre o documento',
-      limit: 'Onde este serviço para',
+      limit: 'Quando procurar ajuda profissional',
       urgent: 'Situação que pode ser urgente',
       canDo: 'O que posso fazer',
       attention: 'Atenção',
@@ -569,6 +575,7 @@ window.ROSS_I18N = {
       repealed: 'Repeal or veto indicated in the text', previous: 'Previous', next: 'Next results',
       empty: 'No matching passage in the imported corpus. Try fewer words, a law number or other filters.',
       unavailable: 'Search is unavailable right now. Please try again shortly.', rateLimit: 'The search limit has been reached. Please try again later.',
+      answerBanner: 'Includes texts from a law collection whose current validity has not been confirmed. The explanation is generated by AI: check the cited articles.',
       answerNotice: 'This answer includes excerpts imported from ctresb/leis. Check the edition, capture date and source of each reference. Their current legal validity has not been verified.',
       noAI: 'I found these excerpts. The AI explanation is not yet available; you can read the text and open each source.',
       regulador: 'Regulatory agencies', organ: 'Agency', chooseOrgan: 'Choose the agency', federalActs: 'Include federal decrees, provisional measures and resolutions',
@@ -585,15 +592,16 @@ window.ROSS_I18N = {
       headline: 'Understand legal information with more clarity.',
       placeholder: 'What would you like to understand?',
       examples: [
-        { label: 'Can you explain this clause in my contract?', intent: 'clause' },
-        { label: 'What does this law say in plain words?', intent: 'law' },
-        { label: 'What information do I need to gather about this situation?', intent: 'gather' },
-        { label: 'Where can I look for help with this problem?', intent: 'help' }
+        { label: 'I bought a fridge and it stopped working after 20 days. What can I do?', intent: 'defect' },
+        { label: 'I bought something online and changed my mind. Can I return it?', intent: 'withdrawal' },
+        { label: 'I was dismissed without cause. What am I entitled to receive?', intent: 'dismissal' },
+        { label: 'Can my landlord raise the rent whenever they want?', intent: 'rent' }
       ],
       examplesLabel: 'Examples to start with',
       footnote: 'ROSS AI is a tool for legal information and understanding. It does not replace a professional review.',
       demoNotice: 'Demonstration version: answers use fictional sources and are not yet connected to real legal databases.',
       oficialNotice: 'Official sources: {n} Brazilian federal laws with official text (Planalto and the Chamber of Deputies), captured on {date}. The plain-language explanation is generated by AI; always check the cited articles.',
+      oficialNoticeIndex: 'Searches an index of more than 1.2 million Brazilian laws and regulations (federal, state, municipal and regulatory agencies). {n} widely used federal laws have checked official text (Planalto and the Chamber of Deputies), captured on {date}. The explanation is generated by AI; always check the cited articles.',
       oficialNoAI: 'In this environment the AI explanation is unavailable: answers show the official excerpts found.',
       aiNotice: 'AI mode without verified sources: answers are general and marked as unconfirmed.'
     },
@@ -651,7 +659,11 @@ window.ROSS_I18N = {
       aiBanner: 'Experimental AI mode: answer generated without consulting official sources. Law names and articles were not verified.',
       demoBanner: 'Demonstration with fictional sources. No law cited here is real.',
       modeOficial: 'Official sources',
-      oficialBanner: 'Based on excerpts of the official text (Planalto or the Chamber of Deputies), captured on {date}. The explanation is generated by AI and should be checked against the cited articles.'
+      oficialBanner: 'Based on official law texts. The explanation is generated by AI: check the cited articles.',
+      about: 'About this answer',
+      aboutNote: '1 note',
+      aboutNotes: '{n} notes',
+      aboutOficial: 'The cited law texts were captured from the official sources (Planalto and the Chamber of Deputies) on {date}.'
     },
     letter: {
       cta: 'Draft a complaint letter',
@@ -691,7 +703,7 @@ window.ROSS_I18N = {
       inDocument: 'In the document',
       inLaw: 'In the cited legislation',
       document: 'About the document',
-      limit: 'Where this service stops',
+      limit: 'When to get professional help',
       urgent: 'This may be urgent',
       canDo: 'What I can do',
       attention: 'Note',
