@@ -47,6 +47,7 @@
   ["registros públicos", "l6015", "Posso retificar um registro civil que contém erro?", "109"],
   ["FGTS", "l8036", "O empregador deve depositar quanto no FGTS?", "15"],
   ["seguro-desemprego", "l7998", "Quem pode receber seguro-desemprego após dispensa sem justa causa?", "3"],
+  ["décimo terceiro na demissão", "l4090", "Fui demitido sem justa causa. Recebo o décimo terceiro proporcional?", "3"],
   ["estágio", "l11788", "Um estágio sem os requisitos da lei cria vínculo de emprego?", "3"],
   ["trabalho doméstico", "lcp150", "Quantos dias por semana caracterizam empregado doméstico?", "1"],
   ["previdência", "l8213", "Como funciona a pensão por morte do segurado?", "74"],

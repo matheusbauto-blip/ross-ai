@@ -1156,6 +1156,19 @@
   }
   function searchIntent(question) {
     const q = norm(question);
+    /* Demissão: as verbas estão espalhadas em quatro leis (CLT, FGTS, seguro-desemprego e 13º); sem esta regra a busca
+       fica só na CLT e a resposta sai incompleta. */
+    if (/\b(?:demitid[oa]s?|demissao|demitiram|demitir|dispensad[oa]s?|despedid[oa]s?|mandad[oa]s? embora|mandaram embora|mandou embora|desligad[oa]s? da empresa|verbas rescisorias|rescisao do (?:meu )?contrato de trabalho|acerto (?:trabalhista|da rescisao))\b/.test(q)) return {
+      laws: ['del5452', 'l8036', 'l7998', 'l4090'],
+      terms: 'rescisão contrato de trabalho verbas rescisórias aviso prévio férias proporcionais gratificação décimo terceiro FGTS quarenta por cento despedida sem justa causa seguro-desemprego',
+      focus: {
+        del5452: [/realizar o pagamento das verbas rescisorias/, /quiser rescindir o contrato devera avisar/, /na cessacao do contrato de trabalho, qualquer que seja a sua causa/],
+        l8036: [/importancia igual a quarenta por cento/, /despedida sem justa causa, inclusive a indireta/],
+        l7998: [/tera direito a percepcao do seguro-desemprego/],
+        l4090: [/ocorrendo rescisao, sem justa causa/],
+      },
+      focusLimit: 7,
+    };
     const collision = /\b(?:batida|batidas|bateram|bateu|bati|bater|colisao|colisoes|abalroamento|engavetamento)\b/.test(q);
     const vehicle = /\b(?:carro|carros|veiculo|veiculos|moto|motocicleta|caminhao|traseira|para-choque)\b/.test(q);
     if (!(collision && vehicle) && !/\bengavetamento\b|\bacidente de transito\b/.test(q)) {
@@ -1251,6 +1264,23 @@
     for (const h of hits) { if (out.length >= limit) break; const ex = excerptFor(h.a, qTokens, 2200); if (chars + ex.length > (characterBudget || 15000)) continue; chars += ex.length; out.push({ law: h.law, article: h.a, excerpt: repairEncoding(ex), score: h.score }); }
     return out;
   }
+  /* Artigos que completam outros: no Código de Trânsito, o artigo da infração diz só a categoria (gravíssima, grave,
+     média, leve); o valor da multa está no art. 258 e os pontos na carteira, no art. 259. */
+  const COMPANIONS = [{ lawId: 'l9503', when: /infracao\s*[-–:]?\s*(?:gravissima|grave|media|leve)\b/, articles: ['Art. 258', 'Art. 259'], tokens: ['infracao', 'multa', 'ponto'] }];
+  function withCompanions(sources, loaded) {
+    const extra = [];
+    COMPANIONS.forEach((rule) => {
+      if (!sources.some((source) => source.lawId === rule.lawId && rule.when.test(norm(source.excerpt || '')))) return;
+      const law = loaded.find((item) => item.id === rule.lawId);
+      if (!law) return;
+      rule.articles.forEach((label) => {
+        if (sources.concat(extra).some((source) => source.lawId === rule.lawId && source.article === label)) return;
+        const article = law.articles.find((item) => item.label === label && item.status === 'vigente');
+        if (article) extra.push(lawSource({ law: law, article: article, excerpt: repairEncoding(excerptFor(article, rule.tokens, 2200)), score: 0 }, 0));
+      });
+    });
+    return extra.length ? sources.concat(extra).map((source, index) => Object.assign({}, source, { n: index + 1 })) : sources;
+  }
   function lawSource(hit, n) {
     const law = hit.law;
     const entry = state.catalog.laws.find((l) => l.id === law.id) || {};
@@ -1295,10 +1325,13 @@
     });
   }
   /* Sem a verificação automática: os trechos que a intenção aponta e os mais bem pontuados pela busca de palavras. */
+  // Quantos trechos de uma intenção reconhecida acompanham a seleção (a demissão precisa de mais que o padrão).
+  function focusLimit(question) { const intent = searchIntent(question); return (intent && intent.focusLimit) || 2; }
   function fallbackSelection(question, sources) {
-    const focus = focusSources(question, sources).slice(0, 2);
+    const limit = focusLimit(question);
+    const focus = focusSources(question, sources).slice(0, limit);
     const rest = sources.filter((source) => !focus.includes(source)).sort((a, b) => (b.score || 0) - (a.score || 0));
-    return focus.concat(rest).slice(0, 5).map((source, index) => Object.assign({}, source, { n: index + 1 }));
+    return focus.concat(rest).slice(0, Math.max(5, limit + 2)).map((source, index) => Object.assign({}, source, { n: index + 1 }));
   }
   async function selectRelevantSources(question, query, sources, signal) {
     const candidates = sources.slice(0, 200);
@@ -1310,7 +1343,7 @@
     const selected = validatedSelection(candidates, result.laws);
     // Quando a pergunta tem uma intenção reconhecida (ex.: produto com defeito), os artigos que a regulam
     // acompanham a seleção automática em vez de depender dela. A resposta só cita o que usar de fato.
-    const focus = focusSources(question, candidates).filter((source) => !selected.some((s) => s.lawId === source.lawId && s.article === source.article)).slice(0, 2);
+    const focus = focusSources(question, candidates).filter((source) => !selected.some((s) => s.lawId === source.lawId && s.article === source.article)).slice(0, focusLimit(question));
     return selected.concat(focus).map((source, index) => Object.assign({}, source, { n: index + 1 }));
   }
   function priorTurns(conv, currentQuestion) {
@@ -1343,7 +1376,7 @@
   function plainAnswerQuestion(question) {
     return question + '\n\nESCOPO DESTA VERSÃO: O ROSS AI atende apenas ao Direito brasileiro. Não apresente leis brasileiras como se fossem de outro país. Se o pedido depender de legislação estrangeira, explique brevemente a limitação; se houver dúvida sobre a aplicação no Brasil, peça o esclarecimento necessário.' +
       '\n\nESTILO PARA PÚBLICO GERAL: No campo summary (Em resumo), use duas ou três frases curtas e linguagem cotidiana. Comece aplicando a regra ao problema relatado e diga o próximo passo sustentado pelos trechos. Explique termos técnicos em palavras comuns, como "vício" por "defeito". Evite definições abstratas, "garantia legal de adequação" sem explicar e aberturas como "de acordo com os trechos da lei". Use os fatos informados, sem transformar uma hipótese em certeza, diagnosticar a causa de um defeito ou prometer resultado. Não acrescente prazos, direitos ou conclusões que os trechos não sustentem. Respeite um pedido específico de formato ou detalhamento da pessoa.' +
-      '\n\nLINGUAGEM EM TODOS OS CAMPOS: troque termos jurídicos por palavras do dia a dia também em sourcesSay, depends e nextSteps (ex.: "culpa exclusiva de terceiros" → "quando a culpa é só de outra pessoa"; "prestação do serviço" → "o serviço contratado"; "fornecedor" → "a loja ou a empresa", quando couber). Se um termo técnico for indispensável, explique-o na mesma frase.' +
+      '\n\nLINGUAGEM EM TODOS OS CAMPOS: troque termos jurídicos por palavras do dia a dia também em sourcesSay, depends e nextSteps (ex.: "culpa exclusiva de terceiros" → "quando a culpa é só de outra pessoa"; "prestação do serviço" → "o serviço contratado"; "fornecedor" → "a loja ou a empresa", quando couber). Se um termo técnico for indispensável, explique-o na mesma frase. Mas use exatamente os nomes de crimes, institutos, valores e prazos que aparecem nos trechos: furto e roubo, por exemplo, são crimes diferentes.' +
       '\n\nAVISOS: em warnings, no máximo dois cuidados que mudam o caso desta pessoa (ex.: um prazo que pode estar acabando). Dicas práticas, como guardar comprovantes, vão em nextSteps. Não repita que a resposta é informativa, que foi gerada por IA ou que convém procurar um advogado: o app já mostra isso. Use limitNotice só quando houver um limite real deste caso (ex.: depende de perícia, prazo judicial curto).';
   }
   function isRephraseRequest(question) {
@@ -1458,6 +1491,7 @@
         } finally { limit.done(); }
         if (!sources.length) return withCoverage(attachments && attachments.length ? await documentWithoutLaw(text, attachments, conv, signal) : emptyOfficial());
       } else sources = sources.slice(0, 8);
+      sources = withCompanions(sources, loaded);
       onStep(2);
       try {
         const data = sampleFn ? await askOfficial(context.answerQuestion, sources, conv, attachments, signal, question) : await askOfficialAPI(context.answerQuestion, sources, conv, attachments, signal, question, onPartial);

@@ -25,7 +25,7 @@ O índice **não contém os textos**. O texto integral é lido sob demanda pela 
   - Esfera federal + “Incluir decretos…”: também decretos, decretos legislativos e resoluções federais.
   - Estado escolhido: acrescenta a legislação estadual desse estado. Município: exige o estado.
   - Órgãos reguladores: escolha o órgão (a lista vem do próprio índice).
-- **Na conversa:** além das 66 normas distribuídas com o app e do acervo do servidor, a resposta procura no índice federal (e no do estado da conversa). Até três normas com boa correspondência têm o texto lido e os artigos pertinentes entram na seleção de fontes, com a procedência do repositório e a ressalva de vigência não verificada.
+- **Na conversa:** além das 67 normas distribuídas com o app e do acervo do servidor, a resposta procura no índice federal (e no do estado da conversa). Até três normas com boa correspondência têm o texto lido e os artigos pertinentes entram na seleção de fontes, com a procedência do repositório e a ressalva de vigência não verificada.
 
 O índice é carregado por partes conforme a pesquisa; uma pessoa que só conversa sobre leis federais baixa apenas a parte federal.
 

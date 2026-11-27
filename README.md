@@ -34,7 +34,7 @@ Quando o próximo passo de uma resposta é reclamar por escrito (notificar a loj
 
 ## Índice completo do repositório de leis
 
-Além das 66 normas distribuídas com o app e dos textos importados no banco, o site publica um índice estático de todas as normas do [ctresb/leis](https://github.com/ctresb/leis) (edição fixa): federais, estaduais, municipais, órgãos reguladores, jurisprudência e tratados. A pesquisa e as respostas usam esse índice para encontrar a norma pelo título, ementa ou número; o texto integral é lido sob demanda, com conferência de hash. Detalhes, limites e como gerar de novo: `docs/indice-repositorio.md`.
+Além das 67 normas distribuídas com o app e dos textos importados no banco, o site publica um índice estático de todas as normas do [ctresb/leis](https://github.com/ctresb/leis) (edição fixa): federais, estaduais, municipais, órgãos reguladores, jurisprudência e tratados. A pesquisa e as respostas usam esse índice para encontrar a norma pelo título, ementa ou número; o texto integral é lido sob demanda, com conferência de hash. Detalhes, limites e como gerar de novo: `docs/indice-repositorio.md`.
 
 ## Acompanhamento processual
 
@@ -86,7 +86,7 @@ Na busca do site, os IDs de normas sugeridos pelo modelo são preservados junto 
 
 Antes da explicação, uma segunda chamada ao modelo rápido seleciona os trechos relevantes dentre candidatos de cada norma. Só IDs presentes nessa lista são aceitos. Uma seleção vazia pede mais contexto, e uma falha nessa verificação suspende a conclusão gerada por IA. Não encontrar trechos não é apresentado como inexistência de legislação aplicável.
 
-`node --test tests/*.test.mjs` verifica recuperação de artigos em cenários das 66 normas do catálogo, colisão traseira sem expansão por IA, colisões de palavras e siglas, referências inexistentes, texto corrompido, busca no repositório e integração com o provedor. Esses testes verificam o mecanismo de busca; não garantem a correção jurídica de toda resposta possível.
+`node --test tests/*.test.mjs` verifica recuperação de artigos em cenários das 67 normas do catálogo, colisão traseira sem expansão por IA, colisões de palavras e siglas, referências inexistentes, texto corrompido, busca no repositório e integração com o provedor. Esses testes verificam o mecanismo de busca; não garantem a correção jurídica de toda resposta possível.
 
 Para os testes de interação das telas, execute `node qa/prepare-dom.mjs` e `node --test qa/ui.test.mjs`. A preparação baixa uma versão fixa do ambiente DOM e confere sua integridade. Esses testes percorrem as telas em português e inglês, envio e reenvio, anexos, recuperação do histórico e busca/leitura no repositório; não substituem uma revisão visual em navegador.
 

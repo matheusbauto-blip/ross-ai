@@ -25,7 +25,7 @@ test('publication bundle stamps the version, resolves public assets and contains
       assert.doesNotMatch(file.path, /(?:^|\/)(?:\.env|\.git|supabase|qa|tests|docs)(?:\/|$)/);
     }
     assert.ok(readdirSync(directory).includes('.nojekyll'));
-    assert.equal(release.bundledLaws, 66);
+    assert.equal(release.bundledLaws, 67);
     assert.ok(readFileSync(resolve(directory, 'process-tracker.js'), 'utf8').includes('window.ROSS_TRACKER'));
     const app = readFileSync(resolve(directory, 'app.js'), 'utf8');
     for (const feature of ['sources-disclosure', 'function conversationContext(', 'function plainAnswerQuestion(']) assert.ok(app.includes(feature));

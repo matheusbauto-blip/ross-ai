@@ -1121,3 +1121,44 @@ test('the home page offers concrete examples and mentions the full index', async
   assert.ok(examples.some(text => /geladeira/.test(text)) && examples.some(text => /aluguel/.test(text)), examples.join(' | '));
   assert.match(document.querySelector('#main').textContent, /1,2 milhão de normas/);
 });
+
+test('a dismissal question always brings the severance rules spread over four laws', async t => {
+  const answers = [], prepares = [];
+  const { api } = setup(t, async (url, options) => {
+    const local = lawFetch(String(url)); if (local) return local;
+    const body = JSON.parse(options.body);
+    if (body.op === 'search') return Response.json({ results: [] });
+    if (body.op === 'prepare') { prepares.push(body.catalog.some(law => /^passage-/.test(law.id)) ? 'relevance' : 'terms'); return Response.json({ terms: [], laws: ['passage-1'] }); }
+    answers.push(body);
+    return Response.json({ answer: { kind: 'answer', summary: 'Verbas.', sourcesSay: [{ title: 'CLT', text: 'Aviso.', ref: 1 }], sources: [{ ref: 1, why: 'x' }], warnings: [] } });
+  });
+  api.state.mode = 'oficial';
+  await api.submitMessage('Fui demitido sem justa causa. Quais verbas eu tenho direito de receber?');
+  assert.equal(api.state.conversations[0].messages.at(-1).status, 'done');
+  assert.deepEqual(prepares, ['relevance'], 'a recognised subject skips the search preparation');
+  const sent = answers[0].excerpts.map(e => e.name + ' ' + e.article + ' ' + e.excerpt);
+  for (const expected of [/8\.036[\s\S]*quarenta por cento/, /7\.998[\s\S]*seguro-desemprego/, /4\.090[\s\S]*Ocorrendo rescisão, sem justa causa/, /5\.452[\s\S]*aviso/i])
+    assert.ok(sent.some(text => expected.test(text)), 'missing ' + expected + ' in ' + answers[0].excerpts.map(e => e.name.slice(0, 20) + ' ' + e.article).join(', '));
+});
+
+test('a traffic offence brings the articles with the value of the fine and the points', async t => {
+  const answers = [];
+  const { api } = setup(t, async (url, options) => {
+    const local = lawFetch(String(url)); if (local) return local;
+    const body = JSON.parse(options.body);
+    if (body.op === 'search') return Response.json({ results: [] });
+    if (body.op === 'prepare') {
+      if (!body.catalog.some(law => /^passage-/.test(law.id))) return Response.json({ terms: ['celular', 'dirigir'], laws: ['l9503'] });
+      const pick = body.catalog.find(law => /Art\. 252\b/.test(law.name));
+      return Response.json({ terms: [], laws: pick ? [pick.id] : [] });
+    }
+    answers.push(body);
+    return Response.json({ answer: { kind: 'answer', summary: 'Gravíssima.', sourcesSay: [{ title: 'CTB', text: 'Gravíssima.', ref: 1 }], sources: [{ ref: 1, why: 'x' }], warnings: [] } });
+  });
+  api.state.mode = 'oficial';
+  await api.submitMessage('Qual é a multa por dirigir mexendo no celular?');
+  const excerpts = answers[0].excerpts;
+  assert.ok(excerpts.some(e => e.article === 'Art. 252'), excerpts.map(e => e.article).join(', '));
+  assert.ok(excerpts.some(e => e.article === 'Art. 258' && /293,47/.test(e.excerpt)), 'value of the fine');
+  assert.ok(excerpts.some(e => e.article === 'Art. 259' && /gravíssima - sete pontos/.test(e.excerpt)), 'points');
+});
